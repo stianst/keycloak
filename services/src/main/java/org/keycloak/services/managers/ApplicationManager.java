@@ -1,5 +1,10 @@
 package org.keycloak.services.managers;
 
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
 import org.keycloak.models.*;
 import org.keycloak.representations.idm.*;
 
@@ -32,6 +37,17 @@ public class ApplicationManager {
                 realm.updateCredential(resourceUser, credential);
             }
         }
+        if (resourceRep.getRedirectUris() != null) {
+            for (String redirectUri : resourceRep.getRedirectUris()) {
+                resourceUser.addRedirectUri(redirectUri);
+            }
+        }
+        if (resourceRep.getWebOrigins() != null) {
+            for (String webOrigin : resourceRep.getWebOrigins()) {
+                resourceUser.addWebOrigin(webOrigin);
+            }
+        }
+
         realm.grantRole(resourceUser, loginRole);
 
 
@@ -82,6 +98,15 @@ public class ApplicationManager {
         resource.setSurrogateAuthRequired(rep.isSurrogateAuthRequired());
         resource.updateApplication();
 
+        List<String> redirectUris = rep.getRedirectUris();
+        if (redirectUris != null) {
+            resource.getApplicationUser().setRedirectUris(new HashSet<String>(redirectUris));
+        }
+
+        List<String> webOrigins = rep.getWebOrigins();
+        if (webOrigins != null) {
+            resource.getApplicationUser().setWebOrigins(new HashSet<String>(webOrigins));
+        }
     }
 
     public ApplicationRepresentation toRepresentation(ApplicationModel applicationModel) {
@@ -92,6 +117,17 @@ public class ApplicationManager {
         rep.setAdminUrl(applicationModel.getManagementUrl());
         rep.setSurrogateAuthRequired(applicationModel.isSurrogateAuthRequired());
         rep.setBaseUrl(applicationModel.getBaseUrl());
+
+        Set<String> redirectUris = applicationModel.getApplicationUser().getRedirectUris();
+        if (redirectUris != null) {
+            rep.setRedirectUris(new LinkedList<String>(redirectUris));
+        }
+
+        Set<String> webOrigins = applicationModel.getApplicationUser().getWebOrigins();
+        if (webOrigins != null) {
+            rep.setWebOrigins(new LinkedList<String>(webOrigins));
+        }
+
         return rep;
 
     }
