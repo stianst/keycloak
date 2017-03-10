@@ -10,7 +10,7 @@ fi
 
 if [ $1 == "group1" ]; then
     cd testsuite/integration-arquillian/tests/base
-    mvn test -B -Dtest=org.keycloak.testsuite.ad*.**.*Test
+    mvn test -B -Dtest=org.keycloak.testsuite.account.AccountTest
 fi
 
 if [ $1 == "group2" ]; then

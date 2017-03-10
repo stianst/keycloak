@@ -13,11 +13,6 @@ env:
     - MAVEN_OPTS="-Xms512m -Xmx2048m"
   matrix:
     - TESTS=group1
-    - TESTS=group2
-    - TESTS=group3
-    - TESTS=group4
-    - TESTS=adapter
-    - TESTS=old
 
 jdk:
   - oraclejdk8
@@ -26,7 +21,7 @@ before_script:
   - export MAVEN_SKIP_RC=true
 
 install: 
-  - travis_wait 60 mvn install -Pdistribution -DskipTests=true -B -V -q
+  - travis_wait 60 mvn install -Pdistribution -DskipTests=true -B
 
 script:
   - ./travis-run-tests.sh $TESTS

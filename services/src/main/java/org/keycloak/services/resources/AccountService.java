@@ -44,6 +44,7 @@ import org.keycloak.models.UserSessionModel;
 import org.keycloak.models.utils.CredentialValidation;
 import org.keycloak.models.utils.FormMessage;
 import org.keycloak.models.utils.ModelToRepresentation;
+import org.keycloak.profile.ProfileProvider;
 import org.keycloak.protocol.oidc.OIDCLoginProtocol;
 import org.keycloak.protocol.oidc.utils.RedirectUtils;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -57,6 +58,7 @@ import org.keycloak.services.managers.ClientSessionCode;
 import org.keycloak.services.managers.UserSessionManager;
 import org.keycloak.services.messages.Messages;
 import org.keycloak.services.util.ResolveRelative;
+import org.keycloak.services.validation.FormValidationContext;
 import org.keycloak.services.validation.Validation;
 import org.keycloak.storage.ReadOnlyException;
 import org.keycloak.util.JsonSerialization;
@@ -384,7 +386,10 @@ public class AccountService extends AbstractSecuredLocalService {
 
         event.event(EventType.UPDATE_PROFILE).client(auth.getClient()).user(auth.getUser());
 
-        List<FormMessage> errors = Validation.validateUpdateProfileForm(realm.isEditUsernameAllowed(), formData);
+        FormValidationContext validationContext = new FormValidationContext(session, user, formData);
+        session.getProvider(ProfileProvider.class).validate(validationContext);
+        List<FormMessage> errors = validationContext.getErrors();
+
         if (errors != null && !errors.isEmpty()) {
             setReferrerOnPage();
             return account.setErrors(errors).setProfileFormData(formData).createResponse(AccountPages.ACCOUNT);

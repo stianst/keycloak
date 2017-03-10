@@ -34,60 +34,16 @@ import java.util.regex.Pattern;
 
 public class Validation {
 
-    public static final String FIELD_PASSWORD_CONFIRM = "password-confirm";
     public static final String FIELD_EMAIL = "email";
     public static final String FIELD_LAST_NAME = "lastName";
     public static final String FIELD_FIRST_NAME = "firstName";
-    public static final String FIELD_PASSWORD = "password";
     public static final String FIELD_USERNAME = "username";
     
     // Actually allow same emails like angular. See ValidationTest.testEmailValidation()
     private static final Pattern EMAIL_PATTERN = Pattern.compile("[a-zA-Z0-9!#$%&'*+/=?^_`{|}~.-]+@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*");
 
-    public static List<FormMessage> validateRegistrationForm(KeycloakSession session, RealmModel realm, MultivaluedMap<String, String> formData, List<String> requiredCredentialTypes, PasswordPolicy policy) {
-        List<FormMessage> errors = new ArrayList<>();
-
-        if (!realm.isRegistrationEmailAsUsername() && isBlank(formData.getFirst(FIELD_USERNAME))) {
-            addError(errors, FIELD_USERNAME, Messages.MISSING_USERNAME);
-        }
-
-        if (isBlank(formData.getFirst(FIELD_FIRST_NAME))) {
-            addError(errors, FIELD_FIRST_NAME, Messages.MISSING_FIRST_NAME);
-        }
-
-        if (isBlank(formData.getFirst(FIELD_LAST_NAME))) {
-            addError(errors, FIELD_LAST_NAME, Messages.MISSING_LAST_NAME);
-        }
-
-        if (isBlank(formData.getFirst(FIELD_EMAIL))) {
-            addError(errors, FIELD_EMAIL, Messages.MISSING_EMAIL);
-        } else if (!isEmailValid(formData.getFirst(FIELD_EMAIL))) {
-            addError(errors, FIELD_EMAIL, Messages.INVALID_EMAIL);
-        }
-
-        if (requiredCredentialTypes.contains(CredentialRepresentation.PASSWORD)) {
-            if (isBlank(formData.getFirst(FIELD_PASSWORD))) {
-                addError(errors, FIELD_PASSWORD, Messages.MISSING_PASSWORD);
-            } else if (!formData.getFirst(FIELD_PASSWORD).equals(formData.getFirst(FIELD_PASSWORD_CONFIRM))) {
-                addError(errors, FIELD_PASSWORD_CONFIRM, Messages.INVALID_PASSWORD_CONFIRM);
-            }
-        }
-
-        if (formData.getFirst(FIELD_PASSWORD) != null) {
-            PolicyError err = session.getProvider(PasswordPolicyManagerProvider.class).validate(realm.isRegistrationEmailAsUsername() ? formData.getFirst(FIELD_EMAIL) : formData.getFirst(FIELD_USERNAME), formData.getFirst(FIELD_PASSWORD));
-            if (err != null)
-                errors.add(new FormMessage(FIELD_PASSWORD, err.getMessage(), err.getParameters()));
-        }
-        
-        return errors;
-    }
-    
     private static void addError(List<FormMessage> errors, String field, String message){
         errors.add(new FormMessage(field, message));
-    }
-
-    public static List<FormMessage> validateUpdateProfileForm(MultivaluedMap<String, String> formData) {
-        return validateUpdateProfileForm(false, formData);
     }
 
     public static List<FormMessage> validateUpdateProfileForm(boolean editUsernameAllowed, MultivaluedMap<String, String> formData) {
