@@ -54,4 +54,7 @@ public class DummyProfileProvider implements ProfileProvider {
         return EMAIL_PATTERN.matcher(email).matches();
     }
 
+    @Override
+    public void close() {
+    }
 }

@@ -22,7 +22,6 @@ package org.keycloak.provider;
  */
 public interface Provider {
 
-    default void close() {
-    }
+    void close();
 
 }

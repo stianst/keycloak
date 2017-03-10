@@ -59,6 +59,21 @@ public interface UserStorageProviderFactory<T extends UserStorageProvider> exten
     String getId();
 
     @Override
+    default void init(Config.Scope config) {
+
+    }
+
+    @Override
+    default void postInit(KeycloakSessionFactory factory) {
+
+    }
+
+    @Override
+    default void close() {
+
+    }
+
+    @Override
     default String getHelpText() {
         return "";
     }
