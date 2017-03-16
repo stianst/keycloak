@@ -1094,7 +1094,7 @@ public class IdentityBrokerService implements IdentityProvider.AuthenticationCal
         FormMessage errorMessage = new FormMessage(message, parameters);
         try {
             String serializedError = JsonSerialization.writeValueAsString(errorMessage);
-            authSession.setAuthNote(AccountService.ACCOUNT_MGMT_FORWARDED_ERROR_NOTE, serializedError);
+            clientSession.setNote(DeprecatedAccountFormService.ACCOUNT_MGMT_FORWARDED_ERROR_NOTE, serializedError);
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
         }
