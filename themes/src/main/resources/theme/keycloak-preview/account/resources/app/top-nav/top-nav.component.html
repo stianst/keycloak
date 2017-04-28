@@ -1,0 +1,40 @@
+<nav class="navbar navbar-pf-alt">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <a href="http://www.keycloak.org" class="navbar-brand">
+            <img type="image/svg+xml" class="navbar-brand-icon" src="{{resourceUrl}}/app/assets/img/keycloak-logo.png" alt="" width="auto" height="30px"/>
+        </a>
+    </div>
+    <nav class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+        </ul>
+        <ul class="nav navbar-nav navbar-right navbar-iconic">
+            <li class="dropdown">
+                <a class="dropdown-toggle nav-item-iconic" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    <span title="Help" class="fa pficon-help"></span>
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                    <li><a href="#">Help</a></li>
+                    <li><a href="#">About</a></li>
+                </ul>
+            </li>
+            <li class="dropdown">
+                <a class="dropdown-toggle nav-item-iconic" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    <span title="Username" class="fa pficon-user"></span>
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                    <li><a href="#">Preferences</a></li>
+                    <li><a href="#" (click)="logout()">Logout</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
+</nav> <!--/.navbar-->
