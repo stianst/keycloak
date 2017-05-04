@@ -15,16 +15,18 @@
  * limitations under the License.
  */
 
-/// <reference path="keycloak.d.ts"/>
+/*/// <reference path="keycloak.d.ts"/>*/
 
 import {Injectable} from '@angular/core';
-import InitOptions = KeycloakModule.InitOptions;
+//import InitOptions = KeycloakModule.InitOptions;
+import * as Keycloak from './keycloak';
 
 // Need to use local keycloak.js for now due to Chrome bug.
 // This is a newer version than the one obtained from the server.
-var Keycloak = require("./keycloak"); // load keycloak.js locally
+//var Keycloak = require("./keycloak"); // load keycloak.js locally
 
-type KeycloakClient = KeycloakModule.KeycloakClient;
+type KeycloakClient = Keycloak.KeycloakClient;
+type InitOptions = Keycloak.InitOptions;
 
 @Injectable()
 export class KeycloakService {

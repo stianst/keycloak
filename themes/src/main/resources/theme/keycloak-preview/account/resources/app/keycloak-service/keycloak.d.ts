@@ -14,17 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-declare module KeycloakModule {
 
-    export interface Promise {
+export as namespace Keycloak;
+
+export = Keycloak;
+
+declare function Keycloak(config?: string|{}): Keycloak.KeycloakClient;
+
+declare namespace Keycloak {
+
+    interface Promise {
         success(callback: Function): Promise;
         error(callback: Function): Promise;
     }
 
-    export type ResponseModes = "query" | "fragment";
-    export type Flows = "standard" | "implicit" | "hybrid";
+    type ResponseModes = "query" | "fragment";
+    type Flows = "standard" | "implicit" | "hybrid";
     
-    export interface InitOptions {
+    interface InitOptions {
         checkLoginIframe?: boolean;
         checkLoginIframeInterval?: number;
         onLoad?: string;
@@ -37,7 +44,7 @@ declare module KeycloakModule {
         timeSkew?: number;
     }
 
-    export interface LoginOptions {
+    interface LoginOptions {
         redirectUri?: string;
         prompt?: string;
         maxAge?: number;
@@ -46,15 +53,15 @@ declare module KeycloakModule {
         locale?: string;
     }
     
-    export interface LogoutOptions {
+    interface LogoutOptions {
         redirectUri?: string;
     }
 
-    export interface RedirectUriOptions {
+    interface RedirectUriOptions {
         redirectUri?: string;
     }
 
-    export interface KeycloakClient {
+    interface KeycloakClient {
         init(options?: InitOptions): Promise;
         login(options?: LoginOptions): Promise;
         logout(options?: LogoutOptions): Promise;
@@ -100,7 +107,3 @@ declare module KeycloakModule {
         onTokenExpired: Function;
     }
 }
-
-declare var Keycloak: {
-    new(config?: any): KeycloakModule.KeycloakClient;
-};
