@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 import {Component, OnInit} from '@angular/core';
-
 import {KeycloakService} from '../keycloak-service/keycloak.service'
 
 declare const resourceUrl: string;
@@ -28,8 +27,18 @@ declare const resourceUrl: string;
 export class TopNavComponent implements OnInit {
 
     public resourceUrl: string = resourceUrl;
+    public referrer: string;
+    public referrerUri: string;
 
     constructor(private keycloakService: KeycloakService) {
+        this.referrer = this.getQueryParam("referrer");
+        this.referrerUri = this.getQueryParam("referrerUri");
+    }
+
+    // If this is not fixed, I will need to parse the referrer from window.location
+    // https://github.com/angular/angular/issues/12664
+    getQueryParam(param: string): string {
+        return '';
     }
 
     ngOnInit() {
