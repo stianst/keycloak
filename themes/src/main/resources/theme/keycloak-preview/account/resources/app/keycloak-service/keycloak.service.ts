@@ -15,18 +15,15 @@
  * limitations under the License.
  */
 
-/*/// <reference path="keycloak.d.ts"/>*/
-
 import {Injectable} from '@angular/core';
-//import InitOptions = KeycloakModule.InitOptions;
 import * as Keycloak from './keycloak';
 
 // Need to use local keycloak.js for now due to Chrome bug.
 // This is a newer version than the one obtained from the server.
 //var Keycloak = require("./keycloak"); // load keycloak.js locally
 
-type KeycloakClient = Keycloak.KeycloakClient;
-type InitOptions = Keycloak.InitOptions;
+type KeycloakClient = Keycloak.KeycloakInstance;
+type InitOptions = Keycloak.KeycloakInitOptions;
 
 @Injectable()
 export class KeycloakService {
@@ -41,11 +38,11 @@ export class KeycloakService {
      *                       for details.
      * @returns {Promise<T>}
      */
-    static init(configOptions?: any, adapterOptions?: InitOptions): Promise<any> {
+    static init(configOptions?: string|{}, initOptions?: InitOptions): Promise<any> {
         KeycloakService.keycloakAuth = Keycloak(configOptions);
 
         return new Promise((resolve, reject) => {
-            KeycloakService.keycloakAuth.init(adapterOptions)
+            KeycloakService.keycloakAuth.init(initOptions)
                 .success(() => {
                     resolve();
                 })
@@ -69,6 +66,14 @@ export class KeycloakService {
 
     account() {
         KeycloakService.keycloakAuth.accountManagement();
+    }
+    
+    authServerUrl(): string {
+        return KeycloakService.keycloakAuth.authServerUrl;
+    }
+    
+    realm(): string {
+        return KeycloakService.keycloakAuth.realm;
     }
 
     getToken(): Promise<string> {

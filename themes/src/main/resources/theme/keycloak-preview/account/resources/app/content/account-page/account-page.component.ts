@@ -15,18 +15,44 @@
  * limitations under the License.
  */
 import {Component, OnInit} from '@angular/core';
+import {Http, Response} from '@angular/http';
+
+import {AbstractContent} from '../abstract-content/abstract.content';
+import {KeycloakService} from '../../keycloak-service/keycloak.service';
 
 @Component({
     selector: 'app-account-page',
     templateUrl: './account-page.component.html',
     styleUrls: ['./account-page.component.css']
 })
-export class AccountPageComponent implements OnInit {
+export class AccountPageComponent extends AbstractContent implements OnInit {
+    
+    
+    private account: Account = {};
 
-    constructor() {
+    constructor(protected http: Http, protected kcSvc: KeycloakService) {
+        super(http, kcSvc);
+        super.request("/");
+    }
+    
+    protected handleResponse(res: Response) {
+      this.account = res.json();
+      console.log('**** response from account REST API ***');
+      console.log(JSON.stringify(this.account));
+      console.log('***************************************');
     }
 
     ngOnInit() {
     }
+    
+}
 
+class Account {
+    constructor(username: string, 
+                emailVerified: boolean,
+                firstName?: string, 
+                lastName?: string, 
+                email?: string, 
+                attributes?: Object){
+    }
 }
