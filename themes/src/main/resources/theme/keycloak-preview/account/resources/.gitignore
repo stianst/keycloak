@@ -10,6 +10,7 @@ keycloak.json
 
 # ignore libraries (for now?)
 node_modules
+node
 
 # Don't ignore these
 !keycloak.js
