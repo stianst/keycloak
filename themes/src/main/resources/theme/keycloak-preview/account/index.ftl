@@ -56,9 +56,9 @@
           media="screen, print">
     <link href="${resourceUrl}/node_modules/patternfly/dist/css/patternfly-additions.min.css" rel="stylesheet"
           media="screen, print">
-    <script src="${resourceUrl}/node_modules/patternfly/node_modules/jquery/dist/jquery.min.js"></script>
-    <script src="${resourceUrl}/node_modules/patternfly/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script src="${resourceUrl}/node_modules/patternfly/node_modules/jquery-match-height/dist/jquery.matchHeight-min.js"></script>
+    <script src="${resourceUrl}/node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="${resourceUrl}/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="${resourceUrl}/node_modules/jquery-match-height/dist/jquery.matchHeight-min.js"></script>
     <script src="${resourceUrl}/node_modules/patternfly/dist/js/patternfly.min.js"></script>
 
     <!-- Polyfill(s) for older browsers -->

@@ -25,13 +25,21 @@ import {KeycloakService} from '../../keycloak-service/keycloak.service';
         this.accountUrl = kcSvc.authServerUrl() + '/realms/' + kcSvc.realm() + '/account';
     }
     
-    protected request(endpoint: string) {
+    protected doGetRequest(endpoint: string) {
         this.http.get(this.accountUrl + endpoint)
-            .subscribe((res: Response) => this.handleResponse(res),
+            .subscribe((res: Response) => this.handleGetResponse(res),
                        (error: Response) => this.handleServiceError(error));
     }
     
-    protected abstract handleResponse(res: Response): void;
+    protected abstract handleGetResponse(res: Response): void;
+    
+    protected doPostRequest(endpoint: string, body: any) {
+        this.http.post(this.accountUrl + endpoint, body)
+            .subscribe((res: Response) => this.handlePostResponse(res),
+                       (error: Response) => this.handleServiceError(error));
+    }
+    
+    protected abstract handlePostResponse(res: Response): void;
     
     private handleServiceError(error: Response) {
       console.log('**** ERROR!!!! ***');

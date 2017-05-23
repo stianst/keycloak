@@ -27,18 +27,28 @@ import {KeycloakService} from '../../keycloak-service/keycloak.service';
 })
 export class AccountPageComponent extends AbstractContent implements OnInit {
     
-    
     private account: Account = {};
 
     constructor(protected http: Http, protected kcSvc: KeycloakService) {
         super(http, kcSvc);
-        super.request("/");
+        super.doGetRequest("/");
     }
     
-    protected handleResponse(res: Response) {
+    public saveAccount() {
+        console.log("posting: " + JSON.stringify(this.account));
+        super.doPostRequest("/", this.account);
+    }
+    
+    protected handleGetResponse(res: Response) {
       this.account = res.json();
       console.log('**** response from account REST API ***');
       console.log(JSON.stringify(this.account));
+      console.log('***************************************');
+    }
+    
+    protected handlePostResponse(res: Response) {
+      console.log('**** response from account POST ***');
+      console.log(JSON.stringify(res));
       console.log('***************************************');
     }
 
