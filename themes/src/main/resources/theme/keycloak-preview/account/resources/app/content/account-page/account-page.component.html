@@ -4,7 +4,6 @@
 
 <div class="col-sm-9 content-area">
 
-
     <div class="row">
         <div class="col-md-10">
         </div>
@@ -14,9 +13,7 @@
         <hr/>
     </div>
 
-    <form #f="ngForm" (ngSubmit)="saveAccount()" class="form-horizontal">
-
-        <input id="stateChecker" name="stateChecker" value="7L6A5K0Mghuc4cm2DBF78rIMI5140AnKc01_q3Pj-4o" type="hidden">
+    <form #f="ngForm" (ngSubmit)="saveAccount(f)" class="form-horizontal">
 
         <div class="form-group ">
             <div class="col-sm-2 col-md-2">
@@ -61,8 +58,7 @@
         <div class="form-group">
             <div id="kc-form-buttons" class="col-md-offset-2 col-md-10 submit">
                 <div class="">
-
-                    <button type="submit" [disabled]="!f.valid" class="btn btn-primary btn-lg" name="submitAction">Save</button>
+                    <button type="submit" [disabled]="!f.valid || !f.dirty" class="btn btn-primary btn-lg" name="submitAction">Save</button>
                 </div>
             </div>
         </div>
