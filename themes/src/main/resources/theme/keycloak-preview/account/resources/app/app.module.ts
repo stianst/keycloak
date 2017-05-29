@@ -26,6 +26,8 @@ import { KEYCLOAK_HTTP_PROVIDER } from './keycloak-service/keycloak.http';
 
 import { AppComponent } from './app.component';
 import { TopNavComponent } from './top-nav/top-nav.component';
+import { NotificationComponent } from './top-nav/notification.component';
+import {ToastNotifier} from './top-nav/toast.notifier';
 import { SideNavComponent } from './side-nav/side-nav.component';
 import { AccountPageComponent } from './content/account-page/account-page.component';
 import { PasswordPageComponent } from './content/password-page/password-page.component';
@@ -48,6 +50,7 @@ const routes: Routes = [
 const decs = [
     AppComponent,
     TopNavComponent,
+    NotificationComponent,
     SideNavComponent,
     AccountPageComponent,
     PasswordPageComponent,
@@ -68,6 +71,7 @@ const decs = [
   providers: [
     KeycloakService,
     KEYCLOAK_HTTP_PROVIDER,
+    ToastNotifier,
     { provide: LocationStrategy, useClass: HashLocationStrategy }
   ],
   bootstrap: [AppComponent]

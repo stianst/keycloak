@@ -16,7 +16,9 @@
  */
 import {Component, OnInit} from '@angular/core';
 import {Http, Response} from '@angular/http';
+import {FormGroup} from '@angular/forms';
 
+import {ToastNotifier, ToastNotification} from '../../top-nav/toast.notifier';
 import {AbstractContent} from '../abstract-content/abstract.content';
 import {KeycloakService} from '../../keycloak-service/keycloak.service';
 
@@ -29,14 +31,16 @@ export class AccountPageComponent extends AbstractContent implements OnInit {
     
     private account: Account = {};
 
-    constructor(protected http: Http, protected kcSvc: KeycloakService) {
-        super(http, kcSvc);
+    constructor(protected http: Http, protected kcSvc: KeycloakService, protected notifier: ToastNotifier) {
+        super(http, kcSvc, notifier);
         super.doGetRequest("/");
     }
     
-    public saveAccount() {
+    public saveAccount(formGroup: FormGroup) {
+        console.log("from formGroup: " + JSON.stringify(formGroup.value));
         console.log("posting: " + JSON.stringify(this.account));
-        super.doPostRequest("/", this.account);
+        super.doPostRequest("/", formGroup.value);
+        formGroup.reset(this.account);
     }
     
     protected handleGetResponse(res: Response) {
@@ -47,6 +51,7 @@ export class AccountPageComponent extends AbstractContent implements OnInit {
     }
     
     protected handlePostResponse(res: Response) {
+      //super.doGetRequest("/");
       console.log('**** response from account POST ***');
       console.log(JSON.stringify(res));
       console.log('***************************************');

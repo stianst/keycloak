@@ -55,6 +55,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.keycloak.models.ModelDuplicateException;
+import org.keycloak.services.ErrorResponse;
 
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
@@ -130,7 +132,12 @@ public class AccountService {
         event.event(EventType.UPDATE_PROFILE).client(auth.getClient()).user(auth.getUser());
 
         AccountUtils.updateUsername(userRep.getUsername(), user, session);
-        AccountUtils.updateEmail(userRep.getEmail(), user, session, event);
+        
+        try {
+            AccountUtils.updateEmail(userRep.getEmail(), user, session, event);
+        } catch (ModelDuplicateException e) {
+            return ErrorResponse.exists("User with email " + userRep.getEmail() + " already exists.");
+        }
 
         user.setFirstName(userRep.getFirstName());
         user.setLastName(userRep.getLastName());
