@@ -15,6 +15,9 @@
  * limitations under the License.
  */
 import {Component, OnInit} from '@angular/core';
+import {Response} from '@angular/http';
+
+import {AccountServiceClient} from '../../account-service/account.service';
 
 @Component({
     selector: 'app-sessions-page',
@@ -23,9 +26,34 @@ import {Component, OnInit} from '@angular/core';
 })
 export class SessionsPageComponent implements OnInit {
 
-    constructor() {
+    private response: any[] = [];
+    
+    constructor(private accountSvc: AccountServiceClient ) {
+        accountSvc.doGetRequest("/sessions", (res: Response) => this.handleGetResponse(res));
     }
 
+    private handleGetResponse(res: Response) {
+      console.log('**** response from account REST API ***');
+      console.log(JSON.stringify(res));
+      console.log('*** res.json() ***');
+      console.log(JSON.stringify(res.json()));
+      console.log('***************************************');
+      this.response = res.json();
+    }
+    
+    private logoutAllSessions() {
+        this.accountSvc.doDelete("/sessions", 
+                                (res: Response) => this.handleLogoutResponse(res), 
+                                {params: {current: true}},
+                                "Logging out all sessions.");
+    }
+    
+    private handleLogoutResponse(res: Response) {
+      console.log('**** response from account DELETE ***');
+      console.log(JSON.stringify(res));
+      console.log('***************************************');
+    }
+    
     ngOnInit() {
     }
 

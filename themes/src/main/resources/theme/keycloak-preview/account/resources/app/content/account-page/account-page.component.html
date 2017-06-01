@@ -13,7 +13,7 @@
         <hr/>
     </div>
 
-    <form #f="ngForm" (ngSubmit)="saveAccount(f)" class="form-horizontal">
+    <form #formGroup="ngForm" (ngSubmit)="saveAccount()" class="form-horizontal">
 
         <div class="form-group ">
             <div class="col-sm-2 col-md-2">
@@ -21,7 +21,7 @@
             </div>
 
             <div class="col-sm-10 col-md-10">
-                <input class="form-control" id="username" name="username" disabled="disabled" [ngModel]="account.username" type="text">
+                <input type="text" class="form-control" id="username" name="username" disabled value="{{username}}" >
             </div>
         </div>
 
@@ -31,7 +31,7 @@
             </div>
 
             <div class="col-sm-10 col-md-10">
-                <input class="form-control" id="email" name="email" required autofocus="" [(ngModel)]="account.email" type="text">
+                <input type="email" class="form-control" id="email" name="email" required autofocus="" ngModel type="text">
             </div>
         </div>
 
@@ -41,7 +41,7 @@
             </div>
 
             <div class="col-sm-10 col-md-10">
-                <input class="form-control" id="firstName" required name="firstName" [(ngModel)]="account.firstName" type="text">
+                <input class="form-control" id="firstName" required name="firstName" ngModel type="text">
             </div>
         </div>
 
@@ -51,14 +51,14 @@
             </div>
 
             <div class="col-sm-10 col-md-10">
-                <input class="form-control" id="lastName" required name="lastName" [(ngModel)]="account.lastName" type="text">
+                <input class="form-control" id="lastName" required name="lastName" ngModel type="text">
             </div>
         </div>
 
         <div class="form-group">
             <div id="kc-form-buttons" class="col-md-offset-2 col-md-10 submit">
                 <div class="">
-                    <button type="submit" [disabled]="!f.valid || !f.dirty" class="btn btn-primary btn-lg" name="submitAction">Save</button>
+                    <button type="submit" [disabled]="!formGroup.valid || !formGroup.dirty" class="btn btn-primary btn-lg" name="submitAction">Save</button>
                 </div>
             </div>
         </div>
