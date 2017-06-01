@@ -62,7 +62,6 @@ export class AccountPageComponent implements OnInit {
     }
     
     protected handlePostResponse(res: Response) {
-      //super.doGetRequest("/");
       console.log('**** response from account POST ***');
       console.log(JSON.stringify(res));
       console.log('***************************************');
