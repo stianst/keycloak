@@ -24,6 +24,8 @@ import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 import { KeycloakService } from './keycloak-service/keycloak.service';
 import { KEYCLOAK_HTTP_PROVIDER } from './keycloak-service/keycloak.http';
 
+import { AccountServiceClient } from './account-service/account.service'
+
 import { AppComponent } from './app.component';
 import { TopNavComponent } from './top-nav/top-nav.component';
 import { NotificationComponent } from './top-nav/notification.component';
@@ -71,6 +73,7 @@ const decs = [
   providers: [
     KeycloakService,
     KEYCLOAK_HTTP_PROVIDER,
+    AccountServiceClient,
     ToastNotifier,
     { provide: LocationStrategy, useClass: HashLocationStrategy }
   ],

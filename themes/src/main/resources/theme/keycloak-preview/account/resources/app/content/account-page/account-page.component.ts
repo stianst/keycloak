@@ -14,44 +14,48 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {Component, OnInit} from '@angular/core';
-import {Http, Response} from '@angular/http';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {Response} from '@angular/http';
 import {FormGroup} from '@angular/forms';
 
-import {ToastNotifier, ToastNotification} from '../../top-nav/toast.notifier';
-import {AbstractContent} from '../abstract-content/abstract.content';
-import {KeycloakService} from '../../keycloak-service/keycloak.service';
+import {AccountServiceClient} from '../../account-service/account.service';
 
 @Component({
     selector: 'app-account-page',
     templateUrl: './account-page.component.html',
     styleUrls: ['./account-page.component.css']
 })
-export class AccountPageComponent extends AbstractContent implements OnInit {
+export class AccountPageComponent implements OnInit {
     
-    private account: Account = {};
+    @ViewChild('formGroup') private formGroup: FormGroup;
+    
+    // using ordinary variable here
+    // disabled fields not working properly with FormGroup
+    // FormGroup.getRawValue() causes page refresh.  Not sure why?
+    private username: string;
 
-    constructor(protected http: Http, protected kcSvc: KeycloakService, protected notifier: ToastNotifier) {
-        super(http, kcSvc, notifier);
-        super.doGetRequest("/");
+    constructor(private accountSvc: AccountServiceClient ) {
+        accountSvc.doGetRequest("/", (res: Response) => this.handleGetResponse(res));
     }
     
-    public saveAccount(formGroup: FormGroup) {
-        console.log("from formGroup: " + JSON.stringify(formGroup.value));
-        console.log("posting: " + JSON.stringify(this.account));
-        super.doPostRequest("/", formGroup.value);
-        formGroup.reset(this.account);
+    public saveAccount() {
+        console.log("posting: " + JSON.stringify(this.formGroup.value));
+        this.accountSvc.doPostRequest("/", (res: Response) => this.handlePostResponse(res), this.formGroup.value);
+        this.formGroup.reset(this.formGroup.value);
     }
     
     protected handleGetResponse(res: Response) {
-      this.account = res.json();
+      const response: any = res.json();
+      this.username = response.username;
+      this.formGroup.reset(response);
       console.log('**** response from account REST API ***');
-      console.log(JSON.stringify(this.account));
+      console.log(JSON.stringify(res));
+      console.log('*** formGroup ***');
+      console.log(JSON.stringify(this.formGroup.value));
       console.log('***************************************');
     }
     
     protected handlePostResponse(res: Response) {
-      //super.doGetRequest("/");
       console.log('**** response from account POST ***');
       console.log(JSON.stringify(res));
       console.log('***************************************');
@@ -60,14 +64,4 @@ export class AccountPageComponent extends AbstractContent implements OnInit {
     ngOnInit() {
     }
     
-}
-
-class Account {
-    constructor(username: string, 
-                emailVerified: boolean,
-                firstName?: string, 
-                lastName?: string, 
-                email?: string, 
-                attributes?: Object){
-    }
 }
