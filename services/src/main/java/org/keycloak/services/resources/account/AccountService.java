@@ -17,22 +17,21 @@
 package org.keycloak.services.resources.account;
 
 import org.jboss.logging.Logger;
-import org.jboss.resteasy.annotations.Query;
 import org.jboss.resteasy.spi.HttpRequest;
-import org.keycloak.common.Profile;
 import org.keycloak.events.EventBuilder;
 import org.keycloak.events.EventStoreProvider;
 import org.keycloak.events.EventType;
 import org.keycloak.models.AccountRoles;
 import org.keycloak.models.ClientModel;
-import org.keycloak.models.ClientSessionModel;
 import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.ModelDuplicateException;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.UserSessionModel;
 import org.keycloak.representations.account.ClientRepresentation;
 import org.keycloak.representations.account.SessionRepresentation;
 import org.keycloak.representations.account.UserRepresentation;
+import org.keycloak.services.ErrorResponse;
 import org.keycloak.services.managers.Auth;
 import org.keycloak.services.managers.AuthenticationManager;
 import org.keycloak.services.resources.Cors;
@@ -40,8 +39,6 @@ import org.keycloak.services.resources.Cors;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.NotSupportedException;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -55,8 +52,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.keycloak.models.ModelDuplicateException;
-import org.keycloak.services.ErrorResponse;
 
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
@@ -174,24 +169,20 @@ public class AccountService {
         List<SessionRepresentation> reps = new LinkedList<>();
 
         List<UserSessionModel> sessions = session.sessions().getUserSessions(realm, user);
-        for (UserSessionModel session : sessions) {
+        for (UserSessionModel s : sessions) {
             SessionRepresentation rep = new SessionRepresentation();
-            rep.setId(session.getId());
-            rep.setIpAddress(session.getIpAddress());
-            rep.setStarted(session.getStarted());
-            rep.setLastAccess(session.getLastSessionRefresh());
-            rep.setExpires(session.getStarted() + realm.getSsoSessionMaxLifespan());
+            rep.setId(s.getId());
+            rep.setIpAddress(s.getIpAddress());
+            rep.setStarted(s.getStarted());
+            rep.setLastAccess(s.getLastSessionRefresh());
+            rep.setExpires(s.getStarted() + realm.getSsoSessionMaxLifespan());
             rep.setClients(new LinkedList());
 
-            Set<ClientModel> clients = new HashSet<>();
-            for (ClientSessionModel cs : session.getClientSessions()) {
-                clients.add(cs.getClient());
-            }
-
-            for (ClientModel c : clients) {
+            for (String clientUUID : s.getAuthenticatedClientSessions().keySet()) {
+                ClientModel client = realm.getClientById(clientUUID);
                 ClientRepresentation clientRep = new ClientRepresentation();
-                clientRep.setClientId(c.getClientId());
-                clientRep.setClientName(c.getName());
+                clientRep.setClientId(client.getClientId());
+                clientRep.setClientName(client.getName());
                 rep.getClients().add(clientRep);
             }
 

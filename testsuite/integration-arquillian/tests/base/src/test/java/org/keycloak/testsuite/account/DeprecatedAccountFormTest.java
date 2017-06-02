@@ -156,7 +156,6 @@ public class DeprecatedAccountFormTest extends AbstractTestRealmKeycloakTest {
 
     @Before
     public void before() {
-        oauth.state("mystate"); // keycloak enforces that a state param has been sent by client
         userId = findUser("test-user@localhost").getId();
 
         // Revert any password policy and user password changes
@@ -852,7 +851,6 @@ public class DeprecatedAccountFormTest extends AbstractTestRealmKeycloakTest {
         try {
             OAuthClient oauth2 = new OAuthClient();
             oauth2.init(adminClient, driver2);
-            oauth2.state("mystate");
             oauth2.doLogin("view-sessions", "password");
 
             EventRepresentation login2Event = events.expectLogin().user(userId).detail(Details.USERNAME, "view-sessions").assertEvent();

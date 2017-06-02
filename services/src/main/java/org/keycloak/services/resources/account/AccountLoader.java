@@ -78,7 +78,7 @@ public class AccountLoader {
 
         if (request.getHttpMethod().equals(HttpMethod.OPTIONS)) {
             return new CorsPreflightService(request);
-        } else if (accepts.contains(MediaType.APPLICATION_JSON_TYPE) || MediaType.APPLICATION_JSON_TYPE.equals(content)) {
+        } else if (accepts.contains(MediaType.APPLICATION_JSON_TYPE) || MediaType.APPLICATION_JSON_TYPE.equals(content) && !request.getUri().getPath().endsWith("keycloak.json")) {
             AuthenticationManager.AuthResult authResult = new AppAuthManager().authenticateBearerToken(session);
             if (authResult == null) {
                 throw new NotAuthorizedException("Bearer token required");

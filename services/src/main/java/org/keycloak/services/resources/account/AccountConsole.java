@@ -1,9 +1,12 @@
 package org.keycloak.services.resources.account;
 
 import org.jboss.resteasy.annotations.cache.NoCache;
+import org.jboss.resteasy.spi.NotFoundException;
 import org.keycloak.common.Version;
-import org.keycloak.models.RealmModel;
+import org.keycloak.models.*;
+import org.keycloak.models.Constants;
 import org.keycloak.services.Urls;
+import org.keycloak.services.managers.ClientManager;
 import org.keycloak.theme.BrowserSecurityHeaderSetup;
 import org.keycloak.theme.FreeMarkerException;
 import org.keycloak.theme.FreeMarkerUtil;
@@ -12,6 +15,7 @@ import org.keycloak.utils.MediaType;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -28,7 +32,7 @@ import java.util.Map;
 public class AccountConsole {
 
     @Context
-    protected UriInfo uriInfo;
+    protected KeycloakSession session;
     private RealmModel realm;
     private Theme theme;
 
@@ -40,6 +44,7 @@ public class AccountConsole {
     @GET
     @NoCache
     public Response getMainPage() throws URISyntaxException, IOException, FreeMarkerException {
+        UriInfo uriInfo = session.getContext().getUri();
         if (!uriInfo.getRequestUri().getPath().endsWith("/")) {
             return Response.status(302).location(uriInfo.getRequestUriBuilder().path("/").build()).build();
         } else {
@@ -67,7 +72,19 @@ public class AccountConsole {
     @GET
     @Path("index.html")
     public Response getIndexHtmlRedirect() {
-        return Response.status(302).location(uriInfo.getRequestUriBuilder().path("../").build()).build();
+        return Response.status(302).location(session.getContext().getUri().getRequestUriBuilder().path("../").build()).build();
+    }
+
+    @GET
+    @Path("keycloak.json")
+    @Produces(MediaType.APPLICATION_JSON)
+    @NoCache
+    public ClientManager.InstallationAdapterConfig getConfig() {
+        ClientModel accountClient = realm.getClientByClientId(Constants.ACCOUNT_MANAGEMENT_CLIENT_ID);
+        if (accountClient == null) {
+            throw new javax.ws.rs.NotFoundException("Account console client not found");
+        }
+        return new ClientManager().toInstallationRepresentation(realm, accountClient, session.getContext().getUri().getBaseUri());
     }
 
 }
