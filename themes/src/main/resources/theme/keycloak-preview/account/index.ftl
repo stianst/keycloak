@@ -6,6 +6,7 @@
     <script>
         var authUrl = '${authUrl}';
         var baseUrl = '${baseUrl}';
+        var realm = '${realm}';
         var resourceUrl = '${resourceUrl}';
     </script>
 

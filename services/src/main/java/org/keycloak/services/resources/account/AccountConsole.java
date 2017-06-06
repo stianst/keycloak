@@ -57,6 +57,7 @@ public class AccountConsole {
 
             map.put("authUrl", authUrl);
             map.put("baseUrl", authUrl + "/realms/" + realm.getName() + "/account");
+            map.put("realm", realm.getName());
             map.put("resourceUrl", Urls.themeRoot(baseUri) + "/account/" + theme.getName());
             map.put("resourceVersion", Version.RESOURCES_VERSION);
             map.put("properties", theme.getProperties());

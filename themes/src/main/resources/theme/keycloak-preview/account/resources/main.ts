@@ -27,13 +27,15 @@ import { KeycloakService } from './app/keycloak-service/keycloak.service';
 //  enableProdMode();
 //}
 
+declare const authUrl: string;
 declare const resourceUrl: string;
+declare const realm: string;
 
 const noLogin: boolean = false; // convenient for development
 if (noLogin) {
     platformBrowserDynamic().bootstrapModule(AppModule);
 } else {
-    KeycloakService.init(resourceUrl + '/keycloak.json',
+    KeycloakService.init({url: authUrl, realm: realm, clientId: 'account'},
                          {onLoad: 'login-required'})
         .then(() => {
             platformBrowserDynamic().bootstrapModule(AppModule);
