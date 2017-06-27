@@ -96,7 +96,7 @@ public class AccountLoader {
                 accountService.init();
                 return accountService;
             } else {
-                AccountConsole console = new AccountConsole(realm, theme);
+                AccountConsole console = new AccountConsole(realm, client, theme);
                 ResteasyProviderFactory.getInstance().injectProperties(console);
                 return console;
             }

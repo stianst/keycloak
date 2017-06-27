@@ -25,6 +25,10 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import org.keycloak.models.ClientModel;
+import org.keycloak.protocol.oidc.utils.RedirectUtils;
+import org.keycloak.services.util.ResolveRelative;
+import org.keycloak.services.validation.Validation;
 
 /**
  * Created by st on 29/03/17.
@@ -33,18 +37,22 @@ public class AccountConsole {
 
     @Context
     protected KeycloakSession session;
-    private RealmModel realm;
-    private Theme theme;
+    @Context
+    protected UriInfo uriInfo;
+    
+    private final RealmModel realm;
+    private final ClientModel client;
+    private final Theme theme;
 
-    public AccountConsole(RealmModel realm, Theme theme) {
+    public AccountConsole(RealmModel realm, ClientModel client, Theme theme) {
         this.realm = realm;
+        this.client = client;
         this.theme = theme;
     }
 
     @GET
     @NoCache
     public Response getMainPage() throws URISyntaxException, IOException, FreeMarkerException {
-        UriInfo uriInfo = session.getContext().getUri();
         if (!uriInfo.getRequestUri().getPath().endsWith("/")) {
             return Response.status(302).location(uriInfo.getRequestUriBuilder().path("/").build()).build();
         } else {
@@ -60,6 +68,13 @@ public class AccountConsole {
             map.put("realm", realm.getName());
             map.put("resourceUrl", Urls.themeRoot(baseUri) + "/account/" + theme.getName());
             map.put("resourceVersion", Version.RESOURCES_VERSION);
+            
+            String[] referrer = getReferrer();
+            if (referrer != null) {
+                map.put("referrer", referrer[0]);
+                map.put("referrer_uri", referrer[1]);
+            }
+            
             map.put("properties", theme.getProperties());
 
             FreeMarkerUtil freeMarkerUtil = new FreeMarkerUtil();
@@ -86,6 +101,43 @@ public class AccountConsole {
             throw new javax.ws.rs.NotFoundException("Account console client not found");
         }
         return new ClientManager().toInstallationRepresentation(realm, accountClient, session.getContext().getUri().getBaseUri());
+    }
+    
+    private String[] getReferrer() {
+        String referrer = uriInfo.getQueryParameters().getFirst("referrer");
+        if (referrer == null) {
+            return null;
+        }
+
+        String referrerUri = uriInfo.getQueryParameters().getFirst("referrer_uri");
+
+        ClientModel referrerClient = realm.getClientByClientId(referrer);
+        if (referrerClient != null) {
+            if (referrerUri != null) {
+                referrerUri = RedirectUtils.verifyRedirectUri(uriInfo, referrerUri, realm, referrerClient);
+            } else {
+                referrerUri = ResolveRelative.resolveRelativeUri(uriInfo.getRequestUri(), client.getRootUrl(), referrerClient.getBaseUrl());
+            }
+            
+            if (referrerUri != null) {
+                String referrerName = referrerClient.getName();
+                if (Validation.isBlank(referrerName)) {
+                    referrerName = referrer;
+                }
+                return new String[]{referrerName, referrerUri};
+            }
+        } else if (referrerUri != null) {
+            referrerClient = realm.getClientByClientId(referrer);
+            if (client != null) {
+                referrerUri = RedirectUtils.verifyRedirectUri(uriInfo, referrerUri, realm, referrerClient);
+
+                if (referrerUri != null) {
+                    return new String[]{referrer, referrerUri};
+                }
+            }
+        }
+
+        return null;
     }
 
 }

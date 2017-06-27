@@ -52,8 +52,22 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.UriInfo;
+import org.keycloak.common.ClientConnection;
+import org.keycloak.credential.CredentialModel;
+import org.keycloak.events.Details;
+import org.keycloak.events.Errors;
 import org.keycloak.models.ModelDuplicateException;
+import org.keycloak.models.ModelException;
+import org.keycloak.models.UserCredentialModel;
+import org.keycloak.models.utils.FormMessage;
 import org.keycloak.services.ErrorResponse;
+import org.keycloak.services.ServicesLogger;
+import org.keycloak.services.messages.Messages;
+import org.keycloak.services.validation.Validation;
+import org.keycloak.storage.ReadOnlyException;
+import org.keycloak.theme.beans.MessageType;
 
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
@@ -64,20 +78,38 @@ public class AccountService {
 
     @Context
     private HttpRequest request;
+    @Context
+    protected UriInfo uriInfo;
+    @Context
+    protected HttpHeaders headers;
+    @Context
+    protected ClientConnection clientConnection;
 
     private final KeycloakSession session;
     private final ClientModel client;
     private final EventBuilder event;
     private EventStoreProvider eventStore;
     private Auth auth;
+    
+    private final RealmModel realm;
+    private final UserModel user;
+    
+    private List<FormMessage> messages = null;
+    private MessageType messageType = MessageType.ERROR;
+    
+    private UIMessages uiMessages;
 
     public AccountService(KeycloakSession session, Auth auth, ClientModel client, EventBuilder event) {
         this.session = session;
         this.auth = auth;
+        this.realm = auth.getRealm();
+        this.user = auth.getUser();
         this.client = client;
         this.event = event;
+        
+        this.uiMessages = new UIMessages(session, auth);
     }
-
+    
     public void init() {
         eventStore = session.getProvider(EventStoreProvider.class);
     }
@@ -124,16 +156,14 @@ public class AccountService {
     public Response updateAccount(UserRepresentation userRep) {
         auth.require(AccountRoles.MANAGE_ACCOUNT);
 
-        UserModel user = auth.getUser();
-
-        event.event(EventType.UPDATE_PROFILE).client(auth.getClient()).user(auth.getUser());
+        event.event(EventType.UPDATE_PROFILE).client(auth.getClient()).user(user);
 
         AccountUtils.updateUsername(userRep.getUsername(), user, session);
         
         try {
             AccountUtils.updateEmail(userRep.getEmail(), user, session, event);
         } catch (ModelDuplicateException e) {
-            return ErrorResponse.exists("User with email " + userRep.getEmail() + " already exists.");
+            return ErrorResponse.exists(uiMessages.localize(Messages.EMAIL_EXISTS));
         }
 
         user.setFirstName(userRep.getFirstName());
@@ -165,9 +195,6 @@ public class AccountService {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response sessions() {
-        RealmModel realm = auth.getRealm();
-        UserModel user = auth.getUser();
-
         List<SessionRepresentation> reps = new LinkedList<>();
 
         List<UserSessionModel> sessions = session.sessions().getUserSessions(realm, user);
@@ -204,8 +231,6 @@ public class AccountService {
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     public Response sessionsLogout(@QueryParam("current") boolean removeCurrent) {
-        RealmModel realm = auth.getRealm();
-        UserModel user = auth.getUser();
         UserSessionModel userSession = auth.getSession();
 
         List<UserSessionModel> userSessions = session.sessions().getUserSessions(realm, user);
@@ -219,8 +244,125 @@ public class AccountService {
     }
 
 
+    public static class PasswordChangeRequest {
+        private String password;
+        private String newPassword;
+        private String confirmation;
+
+        public PasswordChangeRequest() {}
+        
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+
+        public String getNewPassword() {
+            return newPassword;
+        }
+
+        public void setNewPassword(String newPassword) {
+            this.newPassword = newPassword;
+        }
+
+        public String getConfirmation() {
+            return confirmation;
+        }
+
+        public void setConfirmation(String confirmation) {
+            this.confirmation = confirmation;
+        }
+    }
+    
+    @Path("/credentials")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateCredentials(PasswordChangeRequest passReq) {
+        auth.require(AccountRoles.MANAGE_ACCOUNT);
+
+        String password = passReq.getPassword();
+        String passwordNew = passReq.getNewPassword();
+        String passwordConfirm = passReq.getConfirmation();
+
+        // why did old code call auth.getClientSession().getUserSession().getUser()?
+        /*EventBuilder errorEvent = event.clone().event(EventType.UPDATE_PASSWORD_ERROR)
+                .client(auth.getClient())
+                .user(auth.getClientSession().getUserSession().getUser());*/
+        
+        EventBuilder errorEvent = event.clone().event(EventType.UPDATE_PASSWORD_ERROR)
+                .client(client)
+                .user(user);
+
+        boolean requireCurrent = isPasswordSet(session, realm, user);
+        if (requireCurrent) {
+            if (Validation.isBlank(password)) {
+                errorEvent.error(Errors.PASSWORD_MISSING);
+                //return account.setError(Messages.MISSING_PASSWORD).createResponse(AccountPages.PASSWORD);
+                return ErrorResponse.error(uiMessages.localize(Messages.MISSING_PASSWORD), 
+                                           Response.Status.PRECONDITION_FAILED);
+            }
+
+            UserCredentialModel cred = UserCredentialModel.password(password);
+            if (!session.userCredentialManager().isValid(realm, user, cred)) {
+                errorEvent.error(Errors.INVALID_USER_CREDENTIALS);
+                //return account.setError(Messages.INVALID_PASSWORD_EXISTING).createResponse(AccountPages.PASSWORD);
+                return ErrorResponse.error(uiMessages.localize(Messages.INVALID_PASSWORD_EXISTING), 
+                                           Response.Status.PRECONDITION_FAILED);
+            }
+        }
+
+        if (Validation.isBlank(passwordNew)) {
+            errorEvent.error(Errors.PASSWORD_MISSING);
+            //return account.setError(Messages.MISSING_PASSWORD).createResponse(AccountPages.PASSWORD);
+            return ErrorResponse.error(uiMessages.localize(Messages.MISSING_PASSWORD), 
+                                       Response.Status.PRECONDITION_FAILED);
+        }
+
+        if (!passwordNew.equals(passwordConfirm)) {
+            errorEvent.error(Errors.PASSWORD_CONFIRM_ERROR);
+            //return account.setError(Messages.INVALID_PASSWORD_CONFIRM).createResponse(AccountPages.PASSWORD);
+            return ErrorResponse.error(uiMessages.localize(Messages.INVALID_PASSWORD_CONFIRM), 
+                                       Response.Status.PRECONDITION_FAILED);
+        }
+
+        try {
+            session.userCredentialManager().updateCredential(realm, user, UserCredentialModel.password(passwordNew, false));
+        } catch (ReadOnlyException mre) {
+            errorEvent.error(Errors.NOT_ALLOWED);
+            //return account.setError(Messages.READ_ONLY_PASSWORD).createResponse(AccountPages.PASSWORD);
+            return Cors.add(request, Response.serverError()).auth().allowedOrigins(auth.getToken()).build();
+        } catch (ModelException me) {
+            ServicesLogger.LOGGER.failedToUpdatePassword(me);
+            errorEvent.detail(Details.REASON, me.getMessage()).error(Errors.PASSWORD_REJECTED);
+            //return account.setError(me.getMessage(), me.getParameters()).createResponse(AccountPages.PASSWORD);
+            return Cors.add(request, Response.serverError()).auth().allowedOrigins(auth.getToken()).build();
+        } catch (Exception ape) {
+            ServicesLogger.LOGGER.failedToUpdatePassword(ape);
+            errorEvent.detail(Details.REASON, ape.getMessage()).error(Errors.PASSWORD_REJECTED);
+            //return account.setError(ape.getMessage()).createResponse(AccountPages.PASSWORD);
+            return Cors.add(request, Response.serverError()).auth().allowedOrigins(auth.getToken()).build();
+        }
+
+        List<UserSessionModel> sessions = session.sessions().getUserSessions(realm, user);
+        for (UserSessionModel s : sessions) {
+            if (!s.getId().equals(auth.getSession().getId())) {
+                AuthenticationManager.backchannelLogout(session, realm, s, uriInfo, clientConnection, headers, true);
+            }
+        }
+
+        event.event(EventType.UPDATE_PASSWORD).client(auth.getClient()).user(auth.getUser()).success();
+
+        return Cors.add(request, Response.ok()).auth().allowedOrigins(auth.getToken()).build(); 
+    }
+    
+    private static boolean isPasswordSet(KeycloakSession session, RealmModel realm, UserModel user) {
+        return session.userCredentialManager().isConfiguredFor(realm, user, CredentialModel.PASSWORD);
+    }
+    
     // TODO Federated identities
-    // TODO Update credentials
     // TODO Applications
     // TODO Logs
 

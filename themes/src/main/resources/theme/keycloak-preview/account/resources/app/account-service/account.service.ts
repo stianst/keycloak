@@ -69,12 +69,13 @@ export class AccountServiceClient {
                        (error: Response) => this.handleServiceError(error));
     }
     
-    private handleServiceError(response: Response) {
+    private handleServiceError(response: Response): void {
         console.log('**** ERROR!!!! ***');
         console.log(JSON.stringify(response));
+        console.log("response.status=" + response.status);
         console.log('***************************************')
         
-        if (response.status === 401) {
+        if ((response.status === undefined) || (response.status === 401)) {
             this.kcSvc.logout();
             return;
         }
@@ -89,13 +90,16 @@ export class AccountServiceClient {
 
         let message: string = response.status + " " + response.statusText;
 
+        const not500Error: boolean = response.status !== 500;
+        console.log('not500Error=' + not500Error);
+        
         // Unfortunately, errors can be sent back in the response body as
         // 'errorMessage' or 'error_description'
-        if (response.json().hasOwnProperty('errorMessage')) {
+        if (not500Error && response.json().hasOwnProperty('errorMessage')) {
             message = response.json().errorMessage;
         }
 
-        if (response.json().hasOwnProperty('error_description')) {
+        if (not500Error && response.json().hasOwnProperty('error_description')) {
             message = response.json().error_description;
         }
 

@@ -62,6 +62,8 @@ const decs = [
     ApplicationsPageComponent
 ];
 
+export const ORIGINAL_INCOMING_URL: Location = window.location;
+
 @NgModule({
   declarations: decs,
   imports: [

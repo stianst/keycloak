@@ -8,6 +8,11 @@
         var baseUrl = '${baseUrl}';
         var realm = '${realm}';
         var resourceUrl = '${resourceUrl}';
+            
+        <#if referrer??>
+            var referrer = '${referrer}';
+            var referrer_uri = '${referrer_uri}';
+        </#if>
     </script>
 
     <base href="${baseUrl}/">

@@ -14,7 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {Response} from '@angular/http';
+import {FormGroup} from '@angular/forms';
+
+import {AccountServiceClient} from '../../account-service/account.service';
 
 @Component({
     selector: 'app-password-page',
@@ -23,10 +27,22 @@ import {Component, OnInit} from '@angular/core';
 })
 export class PasswordPageComponent implements OnInit {
 
-    constructor() {
+    @ViewChild('formGroup') private formGroup: FormGroup;
+    
+    constructor(private accountSvc: AccountServiceClient) {
+    }
+    
+    public changePassword() {
+        console.log("posting: " + JSON.stringify(this.formGroup.value));
+        this.accountSvc.doPostRequest("/credentials", (res: Response) => this.handlePostResponse(res), this.formGroup.value);
+    }
+    
+    protected handlePostResponse(res: Response) {
+      console.log('**** response from account POST ***');
+      console.log(JSON.stringify(res));
+      console.log('***************************************');
     }
 
     ngOnInit() {
     }
-
 }
