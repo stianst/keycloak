@@ -61,12 +61,6 @@ export class AccountPageComponent implements OnInit {
       console.log('***************************************');
     }
     
-    protected handlePostResponse(res: Response) {
-      console.log('**** response from account POST ***');
-      console.log(JSON.stringify(res));
-      console.log('***************************************');
-    }
-
     ngOnInit() {
     }
     
