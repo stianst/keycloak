@@ -37,6 +37,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import org.keycloak.services.resources.account.AccountService.PasswordChangeRequest;
 
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
@@ -93,7 +94,79 @@ public class AccountTest extends AbstractTestRealmKeycloakTest {
 
         assertEquals(1, sessions.size());
     }
+    
+    @Test
+    public void testUpdatePassword() throws IOException {
+        PasswordChangeRequest request = new PasswordChangeRequest();
+        request.setPassword("password");
+        request.setNewPassword("foo");
+        request.setConfirmation("foo");
+        
+        // First one success
+        assertEquals(200, updatePassword(request));
 
+        // Second time old password is no longer "password"
+        assertEquals(412, updatePassword(request));
+
+        // success
+        request.setPassword("foo");
+        request.setNewPassword("bar");
+        request.setConfirmation("bar");
+        assertEquals(200, updatePassword(request));
+        
+        // I have no idea why I need to reset the client.  For some reason it
+        // get stuck after a certain number of requests.  It freezes on line
+        // 199 of SimpleHttp where it says "return client.execute(httpRequest);"
+        after();
+        before();
+        
+        // mismatched confirmation
+        request.setPassword("bar");
+        request.setNewPassword("cookiemonster");
+        request.setConfirmation("bigbird");
+        assertEquals(412, updatePassword(request));
+        
+        after();
+        before();
+        
+        // password blank
+        request.setPassword("");
+        request.setNewPassword("cookiemonster");
+        request.setConfirmation("cookiemonster");
+        assertEquals(412, updatePassword(request));
+        
+        after();
+        before();
+        
+        // new password blank
+        request.setPassword("bar");
+        request.setNewPassword("");
+        request.setConfirmation("cookiemonster");
+        assertEquals(412, updatePassword(request));
+        
+        after();
+        before();
+        
+        // confirmation blank
+        request.setPassword("bar");
+        request.setNewPassword("cookiemonster");
+        request.setConfirmation("");
+        assertEquals(412, updatePassword(request));
+        
+        after();
+        before();
+        
+        // set back to original
+        request.setPassword("bar");
+        request.setNewPassword("password");
+        request.setConfirmation("password");
+        assertEquals(200, updatePassword(request));
+    }
+    
+    private int updatePassword(PasswordChangeRequest request) throws IOException {
+        return SimpleHttp.doPost(getAccountUrl("credentials"), client).auth(tokenUtil.getToken()).json(request).asStatus();
+    }
+    
     private String getAccountUrl(String resource) {
         return suiteContext.getAuthServerInfo().getContextRoot().toString() + "/auth/realms/test/account" + (resource != null ? "/" + resource : "");
     }
