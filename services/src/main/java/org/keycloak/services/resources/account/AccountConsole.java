@@ -27,6 +27,7 @@ import java.util.Locale;
 import java.util.Map;
 import org.keycloak.models.ClientModel;
 import org.keycloak.protocol.oidc.utils.RedirectUtils;
+import org.keycloak.services.managers.RealmManager;
 import org.keycloak.services.util.ResolveRelative;
 import org.keycloak.services.validation.Validation;
 
@@ -100,7 +101,9 @@ public class AccountConsole {
         if (accountClient == null) {
             throw new javax.ws.rs.NotFoundException("Account console client not found");
         }
-        return new ClientManager().toInstallationRepresentation(realm, accountClient, session.getContext().getUri().getBaseUri());
+        RealmManager realmMgr = new RealmManager(session);
+        URI baseUri = session.getContext().getUri().getBaseUri();
+        return new ClientManager(realmMgr).toInstallationRepresentation(realm, accountClient, baseUri);
     }
     
     private String[] getReferrer() {

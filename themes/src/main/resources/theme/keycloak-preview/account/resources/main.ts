@@ -35,7 +35,7 @@ const noLogin: boolean = false; // convenient for development
 if (noLogin) {
     platformBrowserDynamic().bootstrapModule(AppModule);
 } else {
-    KeycloakService.init(resourceUrl + '/keycloak.json',
+    KeycloakService.init(authUrl + '/realms/' + realm + '/account/keycloak.json',
                          {onLoad: 'login-required'})
         .then(() => {
             platformBrowserDynamic().bootstrapModule(AppModule);

@@ -33,7 +33,7 @@ export class AccountServiceClient {
     constructor(protected http: Http,
         protected kcSvc: KeycloakService,
         protected notifier: ToastNotifier) {
-        this.accountUrl = kcSvc.authServerUrl() + '/realms/' + kcSvc.realm() + '/account';
+        this.accountUrl = kcSvc.authServerUrl() + 'realms/' + kcSvc.realm() + '/account';
     }
     
     public doGetRequest(endpoint: string, 
