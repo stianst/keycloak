@@ -65,13 +65,3 @@ export class AccountPageComponent implements OnInit {
     }
     
 }
-
-class Account {
-    constructor(username: string, 
-                emailVerified: boolean,
-                firstName?: string, 
-                lastName?: string, 
-                email?: string, 
-                attributes?: Object){
-    }
-}

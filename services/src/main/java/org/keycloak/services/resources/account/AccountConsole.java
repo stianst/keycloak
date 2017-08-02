@@ -44,13 +44,13 @@ public class AccountConsole {
     private final RealmModel realm;
     private final ClientModel client;
     private final Theme theme;
-
+    
     public AccountConsole(RealmModel realm, ClientModel client, Theme theme) {
         this.realm = realm;
         this.client = client;
         this.theme = theme;
     }
-
+    
     @GET
     @NoCache
     public Response getMainPage() throws URISyntaxException, IOException, FreeMarkerException {
@@ -106,6 +106,7 @@ public class AccountConsole {
         return new ClientManager(realmMgr).toInstallationRepresentation(realm, accountClient, baseUri);
     }
     
+    // TODO: took this code from elsewhere - refactor
     private String[] getReferrer() {
         String referrer = uriInfo.getQueryParameters().getFirst("referrer");
         if (referrer == null) {

@@ -227,6 +227,26 @@ public class AccountService {
             return ErrorResponse.error(uiMessages.localize(Messages.READ_ONLY_USER), Response.Status.BAD_REQUEST);
         }
     }
+    
+    /**
+     * Get application information.
+     *
+     * @return
+     */
+    @Path("/applications")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @NoCache
+    public Response applications() {
+        // ApplicationsBean gets "Cannot access delegate without a transaction"
+        // in RealmCacheSession line 179.
+        // ApplicationsBean apps = new ApplicationsBean(session, realm, user);
+        // TODO: also eventually need to return AdvancedMessageFormatterMethod to get the localized messages.
+        // see FreeMarkerAcocuntProvider
+        
+        SkinnyApplicationsBean apps = new SkinnyApplicationsBean(session, realm, user);
+        return Cors.add(request, Response.ok(apps)).auth().allowedOrigins(auth.getToken()).build();
+    }
 
     /**
      * Get session information.

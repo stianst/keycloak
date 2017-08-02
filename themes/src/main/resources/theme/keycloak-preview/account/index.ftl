@@ -11,7 +11,7 @@
             
         <#if referrer??>
             var referrer = '${referrer}';
-            var referrer_uri = '${referrer_uri}';
+            var referrer_uri = '${referrer_uri?html}';
         </#if>
     </script>
 
@@ -32,9 +32,7 @@
 
     <link rel="stylesheet" href="${resourceUrl}/styles.css">
 
-    <!-- This keycloak.js has a chrome bug.  Uncomment once merged with master.
     <script src="${authUrl}/js/${resourceVersion}/keycloak.js" type="text/javascript"></script>
-    -->
 
     <!-- PatternFly -->
     <!-- iPad retina icon -->

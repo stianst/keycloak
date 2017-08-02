@@ -14,13 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import {Injectable} from '@angular/core';
-import * as Keycloak from './keycloak';
 
-// Need to use local keycloak.js for now due to Chrome bug.
-// This is a newer version than the one obtained from the server.
-//var Keycloak = require("./keycloak"); // load keycloak.js locally
+// If using a local keycloak.js, uncomment this import.  With keycloak.js fetched
+// from the server, you get a compile-time warning on use of the Keycloak()
+// method below.  I'm not sure how to fix this, but it's certainly cleaner
+// to get keycloak.js from the server.
+// 
+//import * as Keycloak from './keycloak';
 
 type KeycloakClient = Keycloak.KeycloakInstance;
 type InitOptions = Keycloak.KeycloakInitOptions;
