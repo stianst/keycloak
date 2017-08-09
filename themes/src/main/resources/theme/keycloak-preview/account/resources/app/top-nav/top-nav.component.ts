@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 import {Component, OnInit} from '@angular/core';
+import {TranslateUtil} from '../ngx-translate/translate.util';
 import {KeycloakService} from '../keycloak-service/keycloak.service';
-import {ORIGINAL_INCOMING_URL} from '../app.module';
 
 declare const resourceUrl: string;
 declare const referrer: string;
@@ -31,16 +31,16 @@ export class TopNavComponent implements OnInit {
 
     public resourceUrl: string = resourceUrl;
     
-    public referrer: string;
+    public referrerName: { param_0: string };
     public referrerUri: string;
 
-    constructor(private keycloakService: KeycloakService) {
+    constructor(private keycloakService: KeycloakService, translateUtil: TranslateUtil) {
         if (typeof referrer !== "undefined") {
-            this.referrer = referrer;
+            this.referrerName = {param_0: translateUtil.translate(referrer) };
             this.referrerUri = referrer_uri;
         }
     }
-
+    
     ngOnInit() {
     }
 

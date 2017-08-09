@@ -20,8 +20,8 @@
         <ul class="nav navbar-nav">
         </ul>
         <ul class="nav navbar-nav navbar-right navbar-iconic">
-            <li *ngIf="referrerUri && referrer">
-                <a class="nav-item-iconic" href="{{referrerUri}}"><span class="pficon-arrow"></span> Back to {{referrer}}</a>
+            <li *ngIf="referrerUri && referrerName">
+                <a class="nav-item-iconic" href="{{referrerUri}}"><span class="pficon-arrow"></span> {{'backTo' | translate:referrerName}}</a>
             </li>
             <li class="dropdown">
                 <a class="dropdown-toggle nav-item-iconic" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
@@ -40,7 +40,7 @@
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
                     <li><a href="#">Preferences</a></li>
-                    <li><a href="#" (click)="logout()">Logout</a></li>
+                    <li><a href="#" (click)="logout()">{{'doSignOut' | translate}}</a></li>
                 </ul>
             </li>
         </ul>

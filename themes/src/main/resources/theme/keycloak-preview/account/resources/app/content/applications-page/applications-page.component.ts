@@ -17,9 +17,12 @@
 import {Component, OnInit} from '@angular/core';
 import {Response} from '@angular/http';
 
+import {TranslateUtil} from '../../ngx-translate/translate.util';
 import {AccountServiceClient} from '../../account-service/account.service';
 
 declare const resourceUrl: string;
+
+type ApplicationView = "LargeCards" | "SmallCards" | "List";
 
 @Component({
     moduleId: module.id,
@@ -28,13 +31,13 @@ declare const resourceUrl: string;
     styleUrls: ['applications-page.component.css']
 })
 export class ApplicationsPageComponent implements OnInit {
-    private activeView: string = "LargeCards";
+    private activeView: ApplicationView = "LargeCards";
     
     private resourceUrl: string = resourceUrl;
     private applications: any[] = [];
     private sessions: any[] = [];
 
-    constructor(private accountSvc: AccountServiceClient ) {
+    constructor(accountSvc: AccountServiceClient, private translateUtil: TranslateUtil ) {
         accountSvc.doGetRequest("/applications", (res: Response) => this.handleGetAppsResponse(res));
         accountSvc.doGetRequest("/sessions", (res: Response) => this.handleGetSessionsResponse(res));
     }
@@ -62,20 +65,11 @@ export class ApplicationsPageComponent implements OnInit {
     }
     
     private getName(application: any): string {
+        if (application.hasOwnProperty('name')) {
+            return this.translateUtil.translate(application.name);
+        }
+        
         return application.clientId;
-        /*if (!application.hasOwnProperty('name')) {
-            return application.clientId;
-        }
-        
-        let name: string = application.name;
-        
-        if (name.startsWith("${") && 
-            name.endsWith("}") &&
-            name.length > 3) {
-            name = name.substring(2, name.length -1);
-        }
-        
-        return name;*/
     }
     
     private getDescription (application: any): string {
@@ -114,7 +108,7 @@ export class ApplicationsPageComponent implements OnInit {
         }
     }
     
-    private changeView(activeView: string) {
+    private changeView(activeView: ApplicationView) {
         this.activeView = activeView;
     }
 

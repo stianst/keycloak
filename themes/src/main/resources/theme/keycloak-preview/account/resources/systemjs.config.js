@@ -22,8 +22,9 @@
       '@angular/http': 'npm:@angular/http/bundles/http.umd.js',
       '@angular/router': 'npm:@angular/router/bundles/router.umd.js',
       '@angular/forms': 'npm:@angular/forms/bundles/forms.umd.js',
-
+      
       // other libraries
+      '@ngx-translate/core':       'npm:@ngx-translate/core/bundles/core.umd.js',
       'rxjs':                      'npm:rxjs',
       'angular-in-memory-web-api': 'npm:angular-in-memory-web-api/bundles/in-memory-web-api.umd.js'
     },
@@ -36,6 +37,9 @@
             loader: resourceUrl + '/systemjs-angular-loader.js'
           }
         }
+      },
+      '@ngx-translate/core': {
+          defaultExtension: 'js'
       },
       rxjs: {
         defaultExtension: 'js'

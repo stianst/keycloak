@@ -21,15 +21,20 @@ import { HttpModule } from '@angular/http';
 import { RouterModule, Routes } from '@angular/router';
 import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 
+import { TranslateLoader } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
+
 import { KeycloakService } from './keycloak-service/keycloak.service';
 import { KEYCLOAK_HTTP_PROVIDER } from './keycloak-service/keycloak.http';
 
-import { AccountServiceClient } from './account-service/account.service'
+import { AccountServiceClient } from './account-service/account.service';
+import {TranslateUtil} from './ngx-translate/translate.util';
 
+import { DeclaredVarTranslateLoader } from './ngx-translate/declared.var.translate.loader';
 import { AppComponent } from './app.component';
 import { TopNavComponent } from './top-nav/top-nav.component';
 import { NotificationComponent } from './top-nav/notification.component';
-import {ToastNotifier} from './top-nav/toast.notifier';
+import { ToastNotifier } from './top-nav/toast.notifier';
 import { SideNavComponent } from './side-nav/side-nav.component';
 import { AccountPageComponent } from './content/account-page/account-page.component';
 import { PasswordPageComponent } from './content/password-page/password-page.component';
@@ -70,12 +75,16 @@ export const ORIGINAL_INCOMING_URL: Location = window.location;
     BrowserModule,
     FormsModule,
     HttpModule,
+    TranslateModule.forRoot({
+        loader: {provide: TranslateLoader, useClass: DeclaredVarTranslateLoader}
+    }),
     RouterModule.forRoot(routes)
   ],
   providers: [
     KeycloakService,
     KEYCLOAK_HTTP_PROVIDER,
     AccountServiceClient,
+    TranslateUtil,
     ToastNotifier,
     { provide: LocationStrategy, useClass: HashLocationStrategy }
   ],

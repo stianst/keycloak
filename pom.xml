@@ -66,6 +66,7 @@
         <hibernate.javax.persistence.version>1.0.0.Final</hibernate.javax.persistence.version>
         <infinispan.version>8.2.6.Final</infinispan.version>
         <jackson.version>2.5.4</jackson.version>
+        <javax.json.version>1.0.4</javax.json.version>
         <javax.mail.version>1.5.5</javax.mail.version>
         <jboss.logging.version>3.3.0.Final</jboss.logging.version>
         <jboss.logging.tools.version>2.0.1.Final</jboss.logging.tools.version>
@@ -237,6 +238,11 @@
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcpkix-jdk15on</artifactId>
                 <version>${bouncycastle.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish</groupId>
+                <artifactId>javax.json</artifactId>
+                <version>${javax.json.version}</version>
             </dependency>
             <dependency>
                 <groupId>javax.mail</groupId>

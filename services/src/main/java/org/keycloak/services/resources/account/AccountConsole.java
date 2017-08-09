@@ -1,7 +1,6 @@
 package org.keycloak.services.resources.account;
 
 import org.jboss.resteasy.annotations.cache.NoCache;
-import org.jboss.resteasy.spi.NotFoundException;
 import org.keycloak.common.Version;
 import org.keycloak.models.*;
 import org.keycloak.models.Constants;
@@ -20,14 +19,25 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.json.Json;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonWriter;
+import org.jboss.logging.Logger;
 import org.keycloak.models.ClientModel;
 import org.keycloak.protocol.oidc.utils.RedirectUtils;
 import org.keycloak.services.managers.RealmManager;
+import org.keycloak.services.managers.AppAuthManager;
+import org.keycloak.services.managers.Auth;
+import org.keycloak.services.managers.AuthenticationManager;
 import org.keycloak.services.util.ResolveRelative;
 import org.keycloak.services.validation.Validation;
 
@@ -35,20 +45,69 @@ import org.keycloak.services.validation.Validation;
  * Created by st on 29/03/17.
  */
 public class AccountConsole {
+    private static final Logger logger = Logger.getLogger(AccountConsole.class);
+    
+    private final Pattern bundleParamPattern = Pattern.compile("(\\{\\s*(\\d+)\\s*\\})");
 
     @Context
     protected KeycloakSession session;
     @Context
     protected UriInfo uriInfo;
     
+    private final AppAuthManager authManager;
     private final RealmModel realm;
     private final ClientModel client;
     private final Theme theme;
     
+    private Auth auth;
     public AccountConsole(RealmModel realm, ClientModel client, Theme theme) {
         this.realm = realm;
         this.client = client;
         this.theme = theme;
+        this.authManager = new AppAuthManager();
+    }
+    
+    // copied from DeprecatedAccountFormService
+    public void init() {
+        //eventStore = session.getProvider(EventStoreProvider.class);
+
+        //account = session.getProvider(AccountProvider.class).setRealm(realm).setUriInfo(uriInfo).setHttpHeaders(headers);
+
+        AuthenticationManager.AuthResult authResult = authManager.authenticateIdentityCookie(session, realm);
+        if (authResult != null) {
+            auth = new Auth(realm, authResult.getToken(), authResult.getUser(), client, authResult.getSession(), true);
+            //updateCsrfChecks();
+            //account.setStateChecker(stateChecker);
+        }
+
+        //String requestOrigin = UriUtils.getOrigin(uriInfo.getBaseUri());
+
+    /*    String origin = headers.getRequestHeaders().getFirst("Origin");
+        if (origin != null && !requestOrigin.equals(origin)) {
+            throw new ForbiddenException();
+        }
+
+        if (!request.getHttpMethod().equals("GET")) {
+            String referrer = headers.getRequestHeaders().getFirst("Referer");
+            if (referrer != null && !requestOrigin.equals(UriUtils.getOrigin(referrer))) {
+                throw new ForbiddenException();
+            }
+        }
+    
+        if (authResult != null) {
+            UserSessionModel userSession = authResult.getSession();
+            if (userSession != null) {
+                AuthenticatedClientSessionModel clientSession = userSession.getAuthenticatedClientSessions().get(client.getId());
+                if (clientSession == null) {
+                    clientSession = session.sessions().createClientSession(userSession.getRealm(), client, userSession);
+                }
+                auth.setClientSession(clientSession);
+            }
+
+            account.setUser(auth.getUser());
+        }*/
+
+        //account.setFeatures(realm.isIdentityFederationEnabled(), eventStore != null && realm.isEventsEnabled(), true);
     }
     
     @GET
@@ -76,6 +135,16 @@ public class AccountConsole {
                 map.put("referrer_uri", referrer[1]);
             }
             
+            try {
+                if (auth != null) {
+                    Locale locale = session.getContext().resolveLocale(auth.getUser());
+                    map.put("locale", locale.toLanguageTag());
+                    map.put("msg", messagesToJsonString(theme.getMessages(locale)));
+                }
+            } catch (Exception e) {
+                logger.warn("Failed to load messages", e);
+            }
+            
             map.put("properties", theme.getProperties());
 
             FreeMarkerUtil freeMarkerUtil = new FreeMarkerUtil();
@@ -86,6 +155,40 @@ public class AccountConsole {
         }
     }
 
+    private String messagesToJsonString(Properties props) {
+        if (props == null) return "";
+        
+        JsonObjectBuilder json = Json.createObjectBuilder();
+        for (String prop : props.stringPropertyNames()) {
+            json.add(prop, convertPropValue(props.getProperty(prop)));
+        }
+        
+        return json.build().toString();
+    }
+    
+    private String convertPropValue(String propertyValue) {
+        propertyValue = propertyValue.replace("''", "%27");
+        propertyValue = propertyValue.replace("'", "%27");
+        propertyValue = propertyValue.replace("\"", "%22");
+        
+        propertyValue = putJavaParamsInNgTranslateFormat(propertyValue);
+
+        return propertyValue;
+    }
+    
+    // Put java resource bundle params in ngx-translate format
+    // Do you like {0} and {1} ?
+    //    becomes
+    // Do you like {{param_0}} and {{param_1}} ?
+    private String putJavaParamsInNgTranslateFormat(String propertyValue) {
+        Matcher matcher = bundleParamPattern.matcher(propertyValue);
+        while (matcher.find()) {
+            propertyValue = propertyValue.replace(matcher.group(1), "{{param_" + matcher.group(2) + "}}");
+        }
+
+        return propertyValue;
+    }
+    
     @GET
     @Path("index.html")
     public Response getIndexHtmlRedirect() {

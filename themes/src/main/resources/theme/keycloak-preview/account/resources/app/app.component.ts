@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 import {Component} from '@angular/core';
-import {Http, Headers, RequestOptions, Response} from '@angular/http';
 
-import {KeycloakService} from './keycloak-service/keycloak.service';
+import {TranslateService} from '@ngx-translate/core';
+
+declare const locale: string;
 
 @Component({
     selector: 'app-root',
@@ -25,6 +26,11 @@ import {KeycloakService} from './keycloak-service/keycloak.service';
     styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-    constructor(private http: Http, private kc: KeycloakService) {
+    constructor(translate: TranslateService) {
+        // this language will be used as a fallback when a translation isn't found in the current language
+        translate.setDefaultLang('en');
+
+        // the lang to use, if the lang isn't available, it will use the current loader to get them
+        translate.use(locale);
     }
 }

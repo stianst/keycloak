@@ -98,6 +98,7 @@ public class AccountLoader {
             } else {
                 AccountConsole console = new AccountConsole(realm, client, theme);
                 ResteasyProviderFactory.getInstance().injectProperties(console);
+                console.init();
                 return console;
             }
         }

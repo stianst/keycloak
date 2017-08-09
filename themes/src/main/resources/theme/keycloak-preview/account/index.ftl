@@ -13,6 +13,11 @@
             var referrer = '${referrer}';
             var referrer_uri = '${referrer_uri?html}';
         </#if>
+        
+        <#if msg??>
+            var locale = '${locale}';
+            var l18n_msg = JSON.parse('${msg}');
+        </#if>
     </script>
 
     <base href="${baseUrl}/">
@@ -32,7 +37,7 @@
 
     <link rel="stylesheet" href="${resourceUrl}/styles.css">
 
-    <script src="${authUrl}/js/${resourceVersion}/keycloak.js" type="text/javascript"></script>
+    <!--<script src="${authUrl}/js/${resourceVersion}/keycloak.js" type="text/javascript"></script>-->
 
     <!-- PatternFly -->
     <!-- iPad retina icon -->
