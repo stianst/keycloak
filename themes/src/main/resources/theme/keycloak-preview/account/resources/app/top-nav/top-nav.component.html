@@ -4,7 +4,7 @@
     <notification></notification>
 
     <div class="navbar-header">
-        <button type="button" class="navbar-toggle">
+        <button (click)="menuClicked()" type="button" class="navbar-toggle">
             <span class="sr-only">Toggle navigation</span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
@@ -18,8 +18,8 @@
         <ul class="nav navbar-nav">
         </ul>
         <ul class="nav navbar-nav navbar-right navbar-iconic">
-            <li *ngIf="referrerUri && referrerName">
-                <a class="nav-item-iconic" href="{{referrerUri}}"><span class="pficon-arrow"></span> {{'backTo' | translate:referrerName}}</a>
+            <li *ngIf="referrer.exists()">
+                <a class="nav-item-iconic" href="{{referrer.getUri()}}"><span class="pficon-arrow"></span> {{'backTo' | translate:referrer.getName()}}</a>
             </li>
             <li class="dropdown">
                 <a class="dropdown-toggle nav-item-iconic" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">

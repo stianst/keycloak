@@ -25,7 +25,7 @@ declare const resourceUrl: string;
 type ApplicationView = "LargeCards" | "SmallCards" | "List";
 
 @Component({
-    moduleId: module.id,
+    moduleId: module.id, // need this for styleUrls path to work properly with Systemjs
     selector: 'app-applications-page',
     templateUrl: 'applications-page.component.html',
     styleUrls: ['applications-page.component.css']

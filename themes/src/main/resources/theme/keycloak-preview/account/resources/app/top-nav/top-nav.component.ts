@@ -17,6 +17,8 @@
 import {Component, OnInit} from '@angular/core';
 import {TranslateUtil} from '../ngx-translate/translate.util';
 import {KeycloakService} from '../keycloak-service/keycloak.service';
+import {ResponsivenessService} from "../responsiveness-service/responsiveness.service";
+import {Referrer} from "../page/referrer";
 
 declare const resourceUrl: string;
 declare const referrer: string;
@@ -31,20 +33,20 @@ export class TopNavComponent implements OnInit {
 
     public resourceUrl: string = resourceUrl;
     
-    public referrerName: { param_0: string };
-    public referrerUri: string;
-
-    constructor(private keycloakService: KeycloakService, translateUtil: TranslateUtil) {
-        if (typeof referrer !== "undefined") {
-            this.referrerName = {param_0: translateUtil.translate(referrer) };
-            this.referrerUri = referrer_uri;
-        }
+    private referrer: Referrer;
+    
+    constructor(private keycloakService: KeycloakService, translateUtil: TranslateUtil, private respSvc: ResponsivenessService) {
+        this.referrer = new Referrer(translateUtil);
+    }
+    
+    private menuClicked(): void {
+        this.respSvc.menuClicked();
     }
     
     ngOnInit() {
     }
 
-    logout() {
+    private logout() {
         this.keycloakService.logout();
     }
 

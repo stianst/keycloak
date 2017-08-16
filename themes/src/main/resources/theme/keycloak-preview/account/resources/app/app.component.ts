@@ -14,9 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {Component} from '@angular/core';
+import {Component, HostListener} from '@angular/core';
 
 import {TranslateService} from '@ngx-translate/core';
+
+import {ResponsivenessService, ContentWidthClass, MenuClickListener} from "./responsiveness-service/responsiveness.service";
 
 declare const locale: string;
 
@@ -25,12 +27,27 @@ declare const locale: string;
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.css']
 })
-export class AppComponent {
-    constructor(translate: TranslateService) {
+export class AppComponent implements MenuClickListener {
+    
+    private contentWidthClass: ContentWidthClass = this.respSvc.calcSideContentWidthClass();
+    
+    constructor(translate: TranslateService, private respSvc: ResponsivenessService) {
         // this language will be used as a fallback when a translation isn't found in the current language
         translate.setDefaultLang('en');
 
         // the lang to use, if the lang isn't available, it will use the current loader to get them
         translate.use(locale);
+        
+        this.respSvc.addMenuClickListener(this);
     }
+    
+    public menuClicked() : void {
+        this.contentWidthClass = this.respSvc.calcSideContentWidthClass();
+    }
+    
+    @HostListener('window:resize', ['$event'])
+    private onResize(event: any) {
+        this.contentWidthClass = this.respSvc.calcSideContentWidthClass();
+    }
+    
 }

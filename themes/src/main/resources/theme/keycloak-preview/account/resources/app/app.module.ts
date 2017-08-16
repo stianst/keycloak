@@ -27,6 +27,8 @@ import { TranslateModule } from '@ngx-translate/core';
 import { KeycloakService } from './keycloak-service/keycloak.service';
 import { KEYCLOAK_HTTP_PROVIDER } from './keycloak-service/keycloak.http';
 
+import {ResponsivenessService} from './responsiveness-service/responsiveness.service'
+
 import { AccountServiceClient } from './account-service/account.service';
 import {TranslateUtil} from './ngx-translate/translate.util';
 
@@ -83,6 +85,7 @@ export const ORIGINAL_INCOMING_URL: Location = window.location;
   providers: [
     KeycloakService,
     KEYCLOAK_HTTP_PROVIDER,
+    ResponsivenessService,
     AccountServiceClient,
     TranslateUtil,
     ToastNotifier,
