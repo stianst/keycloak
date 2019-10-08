@@ -1436,6 +1436,11 @@
     </dependencyManagement>
 
     <repositories>
+        <repository>
+            <id>central2</id>
+            <url>https://repo.maven.apache.org/maven2</url>
+        </repository>
+
         <!-- for org.jboss.web:jbossweb -->
         <repository>
             <id>jboss</id>
@@ -1443,6 +1448,11 @@
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
+        </repository>
+
+        <repository>
+            <id>central3</id>
+            <url>https://repo.maven.apache.org/maven2</url>
         </repository>
     </repositories>
 
