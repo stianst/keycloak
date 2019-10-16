@@ -2,8 +2,6 @@ package org.keycloak.testsuite.url;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.jboss.arquillian.container.test.api.ContainerController;
-import org.jboss.arquillian.test.api.ArquillianResource;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.keycloak.admin.client.Keycloak;
@@ -19,39 +17,36 @@ import org.keycloak.representations.idm.ClientInitialAccessCreatePresentation;
 import org.keycloak.representations.idm.ClientInitialAccessPresentation;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
-import org.keycloak.testsuite.AbstractKeycloakTest;
 import org.keycloak.testsuite.arquillian.AuthServerTestEnricher;
 import org.keycloak.testsuite.util.AdminClientUtil;
+import org.keycloak.testsuite.util.ClientBuilder;
 import org.keycloak.testsuite.util.ContainerAssume;
 import org.keycloak.testsuite.util.OAuthClient;
-import org.wildfly.extras.creaper.core.online.OnlineManagementClient;
-import org.wildfly.extras.creaper.core.online.operations.admin.Administration;
+import org.keycloak.testsuite.util.RealmBuilder;
+import org.keycloak.testsuite.util.UserBuilder;
 
-import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.keycloak.testsuite.admin.AbstractAdminTest.loadJson;
 
-public class FixedHostnameTest extends AbstractKeycloakTest {
-
-    @ArquillianResource
-    protected ContainerController controller;
+public class FixedHostnameTest extends AbstractHostnameTest {
 
     private String authServerUrl;
 
     @Override
     public void addTestRealms(List<RealmRepresentation> testRealms) {
-        RealmRepresentation realm = loadJson(getClass().getResourceAsStream("/testrealm.json"), RealmRepresentation.class);
-        testRealms.add(realm);
+        RealmRepresentation test = RealmBuilder.create().name("test")
+                .client(ClientBuilder.create().name("direct-grant").clientId("direct-grant").enabled(true).secret("password").directAccessGrants())
+                .user(UserBuilder.create().username("test-user@localhost").password("password"))
+                .build();
+        testRealms.add(test);
 
-        RealmRepresentation customHostname = loadJson(getClass().getResourceAsStream("/testrealm.json"), RealmRepresentation.class);
-        customHostname.setId("hostname");
-        customHostname.setRealm("hostname");
-        customHostname.setAttributes(new HashMap<>());
-        customHostname.getAttributes().put("hostname", "custom-domain.127.0.0.1.nip.io");
-
+        RealmRepresentation customHostname = RealmBuilder.create().name("hostname")
+                .client(ClientBuilder.create().name("direct-grant").clientId("direct-grant").enabled(true).secret("password").directAccessGrants())
+                .user(UserBuilder.create().username("test-user@localhost").password("password"))
+                .attribute("hostname", "custom-domain.127.0.0.1.nip.io")
+                .build();
         testRealms.add(customHostname);
     }
 
@@ -70,7 +65,7 @@ public class FixedHostnameTest extends AbstractKeycloakTest {
         try (Keycloak testAdminClient = AdminClientUtil.createAdminClient(suiteContext.isAdapterCompatTesting(), AuthServerTestEnricher.getAuthServerContextRoot())) {
             assertWellKnown("test", AUTH_SERVER_SCHEME + "://localhost:" + AUTH_SERVER_PORT);
 
-            configureFixedHostname(-1, -1, false);
+            configureFixed("keycloak.127.0.0.1.nip.io", -1, -1, false);
 
             assertWellKnown("test", AUTH_SERVER_SCHEME + "://keycloak.127.0.0.1.nip.io:" + AUTH_SERVER_PORT);
             assertWellKnown("hostname", AUTH_SERVER_SCHEME + "://custom-domain.127.0.0.1.nip.io:" + AUTH_SERVER_PORT);
@@ -81,7 +76,7 @@ public class FixedHostnameTest extends AbstractKeycloakTest {
             assertInitialAccessTokenFromMasterRealm(testAdminClient,"test", AUTH_SERVER_SCHEME + "://keycloak.127.0.0.1.nip.io:" + AUTH_SERVER_PORT);
             assertInitialAccessTokenFromMasterRealm(testAdminClient,"hostname", AUTH_SERVER_SCHEME + "://custom-domain.127.0.0.1.nip.io:" + AUTH_SERVER_PORT);
         } finally {
-            clearFixedHostname();
+            reset();
         }
     }
 
@@ -96,7 +91,7 @@ public class FixedHostnameTest extends AbstractKeycloakTest {
         try (Keycloak testAdminClient = AdminClientUtil.createAdminClient(suiteContext.isAdapterCompatTesting(), "http://localhost:8180")) {
             assertWellKnown("test", "http://localhost:8180");
 
-            configureFixedHostname(80, -1, false);
+            configureFixed("keycloak.127.0.0.1.nip.io", 80, -1, false);
 
             assertWellKnown("test", "http://keycloak.127.0.0.1.nip.io");
             assertWellKnown("hostname", "http://custom-domain.127.0.0.1.nip.io");
@@ -107,7 +102,7 @@ public class FixedHostnameTest extends AbstractKeycloakTest {
             assertInitialAccessTokenFromMasterRealm(testAdminClient,"test", "http://keycloak.127.0.0.1.nip.io");
             assertInitialAccessTokenFromMasterRealm(testAdminClient,"hostname", "http://custom-domain.127.0.0.1.nip.io");
         } finally {
-            clearFixedHostname();
+            reset();
         }
     }
 
@@ -122,7 +117,7 @@ public class FixedHostnameTest extends AbstractKeycloakTest {
         try (Keycloak testAdminClient = AdminClientUtil.createAdminClient(suiteContext.isAdapterCompatTesting(), "http://localhost:8180")) {
             assertWellKnown("test", "http://localhost:8180");
 
-            configureFixedHostname(-1, 443, true);
+            configureFixed("keycloak.127.0.0.1.nip.io", -1, 443, true);
 
             assertWellKnown("test", "https://keycloak.127.0.0.1.nip.io");
             assertWellKnown("hostname", "https://custom-domain.127.0.0.1.nip.io");
@@ -133,7 +128,7 @@ public class FixedHostnameTest extends AbstractKeycloakTest {
             assertInitialAccessTokenFromMasterRealm(testAdminClient, "test", "https://keycloak.127.0.0.1.nip.io");
             assertInitialAccessTokenFromMasterRealm(testAdminClient, "hostname", "https://custom-domain.127.0.0.1.nip.io");
         } finally {
-            clearFixedHostname();
+            reset();
         }
     }
 
@@ -176,58 +171,6 @@ public class FixedHostnameTest extends AbstractKeycloakTest {
     private void assertWellKnown(String realm, String expectedBaseUrl) {
         OIDCConfigurationRepresentation config = oauth.doWellKnownRequest(realm);
         assertEquals(expectedBaseUrl + "/auth/realms/" + realm + "/protocol/openid-connect/token", config.getTokenEndpoint());
-    }
-
-    private void configureFixedHostname(int httpPort, int httpsPort, boolean alwaysHttps) throws Exception {
-        if (suiteContext.getAuthServerInfo().isUndertow()) {
-            configureUndertow("fixed", "keycloak.127.0.0.1.nip.io", httpPort, httpsPort, alwaysHttps);
-        } else if (suiteContext.getAuthServerInfo().isJBossBased()) {
-            configureWildFly("fixed", "keycloak.127.0.0.1.nip.io", httpPort, httpsPort, alwaysHttps);
-        } else {
-            throw new RuntimeException("Don't know how to config");
-        }
-
-        reconnectAdminClient();
-
-    }
-
-    private void clearFixedHostname() throws Exception {
-        if (suiteContext.getAuthServerInfo().isUndertow()) {
-            configureUndertow("request", "localhost", -1, -1,false);
-        } else if (suiteContext.getAuthServerInfo().isJBossBased()) {
-            configureWildFly("request", "localhost", -1, -1, false);
-        } else {
-            throw new RuntimeException("Don't know how to config");
-        }
-
-        reconnectAdminClient();
-    }
-
-    private void configureUndertow(String provider, String hostname, int httpPort, int httpsPort, boolean alwaysHttps) {
-        controller.stop(suiteContext.getAuthServerInfo().getQualifier());
-
-        System.setProperty("keycloak.hostname.provider", provider);
-        System.setProperty("keycloak.hostname.fixed.hostname", hostname);
-        System.setProperty("keycloak.hostname.fixed.httpPort", String.valueOf(httpPort));
-        System.setProperty("keycloak.hostname.fixed.httpsPort", String.valueOf(httpsPort));
-        System.setProperty("keycloak.hostname.fixed.alwaysHttps", String.valueOf(alwaysHttps));
-
-        controller.start(suiteContext.getAuthServerInfo().getQualifier());
-    }
-
-    private void configureWildFly(String provider, String hostname, int httpPort, int httpsPort, boolean alwaysHttps) throws Exception {
-        OnlineManagementClient client = AuthServerTestEnricher.getManagementClient();
-        Administration administration = new Administration(client);
-
-        client.execute("/subsystem=keycloak-server/spi=hostname:write-attribute(name=default-provider, value=" + provider + ")");
-        client.execute("/subsystem=keycloak-server/spi=hostname/provider=fixed:write-attribute(name=properties.hostname,value=" + hostname + ")");
-        client.execute("/subsystem=keycloak-server/spi=hostname/provider=fixed:write-attribute(name=properties.httpPort,value=" + httpPort + ")");
-        client.execute("/subsystem=keycloak-server/spi=hostname/provider=fixed:write-attribute(name=properties.httpsPort,value=" + httpsPort + ")");
-        client.execute("/subsystem=keycloak-server/spi=hostname/provider=fixed:write-attribute(name=properties.alwaysHttps,value=" + alwaysHttps + ")");
-
-        administration.reloadIfRequired();
-
-        client.close();
     }
 
 }
