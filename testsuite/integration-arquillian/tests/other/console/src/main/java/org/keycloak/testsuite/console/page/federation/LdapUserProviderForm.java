@@ -54,9 +54,6 @@ public class LdapUserProviderForm extends Form {
     @FindBy(id = "ldapBindCred")
     private WebElement ldapBindCredentialInput;
 
-    @FindBy(xpath = ".//span[../input[@id = 'ldapBindCred']]")
-    private WebElement ldapBindCredentialMaskButton;
-
     @FindBy(id = "customUserSearchFilter")
     private WebElement customUserSearchFilterInput;
 
@@ -184,14 +181,6 @@ public class LdapUserProviderForm extends Form {
 
     public void setLdapBindDnInput(String ldapBindDn) {
         UIUtils.setTextInputValue(ldapBindDnInput, ldapBindDn);
-    }
-
-    public boolean isLdapBindCredentialInputPasswordMasked() {
-        return ldapBindCredentialInput.getAttribute("class").matches(".*\\bpassword-conceal\\b.*");
-    }
-
-    public void toggleLdapBindCredentialInputPasswordMasked() {
-        ldapBindCredentialMaskButton.click();
     }
 
     public void setLdapBindCredentialInput(String ldapBindCredential) {
