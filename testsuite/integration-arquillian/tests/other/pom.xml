@@ -49,7 +49,7 @@
                     <executions>
                         <execution>
                             <id>unpack-test-resources</id>
-                            <phase>generate-resources</phase>
+                            <phase>package</phase>
                             <goals>
                                 <goal>unpack</goal>
                             </goals>

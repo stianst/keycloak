@@ -1,0 +1,39 @@
+name: Keycloak CI
+
+on: [push]
+
+jobs:
+  undertow:
+    name: Build and Test on Undertow
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/cache@v1
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+    - uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+    - name: Test
+      run: 
+        mvn integration-test -B -nsu -Dtest=ClientTest -DfailIfNoTests=false | java -cp testsuite/utils/target/classes org.keycloak.testsuite.LogTrimmer
+  wildfly:
+    name: Build and Test on WildFly
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/cache@v1
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+    - uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+    - name: Test
+      run: 
+        mvn integration-test -B -nsu -Pdistribution -Pauth-server-wildfly -Dtest=ClientTest -DfailIfNoTests=false | java -cp testsuite/utils/target/classes org.keycloak.testsuite.LogTrimmer

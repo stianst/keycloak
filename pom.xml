@@ -1668,6 +1668,13 @@
         </profile>
 
         <profile>
+            <id>distribution</id>
+            <modules>
+                <module>distribution</module>
+            </modules>
+        </profile>
+
+        <profile>
             <id>testsuite</id>
             <activation>
                 <property>
@@ -1686,13 +1693,6 @@
                     <name>!skipExamples</name>
                 </property>
             </activation>
-        </profile>
-
-        <profile>
-            <id>distribution</id>
-            <modules>
-                <module>distribution</module>
-            </modules>
         </profile>
 
         <profile>

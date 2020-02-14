@@ -122,6 +122,12 @@
         </dependency>
         <dependency>
             <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-distribution-licenses-maven-plugin</artifactId>
+            <type>maven-plugin</type>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.keycloak</groupId>
             <artifactId>keycloak-kerberos-federation</artifactId>
             <exclusions>
                 <exclusion>
@@ -263,7 +269,8 @@
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-client-cli-dist</artifactId>
-            <type>zip</type>
+            <type>pom</type>
+            <version>${project.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>*</groupId>
@@ -375,7 +382,7 @@
                 <executions>
                     <execution>
                         <id>unpack-theme</id>
-                        <phase>validate</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>unpack</goal>
                         </goals>
@@ -391,7 +398,7 @@
                     </execution>
                     <execution>
                         <id>unpack-cli</id>
-                        <phase>validate</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>unpack</goal>
                         </goals>

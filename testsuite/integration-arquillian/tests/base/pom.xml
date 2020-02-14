@@ -126,6 +126,12 @@
             <groupId>org.apache.maven.resolver</groupId>
             <artifactId>maven-resolver-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-client-cli-dist</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+        </dependency>
     </dependencies>
     
     <build>
@@ -154,10 +160,24 @@
                     </execution>
                 </executions>
             </plugin>
-            
+
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>run-integration-test</id>
+                        <phase>integration-test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <skipTests>false</skipTests>
+                        </configuration>
+                    </execution>
+                </executions>
+
                 <configuration>
+                    <skipTests>true</skipTests>
                     <excludes>
                         <exclude>${exclude.test}</exclude>
                         <exclude>${exclude.console}</exclude>
@@ -226,7 +246,7 @@
                 <executions>
                     <execution>
                         <id>unpack-client-cli-dist</id>
-                        <phase>generate-test-resources</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>unpack</goal>
                         </goals>

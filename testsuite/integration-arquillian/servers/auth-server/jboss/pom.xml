@@ -94,7 +94,7 @@
                         <executions>
                             <execution>
                                 <id>unpack-server-or-overlay</id>
-                                <phase>generate-resources</phase>
+                                <phase>package</phase>
                                 <goals>
                                     <goal>unpack</goal>
                                 </goals>
@@ -112,7 +112,7 @@
                             </execution>
                             <execution>
                                 <id>copy-testsuite-providers</id>
-                                <phase>generate-resources</phase>
+                                <phase>package</phase>
                                 <goals>
                                     <goal>copy</goal>
                                 </goals>
@@ -131,7 +131,7 @@
                             </execution>
                             <execution>
                                 <id>install-testsuite-providers-module</id>
-                                <phase>generate-resources</phase>
+                                <phase>package</phase>
                                 <goals>
                                     <goal>unpack</goal>
                                 </goals>
@@ -279,7 +279,7 @@
                             </execution>
                             <execution>
                                 <id>ant-apply-prepared-clis</id>
-                                <phase>process-resources</phase>
+                                <phase>package</phase>
                                 <goals>
                                     <goal>run</goal>
                                 </goals>
@@ -341,7 +341,7 @@
                             <executions>
                                 <execution>
                                     <id>unpack-overlaid-container</id>
-                                    <phase>generate-resources</phase>
+                                    <phase>package</phase>
                                     <goals>
                                         <goal>unpack</goal>
                                     </goals>
@@ -436,7 +436,7 @@
                             <executions>
                                 <execution>
                                     <id>jdbc-driver</id>
-                                    <phase>generate-resources</phase>
+                                    <phase>package</phase>
                                     <goals>
                                         <goal>copy</goal>
                                     </goals>

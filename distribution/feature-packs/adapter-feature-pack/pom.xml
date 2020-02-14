@@ -162,7 +162,7 @@
                         <goals>
                             <goal>build</goal>
                         </goals>
-                        <phase>compile</phase>
+                        <phase>package</phase>
                         <configuration>
                             <config-file>feature-pack-build.xml</config-file>
                         </configuration>

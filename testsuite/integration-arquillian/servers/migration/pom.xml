@@ -147,7 +147,7 @@
                     </execution>
                     <execution>
                         <id>ant-apply-prepared-clis</id>
-                        <phase>process-resources</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>run</goal>
                         </goals>

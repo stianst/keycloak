@@ -97,7 +97,7 @@
                         <executions>
                             <execution>
                                 <id>unpack-wildfly-and-oidc-adapter</id>
-                                <phase>generate-resources</phase>
+                                <phase>package</phase>
                                 <goals>
                                     <goal>unpack</goal>
                                 </goals>
@@ -647,7 +647,7 @@
                         <executions>
                             <execution>
                                 <id>unpack-saml-adapter</id>
-                                <phase>generate-resources</phase>
+                                <phase>package</phase>
                                 <goals>
                                     <goal>unpack</goal>
                                 </goals>

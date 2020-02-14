@@ -27,6 +27,7 @@
 
     <artifactId>keycloak-client-registration-cli</artifactId>
     <name>Keycloak Client Registration CLI</name>
+
     <description/>
 
     <dependencies>
