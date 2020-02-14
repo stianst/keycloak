@@ -80,7 +80,7 @@
                         <executions>
                             <execution>
                                 <id>unpack-tomcat-and-adapter</id>
-                                <phase>generate-test-resources</phase>
+                                <phase>package</phase>
                                 <goals>
                                     <goal>unpack</goal>
                                 </goals>
@@ -246,7 +246,7 @@
                         <executions>
                             <execution>
                                 <id>unpack-saml-adapter</id>
-                                <phase>generate-resources</phase>
+                                <phase>package</phase>
                                 <goals>
                                     <goal>unpack</goal>
                                 </goals>

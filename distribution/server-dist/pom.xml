@@ -43,7 +43,8 @@
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-server-feature-pack</artifactId>
-            <type>zip</type>
+            <type>pom</type>
+            <version>${project.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>*</groupId>
@@ -65,7 +66,7 @@
                         <goals>
                             <goal>build</goal>
                         </goals>
-                        <phase>compile</phase>
+                        <phase>package</phase>
                         <configuration>
                             <config-file>../${keycloak.provisioning.xml}</config-file>
                         </configuration>
@@ -78,7 +79,7 @@
                 <executions>
                     <execution>
                         <id>unpack-server-feature-pack-licenses</id>
-                        <phase>prepare-package</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>unpack-dependencies</goal>
                         </goals>

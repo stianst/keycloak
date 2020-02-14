@@ -69,7 +69,7 @@
                 <executions>
                     <execution>
                         <id>libs-for-tomcat-7</id>
-                        <phase>generate-test-resources</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>copy</goal>
                         </goals>

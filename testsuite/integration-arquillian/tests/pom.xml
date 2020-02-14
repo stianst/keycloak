@@ -210,7 +210,7 @@
                     <executions>
                         <execution>
                             <id>unpack-auth-server-jboss</id>
-                            <phase>generate-resources</phase>
+                            <phase>package</phase>
                             <goals>
                                 <goal>unpack</goal>
                             </goals>
@@ -230,7 +230,7 @@
                         </execution>
                         <execution>
                             <id>unpack-undertow-server</id>
-                            <phase>generate-test-resources</phase>
+                            <phase>package</phase>
                             <goals>
                                 <goal>unpack</goal>
                             </goals>
@@ -268,7 +268,7 @@
                         </execution>
                         <execution>
                             <id>example-wars</id>
-                            <phase>generate-test-resources</phase>
+                            <phase>package</phase>
                             <goals>
                                 <goal>copy</goal>
                             </goals>
@@ -324,7 +324,7 @@
                         </execution>
                         <execution>
                             <id>test-apps-realms</id>
-                            <phase>generate-test-resources</phase>
+                            <phase>package</phase>
                             <goals>
                                 <goal>unpack</goal>
                             </goals>
@@ -981,7 +981,7 @@
                             <executions>
                                 <execution>
                                     <id>unpack-cache-server-infinispan</id>
-                                    <phase>generate-resources</phase>
+                                    <phase>package</phase>
                                     <goals>
                                         <goal>unpack</goal>
                                     </goals>
@@ -1052,7 +1052,7 @@
                             <executions>
                                 <execution>
                                     <id>unpack-cache-server-jdg</id>
-                                    <phase>generate-resources</phase>
+                                    <phase>package</phase>
                                     <goals>
                                         <goal>unpack</goal>
                                     </goals>
@@ -1330,7 +1330,7 @@
                             <executions>
                                 <execution>
                                     <id>unpack-migrated-auth-server-jboss</id>
-                                    <phase>generate-resources</phase>
+                                    <phase>package</phase>
                                     <goals>
                                         <goal>unpack</goal>
                                     </goals>
@@ -1642,7 +1642,8 @@
                 <dependency>
                     <groupId>org.keycloak</groupId>
                     <artifactId>keycloak-client-cli-dist</artifactId>
-                    <type>zip</type>
+                    <type>pom</type>
+                    <version>${project.version}</version>
                 </dependency>
 
                 <dependency>

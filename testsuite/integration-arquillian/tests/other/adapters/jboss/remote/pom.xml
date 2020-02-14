@@ -68,7 +68,7 @@
                 <executions>
                     <execution>
                         <id>copy-app-profile-jee-quickstart</id>
-                        <phase>generate-test-resources</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>copy</goal>
                         </goals>

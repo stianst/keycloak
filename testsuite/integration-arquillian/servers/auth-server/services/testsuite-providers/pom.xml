@@ -101,7 +101,7 @@
                 <executions>
                     <execution>
                         <id>unpack-javascript-adapter</id>
-                        <phase>generate-resources</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>unpack</goal>
                         </goals>

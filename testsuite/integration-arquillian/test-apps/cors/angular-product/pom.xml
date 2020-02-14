@@ -34,6 +34,14 @@
         <js-adapter.version>${project.version}</js-adapter.version>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-js-adapter</artifactId>
+            <version>${js-adapter.version}</version>
+        </dependency>
+    </dependencies>
+
     <build>
         <finalName>angular-cors-product</finalName>
         <plugins>
@@ -56,7 +64,7 @@
                 <executions>
                     <execution>
                         <id>unpack-javascript-adapter</id>
-                        <phase>generate-resources</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>unpack</goal>
                         </goals>

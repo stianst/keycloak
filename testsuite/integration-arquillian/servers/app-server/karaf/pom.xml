@@ -78,7 +78,7 @@
                         <executions>
                             <execution>
                                 <id>unpack-karaf</id>
-                                <phase>generate-resources</phase>
+                                <phase>package</phase>
                                 <goals>
                                     <goal>unpack</goal>
                                 </goals>
