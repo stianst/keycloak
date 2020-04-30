@@ -42,6 +42,7 @@ public final class SuiteContext {
 
     private List<ContainerInfo> authServerInfo = new LinkedList<>();
     private final List<List<ContainerInfo>> authServerBackendsInfo = new ArrayList<>();
+    private ContainerInfo legacyAuthServerInfo;
 
     private final List<ContainerInfo> cacheServersInfo = new ArrayList<>();
 
@@ -153,6 +154,14 @@ public final class SuiteContext {
         authServerBackendsInfo.get(dcIndex).add(container);
     }
 
+    public ContainerInfo getLegacyAuthServerInfo() {
+        return legacyAuthServerInfo;
+    }
+
+    public void setLegacyAuthServerInfo(ContainerInfo legacyAuthServerInfo) {
+        this.legacyAuthServerInfo = legacyAuthServerInfo;
+    }
+
     public ContainerInfo getMigratedAuthServerInfo() {
         return migratedAuthServerInfo;
     }
@@ -209,6 +218,9 @@ public final class SuiteContext {
               .append("\n");
 
             getAuthServerBackendsInfo().forEach(bInfo -> sb.append("  Backend: ").append(bInfo).append(" - ").append(bInfo.getContextRoot().toExternalForm()).append("\n"));
+            if (Boolean.parseBoolean(System.getProperty("auth.server.jboss.legacy"))) {
+                sb.append("  Legacy:  ").append(getLegacyAuthServerInfo()).append("           - ").append(getLegacyAuthServerInfo().getContextRoot().toExternalForm()).append("\n");
+            }
         } else {
           sb.append(getAuthServerInfo().getQualifier())
             .append("\n");
