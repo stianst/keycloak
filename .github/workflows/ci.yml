@@ -19,7 +19,7 @@ jobs:
         java-version: 1.8
     - name: Build
       run: 
-        mvn compile -B -nsu
+        mvn compile -B -nsu -DskipTestsuite
     - name: Test
       run: 
         mvn integration-test -B -nsu -Dtest=ClientTest -DfailIfNoTests=false
@@ -39,7 +39,7 @@ jobs:
         java-version: 1.8
     - name: Build
       run: 
-        mvn compile -B -nsu
+        mvn compile -B -nsu -DskipTestsuite
     - name: Test
       run: 
         mvn integration-test -B -nsu -Pdistribution -Pauth-server-wildfly -Dtest=ClientTest -DfailIfNoTests=false | java -cp testsuite/utils/target/classes org.keycloak.testsuite.LogTrimmer
