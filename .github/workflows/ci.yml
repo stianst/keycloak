@@ -19,7 +19,7 @@ jobs:
         java-version: 1.8
     - name: Test
       run: 
-        mvn integration-test -B -nsu -Dtest=ClientTest -DfailIfNoTests=false | java -cp testsuite/utils/target/classes org.keycloak.testsuite.LogTrimmer
+        mvn integration-test -B -nsu -Dtest=ClientTest -DfailIfNoTests=false
   wildfly:
     name: Build and Test on WildFly
     runs-on: ubuntu-latest
