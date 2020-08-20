@@ -1,4 +1,4 @@
-<project>
+<project xmlns:if="ant:if">
 
     <property name="cli.tmp.dir" value="${project.build.directory}/cli" />
 
@@ -214,6 +214,7 @@
         <copy todir="${cli.tmp.dir}">
             <resources>
                 <file file="${common.resources}/jboss-cli/cross-dc-setup.cli"/>
+                <file file="${common.resources}/jboss-cli/cross-dc-setup_cache-auth.cli" if:true="${crossdc.cache.auth}" />
             </resources>
         </copy>
     </target>

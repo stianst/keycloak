@@ -27,7 +27,7 @@
 
     <fileSets>
         <fileSet>
-            <directory>${cache.server.jboss.home}</directory>
+            <directory>${cache.server.infinispan.home}</directory>
             <outputDirectory>${cache.server.container}</outputDirectory>
             <excludes>
                 <exclude>**/*.sh</exclude>
@@ -35,7 +35,7 @@
             </excludes>
         </fileSet>
         <fileSet>
-            <directory>${cache.server.jboss.home}</directory>
+            <directory>${cache.server.infinispan.home}</directory>
             <outputDirectory>${cache.server.container}</outputDirectory>
             <includes>
                 <include>**/*.sh</include>

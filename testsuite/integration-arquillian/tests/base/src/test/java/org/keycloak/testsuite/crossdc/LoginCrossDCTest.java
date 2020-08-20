@@ -36,8 +36,8 @@ public class LoginCrossDCTest extends AbstractAdminCrossDCTest {
     public void loginTest() throws Exception {
         enableDcOnLoadBalancer(DC.SECOND);
 
-        //log.info("Started to sleep");
-        //Thread.sleep(10000000);
+//        log.info("Started to sleep");
+//        Thread.sleep(10000000);
         for (int i=0 ; i<30 ; i++) {
             OAuthClient.AuthorizationEndpointResponse response1 = oauth.doLogin("test-user@localhost", "password");
             String code = response1.getCode();
