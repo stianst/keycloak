@@ -246,6 +246,25 @@
                                     <overwrite>true</overwrite>
                                 </configuration>
                             </execution>
+                            <execution>
+                                <id>copy-server-keystore</id>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${cache.server.jboss.home}/standalone/configuration</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${common.resources}</directory>
+                                            <includes>
+                                                <include>server.jks</include>
+                                            </includes>
+                                        </resource>
+                                    </resources>
+                                    <overwrite>true</overwrite>
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
 

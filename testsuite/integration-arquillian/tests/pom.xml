@@ -131,6 +131,7 @@
         <cache.server.2.port.offset>2010</cache.server.2.port.offset>
         <cache.server.2.management.port>12000</cache.server.2.management.port>
         <cache.server.console.output>true</cache.server.console.output>
+        <cache.server.auth>false</cache.server.auth>
 
         <dependency.keystore.root>${project.build.directory}/dependency/keystore</dependency.keystore.root>
         <dependency.truststore>${dependency.keystore.root}/keycloak.truststore</dependency.truststore>
@@ -614,6 +615,7 @@
                             <cache.server.2.port.offset>${cache.server.2.port.offset}</cache.server.2.port.offset>
                             <cache.server.2.management.port>${cache.server.2.management.port}</cache.server.2.management.port>
                             <cache.server.java.home>${cache.server.java.home}</cache.server.java.home>
+                            <cache.server.auth>${cache.server.auth}</cache.server.auth>
 
                             <keycloak.connectionsInfinispan.remoteStorePort>${keycloak.connectionsInfinispan.remoteStorePort}</keycloak.connectionsInfinispan.remoteStorePort>
                             <keycloak.connectionsInfinispan.remoteStorePort.2>${keycloak.connectionsInfinispan.remoteStorePort.2}</keycloak.connectionsInfinispan.remoteStorePort.2>
@@ -2145,6 +2147,14 @@
                 <tomcat.javax.net.ssl.properties>-Djavax.net.ssl.trustStore=${app.server.home}/lib/keycloak.truststore -Djavax.net.ssl.trustStorePassword=secret</tomcat.javax.net.ssl.properties>
             </properties>
         </profile>
+        
+        <profile>
+            <id>cache-auth</id>
+            <properties>
+                <cache.server.auth>true</cache.server.auth>
+            </properties>
+        </profile>
+        
     </profiles>
 
 </project>

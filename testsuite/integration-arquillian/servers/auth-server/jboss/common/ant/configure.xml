@@ -216,6 +216,14 @@
                 <file file="${common.resources}/jboss-cli/cross-dc-setup.cli"/>
                 <file file="${common.resources}/jboss-cli/cross-dc-setup_cache-auth.cli" if:true="${crossdc.cache.auth}" />
             </resources>
+            <filterset>
+                <filter token="HOTROD_SASL_MECHANISM" value="${hotrod.sasl.mechanism}"/>
+            </filterset>
+        </copy>
+        <copy todir="${auth.server.home}/standalone/configuration">
+            <resources>
+                <file file="${common.resources}/keystore/hotrod-client-truststore.jks"/>
+            </resources>
         </copy>
     </target>
 

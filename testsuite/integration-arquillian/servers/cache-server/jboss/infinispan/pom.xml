@@ -34,7 +34,7 @@
 
         <cache.server.jboss.groupId>org.infinispan.server</cache.server.jboss.groupId>
         <cache.server.jboss.artifactId>infinispan-server</cache.server.jboss.artifactId>
-        <cache.server.jboss.version>${infinispan.version}</cache.server.jboss.version>
+        <cache.server.jboss.version>9.4.21.Final</cache.server.jboss.version>
         <cache.server.jboss.unpacked.folder.name>${cache.server.jboss.artifactId}-${cache.server.jboss.version}</cache.server.jboss.unpacked.folder.name>
         
         <cache.server.jboss.cache-authorization-disabled>true</cache.server.jboss.cache-authorization-disabled>

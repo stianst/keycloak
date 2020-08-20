@@ -175,6 +175,12 @@
                                                 <include>infinispan-xsite-2.xml</include>
                                             </includes>
                                             <stylesheet>${common.resources}/${cache.server.cache-auth-xsl}</stylesheet>
+                                            <parameters>
+                                                <parameter>
+                                                    <name>hotrod.sasl.mechanism</name>
+                                                    <value>${hotrod.sasl.mechanism}</value>
+                                                </parameter>
+                                            </parameters>
                                             <outputDir>${cache.server.infinispan.config.dir}</outputDir>
                                         </transformationSet>
                                     </transformationSets>
@@ -183,6 +189,32 @@
                             
                         </executions>
                     </plugin>
+                    
+                    <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-server-keystore</id>
+                                <phase>process-test-resources</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${cache.server.infinispan.config.dir}</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${common.resources}</directory>
+                                            <includes>
+                                                <include>server.jks</include>
+                                            </includes>
+                                        </resource>
+                                    </resources>
+                                    <overwrite>true</overwrite>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    
                     
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>

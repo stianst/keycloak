@@ -43,6 +43,7 @@
 
         <cache.default.worker.io-threads>2</cache.default.worker.io-threads>
         <cache.default.worker.task-max-threads>4</cache.default.worker.task-max-threads>
+        <hotrod.sasl.mechanism>DIGEST-MD5</hotrod.sasl.mechanism>
 
         <jboss.cli.executable>jboss-cli.sh</jboss.cli.executable>
 

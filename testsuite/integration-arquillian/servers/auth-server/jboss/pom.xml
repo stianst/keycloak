@@ -275,6 +275,7 @@
                                             <property name="offline.session.cache.owners" value="${offline.session.cache.owners}" />
                                             <property name="login.failure.cache.owners" value="${login.failure.cache.owners}" />
                                             <property name="crossdc.cache.auth" value="${crossdc.cache.auth}" />
+                                            <property name="hotrod.sasl.mechanism" value="${hotrod.sasl.mechanism}" />
                                         </ant>
                                     </target>
                                 </configuration>

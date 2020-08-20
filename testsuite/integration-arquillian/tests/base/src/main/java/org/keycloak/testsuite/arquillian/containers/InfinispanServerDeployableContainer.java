@@ -6,11 +6,19 @@ import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import javax.management.remote.JMXServiceURL;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import org.jboss.arquillian.container.spi.client.container.DeployableContainer;
 import org.jboss.arquillian.container.spi.client.container.DeploymentException;
 import org.jboss.arquillian.container.spi.client.container.LifecycleException;
@@ -33,7 +41,8 @@ public class InfinispanServerDeployableContainer implements DeployableContainer<
 
     private File pidFile;
     private JMXServiceURL jmxServiceURL;
-    private static final String CONNECTOR_ADDRESS = "com.sun.management.jmxremote.localConnectorAddress";
+
+    private static final Boolean CACHE_SERVER_AUTH = Boolean.parseBoolean(System.getProperty("cache.server.auth", "false"));
 
     @Override
     public Class<InfinispanServerConfiguration> getConfigurationClass() {
@@ -73,15 +82,23 @@ public class InfinispanServerDeployableContainer implements DeployableContainer<
         pb = pb.directory(new File(configuration.getInfinispanHome(), "/bin")).inheritIO().redirectErrorStream(true);
         pb.environment().put("LAUNCH_ISPN_IN_BACKGROUND", "false");
         pb.environment().put("ISPN_PIDFILE", pidFile.getAbsolutePath());
+        String javaHome = System.getProperty("cache.server.java.home");
+        if (javaHome != null) {
+            pb.environment().put("JAVA_HOME", javaHome);
+        }
         try {
             log.info("Starting Infinispan server");
             log.info(configuration.getInfinispanHome());
             log.info(commands);
             infinispanServerProcess = pb.start();
 
+            trustAllCertificates();
+
             long startTimeMillis = System.currentTimeMillis();
             long startupTimeoutMillis = 30 * 1000;
-            URL consoleURL = new URL(String.format("http://localhost:%s/console/", 11222 + configuration.getPortOffset()));
+            URL consoleURL = new URL(String.format("%s://localhost:%s/console/",
+                    CACHE_SERVER_AUTH ? "https" : "http",
+                    11222 + configuration.getPortOffset()));
 
             while (true) {
                 Thread.sleep(1000);
@@ -111,6 +128,44 @@ public class InfinispanServerDeployableContainer implements DeployableContainer<
         } catch (InterruptedException ex) {
             log.error("Infinispan server startup process interupted.", ex);
             stop();
+        }
+    }
+
+    private void trustAllCertificates() {
+
+        TrustManager[] trustAllCerts;
+        trustAllCerts = new TrustManager[]{
+            new X509TrustManager() {
+                @Override
+                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                    return null;
+                }
+
+                @Override
+                public void checkClientTrusted(
+                        java.security.cert.X509Certificate[] certs, String authType) {
+                }
+
+                @Override
+                public void checkServerTrusted(
+                        java.security.cert.X509Certificate[] certs, String authType) {
+                }
+            }
+        };
+
+        // Install the all-trusting trust manager
+        try {
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+            HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+                @Override
+                public boolean verify(String arg0, SSLSession arg1) {
+                    return true;
+                }
+            });
+        } catch (KeyManagementException | NoSuchAlgorithmException e) {
+            throw new RuntimeException("Unable to initialize a 'trust-all' trust manager.");
         }
     }
 
