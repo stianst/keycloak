@@ -188,20 +188,17 @@ public class AccountRestService {
      */
     @Path("/sessions")
     public SessionResource sessions() {
-        checkAccountApiEnabled();
         auth.requireOneOf(AccountRoles.MANAGE_ACCOUNT, AccountRoles.VIEW_PROFILE);
         return new SessionResource(session, auth, request);
     }
 
     @Path("/credentials")
     public AccountCredentialResource credentials() {
-        checkAccountApiEnabled();
         return new AccountCredentialResource(session, user, auth);
     }
 
     @Path("/resources")
     public ResourcesService resources() {
-        checkAccountApiEnabled();
         auth.requireOneOf(AccountRoles.MANAGE_ACCOUNT, AccountRoles.VIEW_PROFILE);
         return new ResourcesService(session, user, auth, request);
     }
@@ -251,7 +248,6 @@ public class AccountRestService {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getConsent(final @PathParam("clientId") String clientId) {
-        checkAccountApiEnabled();
         auth.requireOneOf(AccountRoles.MANAGE_ACCOUNT, AccountRoles.VIEW_CONSENT, AccountRoles.MANAGE_CONSENT);
 
         ClientModel client = realm.getClientByClientId(clientId);
@@ -276,7 +272,6 @@ public class AccountRestService {
     @Path("/applications/{clientId}/consent")
     @DELETE
     public Response revokeConsent(final @PathParam("clientId") String clientId) {
-        checkAccountApiEnabled();
         auth.requireOneOf(AccountRoles.MANAGE_ACCOUNT, AccountRoles.MANAGE_CONSENT);
 
         event.event(EventType.REVOKE_GRANT);
@@ -336,7 +331,6 @@ public class AccountRestService {
      * @return response to return to the caller
      */
     private Response upsert(String clientId, ConsentRepresentation consent) {
-        checkAccountApiEnabled();
         auth.requireOneOf(AccountRoles.MANAGE_ACCOUNT, AccountRoles.MANAGE_CONSENT);
 
         event.event(EventType.GRANT_CONSENT);
@@ -404,7 +398,6 @@ public class AccountRestService {
     @Produces(MediaType.APPLICATION_JSON)
     @NoCache
     public List<ClientRepresentation> applications(@QueryParam("name") String name) {
-        checkAccountApiEnabled();
         auth.requireOneOf(AccountRoles.MANAGE_ACCOUNT, AccountRoles.VIEW_APPLICATIONS);
 
         Set<ClientModel> clients = new HashSet<ClientModel>();
@@ -458,13 +451,5 @@ public class AccountRestService {
             return false;
         else
             return client.getName().toLowerCase().contains(name.toLowerCase());
-    }
-
-    // TODO Logs
-    
-    private static void checkAccountApiEnabled() {
-        if (!Profile.isFeatureEnabled(Profile.Feature.ACCOUNT_API)) {
-            throw new NotFoundException();
-        }
     }
 }
