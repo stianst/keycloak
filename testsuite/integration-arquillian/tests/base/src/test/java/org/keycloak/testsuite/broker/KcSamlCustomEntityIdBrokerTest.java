@@ -13,6 +13,7 @@ import java.io.Closeable;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.keycloak.testsuite.util.ServerURLs;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import static org.keycloak.saml.common.constants.JBossSAMLURIConstants.ASSERTION_NSURI;
@@ -50,7 +51,7 @@ public final class KcSamlCustomEntityIdBrokerTest extends AbstractBrokerTest {
 
                         // Find the Issuer element
                         Element issuerElement = DocumentUtil.getDirectChildElement(document.getDocumentElement(), ASSERTION_NSURI.get(), "Issuer");
-                        Assert.assertEquals("Unexpected Issuer element value", "https://localhost:8543/auth/realms/consumer", issuerElement.getTextContent());
+                        Assert.assertEquals("Unexpected Issuer element value", ServerURLs.getAuthServerContextRoot() + "/auth/realms/consumer", issuerElement.getTextContent());
                     }
                     catch (Exception ex)
                     {
