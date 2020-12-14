@@ -239,7 +239,7 @@ public class DeviceActivityTest extends BaseAccountPageTest {
             ClientModel client = session.clientLocalStorage().getClientByClientId(TEST_CLIENT_ID, realm);
             UserModel user = session.users().getUserByUsername("test", realm); // cannot use testUser.getUsername() because it throws NotSerializableException for no apparent reason (or maybe I'm just stupid :D)
 
-            UserSessionModel userSession = session.sessions().createUserSession(sessionId, realm, user, "test", ip, "form", false, null, null);
+            UserSessionModel userSession = session.sessions().createUserSession(sessionId, realm, user, "test", ip, "form", false, null, null,UserSessionModel.SessionPersistenceState.PERSISTENT);
             session.sessions().createClientSession(realm, client, userSession);
         });
 
