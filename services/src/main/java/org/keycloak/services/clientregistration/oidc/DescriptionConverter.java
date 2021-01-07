@@ -133,6 +133,10 @@ public class DescriptionConverter {
             configWrapper.setIdTokenEncryptedResponseEnc(clientOIDC.getIdTokenEncryptedResponseEnc());
         }
 
+        if (clientOIDC.getRequestUris() != null) {
+            configWrapper.setRequestUris(clientOIDC.getRequestUris());
+        }
+
         return client;
     }
 
@@ -221,6 +225,10 @@ public class DescriptionConverter {
         }
         if (config.getIdTokenEncryptedResponseEnc() != null) {
             response.setIdTokenEncryptedResponseEnc(config.getIdTokenEncryptedResponseEnc());
+        }
+
+        if (config.getRequestUris() != null) {
+            response.setRequestUris(config.getRequestUris());
         }
 
         List<ProtocolMapperRepresentation> foundPairwiseMappers = PairwiseSubMapperUtils.getPairwiseSubMappers(client);

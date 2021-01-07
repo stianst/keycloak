@@ -1271,6 +1271,13 @@ module.controller('ClientDetailCtrl', function($scope, realm, client, flows, $ro
                 $scope.displayOnConsentScreen = false;
             }
         }
+
+        if ($scope.client.attributes["request.uris"] && $scope.client.attributes["request.uris"].length > 0) {
+            $scope.client.requestUris = $scope.client.attributes["request.uris"].split("##");
+        } else {
+            $scope.client.requestUris = [];
+        }
+
     }
 
     if (!$scope.create) {
@@ -1408,6 +1415,9 @@ module.controller('ClientDetailCtrl', function($scope, realm, client, flows, $ro
         if ($scope.newWebOrigin && $scope.newWebOrigin.length > 0) {
             return true;
         }
+        if ($scope.newRequestUri && $scope.newRequestUri.length > 0) {
+            return true;
+        }
         return false;
     }
 
@@ -1463,12 +1473,23 @@ module.controller('ClientDetailCtrl', function($scope, realm, client, flows, $ro
         $scope.changed = isChanged();
     }, true);
 
+    $scope.$watch('newRequestUri', function() {
+        $scope.changed = isChanged();
+    }, true);
+
     $scope.deleteWebOrigin = function(index) {
         $scope.clientEdit.webOrigins.splice(index, 1);
     }
     $scope.addWebOrigin = function() {
         $scope.clientEdit.webOrigins.push($scope.newWebOrigin);
         $scope.newWebOrigin = "";
+    }
+    $scope.deleteRequestUri = function(index) {
+        $scope.clientEdit.requestUris.splice(index, 1);
+    }
+    $scope.addRequestUri = function() {
+        $scope.clientEdit.requestUris.push($scope.newRequestUri);
+        $scope.newRequestUri = "";
     }
     $scope.deleteRedirectUri = function(index) {
         $scope.clientEdit.redirectUris.splice(index, 1);
@@ -1487,6 +1508,16 @@ module.controller('ClientDetailCtrl', function($scope, realm, client, flows, $ro
         if ($scope.newWebOrigin && $scope.newWebOrigin.length > 0) {
             $scope.addWebOrigin();
         }
+
+        if ($scope.newRequestUri && $scope.newRequestUri.length > 0) {
+            $scope.addRequestUri();
+        }
+        if ($scope.clientEdit.requestUris && $scope.clientEdit.requestUris.length > 0) {
+            $scope.clientEdit.attributes["request.uris"] = $scope.clientEdit.requestUris.join("##");
+        } else {
+            $scope.clientEdit.attributes["request.uris"] = null;
+        }
+        delete $scope.clientEdit.requestUris;
 
         if ($scope.samlServerSignature == true) {
             $scope.clientEdit.attributes["saml.server.signature"] = "true";

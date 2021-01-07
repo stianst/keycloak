@@ -395,5 +395,21 @@ public class OIDCClientRegistrationTest extends AbstractClientRegistrationTest {
         return ApiUtil.findClientByClientId(adminClient.realms().realm(REALM_NAME), clientId).toRepresentation();
     }
 
+    @Test
+    public void testRequestUris() throws Exception {
+        OIDCClientRepresentation clientRep = null;
+        OIDCClientRepresentation response = null;
+
+        clientRep = createRep();
+        clientRep.setRequestUris(Arrays.asList("http://host/foo", "https://host2/bar"));
+
+        response = reg.oidc().create(clientRep);
+        Assert.assertNames(response.getRequestUris(), "http://host/foo", "https://host2/bar");
+
+        // Test Keycloak representation
+        ClientRepresentation kcClient = getClient(response.getClientId());
+        OIDCAdvancedConfigWrapper config = OIDCAdvancedConfigWrapper.fromClientRepresentation(kcClient);
+        Assert.assertNames(config.getRequestUris(), "http://host/foo", "https://host2/bar");
+    }
 
 }
