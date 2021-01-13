@@ -29,31 +29,9 @@
     <packaging>pom</packaging>
     <name>Keycloak Arquillian Integration TestSuite - Cache Server</name>
 
-    <profiles>
-        <profile>
-            <id>cache-server-infinispan</id>
-            <modules>
-                <module>infinispan/infinispan</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>cache-server-datagrid</id>
-            <modules>
-                <module>infinispan/datagrid</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>cache-server-jboss-infinispan</id>
-            <modules>
-                <module>jboss/infinispan</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>cache-server-jboss-datagrid</id>
-            <modules>
-                <module>jboss/datagrid</module>
-            </modules>
-        </profile>
-    </profiles>
+    <modules>
+        <module>infinispan</module>
+        <module>jboss</module>
+    </modules>
 
 </project>

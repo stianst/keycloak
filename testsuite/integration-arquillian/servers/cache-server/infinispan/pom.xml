@@ -252,6 +252,19 @@
             </build>
         </profile>
         
+        <profile>
+            <id>cache-server-infinispan</id>
+            <modules>
+                <module>infinispan</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>cache-server-datagrid</id>
+            <modules>
+                <module>datagrid</module>
+            </modules>
+        </profile>
+        
     </profiles>
 
 </project>

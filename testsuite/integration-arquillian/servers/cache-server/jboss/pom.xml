@@ -272,6 +272,19 @@
             </build>
         </profile>
         
+        <profile>
+            <id>cache-server-jboss-infinispan</id>
+            <modules>
+                <module>infinispan</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>cache-server-jboss-datagrid</id>
+            <modules>
+                <module>datagrid</module>
+            </modules>
+        </profile>
+        
     </profiles>
 
 </project>
