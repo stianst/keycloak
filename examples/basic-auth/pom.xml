@@ -23,7 +23,7 @@
     <parent>
         <artifactId>keycloak-examples-parent</artifactId>
         <groupId>org.keycloak</groupId>
-        <version>9.0.11</version>
+        <version>9.0.12-SNAPSHOT</version>
     </parent>
 
     <name>Keycloak Examples - Basic Auth</name>
