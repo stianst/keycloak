@@ -61,6 +61,20 @@ public class UserUpdateHelper {
         update(UserUpdateEvent.Account, realm, user, updatedProfile);
     }
 
+    /**
+     * <p>This method should be used when account is updated through the old console where the behavior is different
+     * than when using the new Account REST API and console in regards to how user attributes are managed.
+     *
+     * @deprecated Remove this method as soon as the old console is no longer part of the distribution
+     * @param realm
+     * @param user
+     * @param updatedProfile
+     */
+    @Deprecated
+    public static void updateAccountOldConsole(RealmModel realm, UserModel user, UserProfile updatedProfile) {
+        update(UserUpdateEvent.Account, realm, user, updatedProfile.getAttributes(), false);
+    }
+
     public static void updateUserResource(KeycloakSession session, UserModel user, UserRepresentation rep, boolean removeExistingAttributes) {
         UserProfileProvider profileProvider = session.getProvider(UserProfileProvider.class, LegacyUserProfileProviderFactory.PROVIDER_ID);
         RealmModel realm = session.getContext().getRealm();
