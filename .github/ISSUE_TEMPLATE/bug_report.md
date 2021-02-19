@@ -8,7 +8,9 @@ assignees: ''
 ---
 
 ## Describe the bug
-A clear and concise description of what the bug is. If applicable, add log output, stacktraces, or screenshots to help explain your problem.
+A clear and concise description of what the bug is. 
+
+If applicable, add log output, stacktraces, or screenshots to help explain your problem.
 
 ### To Reproduce
 Steps to reproduce the behavior:
