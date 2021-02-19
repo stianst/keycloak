@@ -23,14 +23,14 @@ A clear and concise description of what you expected to happen.
 **Actual behavior**
 A clear and concise description of the actual behavior.
 
-**Configuration**
-If applicable, describe your configuration to help explain your problem.
-
-**Environment**
-If applicable, describe your environment to help explain your problem.
-
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
 **Additional context**
 Add any other context about the problem here.
+
+***Configuration***
+If applicable, describe your configuration to help explain your problem.
+
+***Environment***
+If applicable, describe your environment to help explain your problem.
