@@ -25,6 +25,7 @@ import org.keycloak.common.constants.ServiceAccountConstants;
 import org.keycloak.events.Details;
 import org.keycloak.events.Errors;
 import org.keycloak.events.EventType;
+import org.keycloak.models.AuthenticationExecutionModel;
 import org.keycloak.models.Constants;
 import org.keycloak.models.utils.SystemClientUtil;
 import org.keycloak.representations.idm.EventRepresentation;
@@ -34,6 +35,7 @@ import org.keycloak.testsuite.AssertEvents;
 import org.keycloak.testsuite.AbstractTestRealmKeycloakTest;
 import org.keycloak.testsuite.admin.ApiUtil;
 import org.keycloak.testsuite.arquillian.annotation.AuthServerContainerExclude;
+import org.keycloak.testsuite.federation.kerberos.AbstractKerberosTest;
 import org.keycloak.testsuite.pages.AppPage;
 import org.keycloak.testsuite.pages.AppPage.RequestType;
 import org.keycloak.testsuite.pages.ErrorPage;
@@ -1059,6 +1061,22 @@ public class ResetPasswordTest extends AbstractTestRealmKeycloakTest {
 
         assertThat(driver2.getPageSource(), Matchers.containsString("Your account has been updated."));
     }
+
+
+    // KEYCLOAK-15239
+    @Test
+    public void resetPasswordWithSpnegoEnabled() throws IOException, MessagingException {
+        // Just switch SPNEGO authenticator requirement to alternative. No real usage of SPNEGO needed for this test
+        AuthenticationExecutionModel.Requirement origRequirement = AbstractKerberosTest.updateKerberosAuthExecutionRequirement(AuthenticationExecutionModel.Requirement.ALTERNATIVE, testRealm());
+
+        try {
+            resetPassword("login-test");
+        } finally {
+            // Revert
+            AbstractKerberosTest.updateKerberosAuthExecutionRequirement(origRequirement, testRealm());
+        }
+    }
+
 
     @Test
     public void failResetPasswordServiceAccount() {
