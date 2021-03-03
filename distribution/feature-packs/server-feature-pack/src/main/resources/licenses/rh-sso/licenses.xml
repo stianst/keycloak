@@ -15,7 +15,7 @@
     <dependency>
       <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
       <artifactId>owasp-java-html-sanitizer</artifactId>
-      <version>20191001.1.0.redhat-00001</version>
+      <version>20191001.1.0.redhat-00002</version>
       <licenses>
         <license>
           <name>Apache Software License 2.0</name>
