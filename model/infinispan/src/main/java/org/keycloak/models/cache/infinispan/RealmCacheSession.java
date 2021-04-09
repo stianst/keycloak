@@ -680,6 +680,11 @@ public class RealmCacheSession implements CacheRealmProvider {
     }
     
     @Override
+    public Set<RoleModel> getClientDefaultRoles(RealmModel realm) {
+        return getRealmDelegate().getClientDefaultRoles(realm);
+    }
+
+    @Override
     public Set<RoleModel> searchForClientRoles(RealmModel realm, ClientModel client, String search, Integer first,
             Integer max) {
         return getRealmDelegate().searchForClientRoles(realm, client, search, first, max);

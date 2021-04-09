@@ -2103,6 +2103,11 @@ public class RealmAdapter implements RealmModel, JpaModel<RealmEntity> {
     }
 
     @Override
+    public Set<RoleModel> getClientDefaultRoles() {
+        return session.realms().getClientDefaultRoles(this);
+    }
+
+    @Override
     public void addDefaultClientScope(ClientScopeModel clientScope, boolean defaultScope) {
         DefaultClientScopeRealmMappingEntity entity = new DefaultClientScopeRealmMappingEntity();
         entity.setClientScope(ClientScopeAdapter.toClientScopeEntity(clientScope, em));

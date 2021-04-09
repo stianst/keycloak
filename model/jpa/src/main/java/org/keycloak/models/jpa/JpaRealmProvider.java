@@ -282,6 +282,15 @@ public class JpaRealmProvider implements RealmProvider {
         return session.realms().getRoleById(roles.get(0), realm);
     }
 
+    @Override
+    public Set<RoleModel> getClientDefaultRoles(RealmModel realm) {
+        TypedQuery<String> query = em.createNamedQuery("getClientDefaultRolesByRealm", String.class);
+        query.setParameter("realm", realm.getId());
+        return query.getResultStream()
+          .map(id -> session.realms().getRoleById(id, realm))
+          .collect(Collectors.toSet());
+    }
+
 
     @Override
     public Set<RoleModel> getClientRoles(RealmModel realm, ClientModel client) {

@@ -35,10 +35,8 @@ public class DefaultRoles {
             set.add(realm.getRole(r));
         }
 
-        for (ClientModel application : realm.getClients()) {
-            for (String r : application.getDefaultRoles()) {
-                set.add(application.getRole(r));
-            }
+        for (RoleModel r : realm.getClientDefaultRoles()) {
+            set.add(r);
         }
         return set;
 

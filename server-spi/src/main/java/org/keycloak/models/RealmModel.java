@@ -509,4 +509,5 @@ public interface RealmModel extends RoleContainerModel {
     void removeDefaultClientScope(ClientScopeModel clientScope);
     List<ClientScopeModel> getDefaultClientScopes(boolean defaultScope);
 
+    Set<RoleModel> getClientDefaultRoles();
 }

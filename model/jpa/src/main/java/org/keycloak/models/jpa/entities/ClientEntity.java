@@ -59,6 +59,7 @@ import java.util.Set;
         @NamedQuery(name="searchClientsByClientId", query="select client.id from ClientEntity client where lower(client.clientId) like lower(concat('%',:clientId,'%')) and client.realm.id = :realm order by client.clientId"),
         @NamedQuery(name="getRealmClientsCount", query="select count(client) from ClientEntity client where client.realm.id = :realm"),
         @NamedQuery(name="findClientByClientId", query="select client from ClientEntity client where client.clientId = :clientId and client.realm.id = :realm"),
+        @NamedQuery(name="getClientDefaultRolesByRealm", query="select r.id from ClientEntity client JOIN client.defaultRoles r where client.realm.id = :realm"),
 })
 public class ClientEntity {
 

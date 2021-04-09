@@ -754,6 +754,11 @@ public class RealmAdapter implements CachedRealmModel {
     }
 
     @Override
+    public Set<RoleModel> getClientDefaultRoles() {
+        return cacheSession.getClientDefaultRoles(this);
+    }
+
+    @Override
     public void updateRequiredCredentials(Set<String> creds) {
         getDelegateForUpdate();
         updated.updateRequiredCredentials(creds);

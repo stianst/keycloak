@@ -44,6 +44,8 @@ public interface RealmProvider extends Provider, ClientProvider {
 
     Long getClientsCount(RealmModel realm);
 
+    Set<RoleModel> getClientDefaultRoles(RealmModel realm);
+
     Long getGroupsCountByNameContaining(RealmModel realm, String search);
     
     List<GroupModel> getGroupsByRole(RealmModel realm, RoleModel role, int firstResult, int maxResults);
