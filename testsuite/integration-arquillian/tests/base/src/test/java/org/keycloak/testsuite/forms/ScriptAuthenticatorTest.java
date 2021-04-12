@@ -49,6 +49,8 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.Map;
 
+import static org.keycloak.common.Profile.Feature.AUTHORIZATION;
+
 /**
  * Tests for {@link org.keycloak.authentication.authenticators.browser.ScriptBasedAuthenticator}
  *
@@ -66,6 +68,11 @@ public class ScriptAuthenticatorTest extends AbstractFlowTest {
     private AuthenticationFlowRepresentation flow;
 
     public static final String EXECUTION_ID = "scriptAuth";
+
+    @BeforeClass
+    public static void enabled() {
+        ProfileAssume.assumeFeatureEnabled(AUTHORIZATION);
+    }
 
     @Override
     public void configureTestRealm(RealmRepresentation testRealm) {

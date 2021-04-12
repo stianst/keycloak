@@ -257,6 +257,8 @@ public class RealmsResource {
 
     @Path("{realm}/authz")
     public Object getAuthorizationService(@PathParam("realm") String name) {
+        ProfileHelper.requireFeature(Profile.Feature.AUTHORIZATION);
+
         init(name);
         AuthorizationProvider authorization = this.session.getProvider(AuthorizationProvider.class);
         AuthorizationService service = new AuthorizationService(authorization);

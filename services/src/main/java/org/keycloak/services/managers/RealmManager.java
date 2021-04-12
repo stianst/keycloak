@@ -571,7 +571,7 @@ public class RealmManager {
                     clientManager.enableServiceAccount(clientModel);
                 }
 
-                if (Boolean.TRUE.equals(client.getAuthorizationServicesEnabled())) {
+                if (Profile.isFeatureEnabled(Profile.Feature.AUTHORIZATION) && Boolean.TRUE.equals(client.getAuthorizationServicesEnabled())) {
                     RepresentationToModel.createResourceServer(clientModel, session, true);
                     if(!skipUserDependent) {
                         RepresentationToModel.importAuthorizationSettings(client, clientModel, session);
