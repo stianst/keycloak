@@ -17,6 +17,7 @@
 
 package org.keycloak;
 
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -55,11 +56,23 @@ public class Config {
 
     }
 
-    public static class SystemPropertiesConfigProvider implements ConfigProvider {
+    public static class SystemPropertiesConfigProvider extends PropertiesConfigProvider {
+        public SystemPropertiesConfigProvider() {
+            super(System.getProperties());
+        }
+    }
+
+    public static class PropertiesConfigProvider implements ConfigProvider {
+
+        private Properties properties;
+
+        public PropertiesConfigProvider(Properties properties) {
+            this.properties = properties;
+        }
 
         @Override
         public String getProvider(String spi) {
-            return System.getProperties().getProperty("keycloak." + spi + ".provider");
+            return properties.getProperty("keycloak." + spi + ".provider");
         }
 
         @Override
@@ -70,16 +83,23 @@ public class Config {
                 sb.append(s);
                 sb.append(".");
             }
-            return new SystemPropertiesScope(sb.toString());
+            return new PropertiesScope(properties, sb.toString());
         }
 
     }
 
-    public static class SystemPropertiesScope implements Scope {
-
-        protected String prefix;
-
+    public static class SystemPropertiesScope extends PropertiesScope {
         public SystemPropertiesScope(String prefix) {
+            super(System.getProperties(), prefix);
+        }
+    }
+
+    public static class PropertiesScope implements Scope {
+        protected String prefix;
+        private Properties properties;
+
+        public PropertiesScope(Properties properties, String prefix) {
+            this.properties = properties;
             this.prefix = prefix;
         }
 
@@ -90,7 +110,7 @@ public class Config {
 
         @Override
         public String get(String key, String defaultValue) {
-            String v = System.getProperty(prefix + key, defaultValue);
+            String v = properties.getProperty(prefix + key, defaultValue);
             return v != null && !v.isEmpty() ? v : null;
         }
 

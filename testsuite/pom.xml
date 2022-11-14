@@ -60,6 +60,7 @@
         <module>integration-arquillian</module>
         <module>model</module>
         <module>utils</module>
+        <module>providers</module>
     </modules>
 
     <profiles>

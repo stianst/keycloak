@@ -6,6 +6,8 @@ import org.keycloak.models.KeycloakSessionFactory;
 
 public class DefaultThemeSelectorProviderFactory implements ThemeSelectorProviderFactory {
 
+    public static final String ID = "default";
+
     @Override
     public ThemeSelectorProvider create(KeycloakSession session) {
         return new DefaultThemeSelectorProvider(session);
@@ -25,6 +27,6 @@ public class DefaultThemeSelectorProviderFactory implements ThemeSelectorProvide
 
     @Override
     public String getId() {
-        return "default";
+        return ID;
     }
 }
