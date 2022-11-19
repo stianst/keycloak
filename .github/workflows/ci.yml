@@ -84,7 +84,7 @@ jobs:
           fi
 
       - name: Analyze Test and/or Coverage Results
-        uses: runforesight/foresight-test-kit-action@v1.3.0
+        uses: runforesight/foresight-test-kit-action@v1.3.1
         if: always() && github.repository == 'keycloak/keycloak'
         with:
           api_key: ${{ secrets.FORESIGHT_API_KEY }}
@@ -176,7 +176,7 @@ jobs:
           fi
 
       - name: Analyze Test and/or Coverage Results
-        uses: runforesight/foresight-test-kit-action@v1.3.0
+        uses: runforesight/foresight-test-kit-action@v1.3.1
         if: always() && github.repository == 'keycloak/keycloak'
         with:
           api_key: ${{ secrets.FORESIGHT_API_KEY }}
@@ -273,7 +273,7 @@ jobs:
           exit $TEST_RESULT
 
       - name: Analyze Test and/or Coverage Results
-        uses: runforesight/foresight-test-kit-action@v1.3.0
+        uses: runforesight/foresight-test-kit-action@v1.3.1
         if: always() && github.repository == 'keycloak/keycloak'
         with:
           api_key: ${{ secrets.FORESIGHT_API_KEY }}
@@ -346,7 +346,7 @@ jobs:
           exit $TEST_RESULT
 
       - name: Analyze Test and/or Coverage Results
-        uses: runforesight/foresight-test-kit-action@v1.3.0
+        uses: runforesight/foresight-test-kit-action@v1.3.1
         if: always() && github.repository == 'keycloak/keycloak'
         with:
           api_key: ${{ secrets.FORESIGHT_API_KEY }}
@@ -407,7 +407,7 @@ jobs:
           exit $TEST_RESULT
 
       - name: Analyze Test and/or Coverage Results
-        uses: runforesight/foresight-test-kit-action@v1.3.0
+        uses: runforesight/foresight-test-kit-action@v1.3.1
         if: always() && github.repository == 'keycloak/keycloak'
         with:
           api_key: ${{ secrets.FORESIGHT_API_KEY }}
@@ -476,7 +476,7 @@ jobs:
           exit $TEST_RESULT
 
       - name: Analyze Test and/or Coverage Results
-        uses: runforesight/foresight-test-kit-action@v1.3.0
+        uses: runforesight/foresight-test-kit-action@v1.3.1
         if: always() && github.repository == 'keycloak/keycloak'
         with:
           api_key: ${{ secrets.FORESIGHT_API_KEY }}
