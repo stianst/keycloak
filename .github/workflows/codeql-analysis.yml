@@ -1,0 +1,125 @@
+name: "CodeQL"
+
+on:
+  push:
+    branches-ignore:
+      - 'main'
+      - 'dependabot/**'
+  pull_request:
+    branches: [main]
+    paths: 
+      - '.github/workflows/codeql-analysis.yml'
+      - '**.java'
+      - 'adapters/oidc/js/**'
+      - 'themes/src/main/**'
+  schedule:
+    - cron: '0 9 * * 2'
+
+concurrency:
+  # Only cancel jobs for PR updates
+  group: codeql-analysis-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  init:
+    name: Check changes
+    if: github.repository == 'keycloak/keycloak'
+    runs-on: ubuntu-latest
+    outputs:
+      java: ${{ steps.diff.outputs.java }}
+      themes: ${{ steps.diff.outputs.themes }}
+      js-adapter: ${{ steps.diff.outputs.js-adapter }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - id: diff
+        run: |
+          JAVA=`git diff --name-only origin/main | grep '.*.java' &>/dev/null && echo true || echo false`
+          THEMES=`git diff --name-only origin/main | grep 'themes/src/main/.*' &>/dev/null && echo true || echo false`
+          JS_ADAPTER=`git diff --name-only origin/main | grep 'adapters/oidc/js/.*' &>/dev/null && echo true || echo false`
+          
+          echo "java=$JAVA" >> $GITHUB_OUTPUT
+          echo "themes=$THEMES" >> $GITHUB_OUTPUT
+          echo "js-adapter=$JS_ADAPTER" >> $GITHUB_OUTPUT
+          
+          echo "Java changed: $JAVA" >> $GITHUB_STEP_SUMMARY
+          echo "Themes changed: $THEMES" >> $GITHUB_STEP_SUMMARY
+          echo "JS adapter changed: $JS_ADAPTER" >> $GITHUB_STEP_SUMMARY
+
+  java:
+    name: CodeQL Java
+    needs: init
+    if: needs.init.outputs.java == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2.1.34
+        with:
+          languages: java
+
+      - name: Build Keycloak
+        uses: ./.github/actions/build-keycloak
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2.1.34
+        with:
+          wait-for-processing: true
+        env:
+          CODEQL_ACTION_EXTRA_OPTIONS: '{"database":{"interpret-results":["--max-paths",0]}}'
+
+  themes:
+    name: CodeQL Themes
+    needs: init
+    if: needs.init.outputs.themes == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2.1.34
+        env:
+          CODEQL_ACTION_EXTRA_OPTIONS: '{"database":{"finalize":["--no-run-unnecessary-builds"]}}'
+        with:
+          languages: javascript
+          source-root: themes/src/main/
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2.1.34
+        with:
+          wait-for-processing: true
+        env:
+          CODEQL_ACTION_EXTRA_OPTIONS: '{"database":{"interpret-results":["--max-paths",0]}}'
+
+  js-adapter:
+    name: CodeQL JavaScript Adapter
+    needs: init
+    if: needs.init.outputs.js-adapter == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2.1.34
+        env:
+          CODEQL_ACTION_EXTRA_OPTIONS: '{"database":{"finalize":["--no-run-unnecessary-builds"]}}'
+        with:
+          languages: javascript
+          source-root: adapters/oidc/js/src/
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2.1.34
+        with:
+          wait-for-processing: true
+        env:
+          CODEQL_ACTION_EXTRA_OPTIONS: '{"database":{"interpret-results":["--max-paths",0]}}'

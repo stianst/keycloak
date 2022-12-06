@@ -1,0 +1,17 @@
+AccountRestServiceTest
+RequiredActionUpdateProfileTest
+org.keycloak.testsuite.admin.*
+AuthorizationTest
+KcOidcBrokerTest
+ClientRegistrationTest
+EventStoreProviderTest
+ExportImportTest
+LDAPUserLoginTest
+LoginTest
+SSOTest
+GeneratedRsaKeyProviderTest
+AuthorizationCodeTest
+PasswordPolicyTest
+SamlClientTest
+TransactionsTest
+UserProfileTest
