@@ -25,10 +25,6 @@ public class GzipResourceEncodingProviderFactory implements ResourceEncodingProv
 
     @Override
     public ResourceEncodingProvider create(KeycloakSession session) {
-        if (cacheDir == null) {
-            cacheDir = initCacheDir();
-        }
-
         return new GzipResourceEncodingProvider(session, cacheDir);
     }
 
@@ -38,6 +34,7 @@ public class GzipResourceEncodingProviderFactory implements ResourceEncodingProv
         for (String s : e.split(" ")) {
             excludedContentTypes.add(s);
         }
+        cacheDir = initCacheDir();
     }
 
     @Override
@@ -62,31 +59,18 @@ public class GzipResourceEncodingProviderFactory implements ResourceEncodingProv
                 .build();
     }
 
-    private synchronized File initCacheDir() {
-        if (cacheDir != null) {
-            return cacheDir;
+    private File initCacheDir() {
+        File cacheDir = new File(Platform.getPlatform().getTmpDirectory(), "kc-gzip-cache");
+        try {
+            FileUtils.deleteDirectory(cacheDir);
+        } catch (IOException e) {
+            logger.warn("Failed to delete old gzip cache directory", e);
         }
-
-        File cacheRoot = new File(Platform.getPlatform().getTmpDirectory(), "kc-gzip-cache");
-        File cacheDir = cacheRoot;
-
-//        if (cacheRoot.isDirectory()) {
-//            for (File f : cacheRoot.listFiles()) {
-//                if (!f.getName().equals(Version.RESOURCES_VERSION)) {
-//                    try {
-//                        FileUtils.deleteDirectory(f);
-//                    } catch (IOException e) {
-//                        logger.warn("Failed to delete old gzip cache directory", e);
-//                    }
-//                }
-//            }
-//        }
 
         if (!cacheDir.isDirectory() && !cacheDir.mkdirs()) {
             logger.warn("Failed to create gzip cache directory");
             return null;
         }
-
         return cacheDir;
     }
 }

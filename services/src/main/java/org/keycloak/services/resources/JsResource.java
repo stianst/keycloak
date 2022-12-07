@@ -129,7 +129,7 @@ public class JsResource {
 
         InputStream inputStream;
         if (encodingProvider != null) {
-            inputStream = encodingProvider.getEncodedStream(() -> getClass().getClassLoader().getResourceAsStream(name), "js", name);
+            inputStream = encodingProvider.getEncodedStream(() -> getClass().getClassLoader().getResourceAsStream(name), "js", Version.VERSION, name);
         } else {
             inputStream = getClass().getClassLoader().getResourceAsStream(name);
         }

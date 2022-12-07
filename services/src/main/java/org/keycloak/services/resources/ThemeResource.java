@@ -65,7 +65,7 @@ public class ThemeResource {
 
             InputStream resource;
             if (encodingProvider != null) {
-                resource = encodingProvider.getEncodedStream(() -> theme.getResourceAsStream(path), themType, themeName, path.replace('/', File.separatorChar));
+                resource = encodingProvider.getEncodedStream(() -> theme.getResourceAsStream(path), themType, themeName, theme.getResourceVersion(), path.replace('/', File.separatorChar));
             } else {
                 resource = theme.getResourceAsStream(path);
             }
