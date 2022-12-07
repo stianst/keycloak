@@ -84,41 +84,21 @@ public class ThemeResourceProviderTest extends AbstractTestRealmKeycloakTest {
 
     @Test
     public void gzipEncoding() throws IOException {
-        final String resourcesVersion = testingClient.server().fetch(session -> Version.RESOURCES_VERSION, String.class);
-
-        // This will return true if files did not exists before the test OR they did exists, but were successfully deleted.
-        // False will be returned just in case that files were exists, but were NOT successfully deleted.
-        // This can happen in rare case when the file were created before in "tmp" directory by different system user and current user can't delete them
-        boolean filesNotExistsInTmp = testingClient.server().fetch(session -> {
-            boolean deleted = true;
-            File file1 = Paths.get(System.getProperty("java.io.tmpdir"), "kc-gzip-cache", resourcesVersion, "welcome", "keycloak", "css", "welcome.css.gz").toFile();
-            if (file1.isFile()) {
-                deleted = file1.delete();
+        final String resourcesVersion = testingClient.server().fetch(session -> {
+            try {
+                return session.theme().getTheme("keycloak", Theme.Type.WELCOME).getResourceVersion();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-
-            File file2 = Paths.get(System.getProperty("java.io.tmpdir"), "kc-gzip-cache", resourcesVersion, "js", "keycloak.js.gz").toFile();
-            if (file2.isFile()) {
-                deleted = deleted && file2.delete();
-            }
-
-            return deleted;
-        }, Boolean.class);
+        }, String.class);
 
         assertEncoded(suiteContext.getAuthServerInfo().getContextRoot().toString() + "/auth/resources/" + resourcesVersion + "/welcome/keycloak/css/welcome.css", "body {");
         assertEncoded(suiteContext.getAuthServerInfo().getContextRoot().toString() + "/auth/js/keycloak.js", "function Keycloak (config)");
 
-        // Check no files exists inside "/tmp" directory. We need to skip this test in the rare case when there are thombstone files created by different user
-        if (filesNotExistsInTmp) {
-            testingClient.server().run(session -> {
-                assertFalse(Paths.get(System.getProperty("java.io.tmpdir"), "kc-gzip-cache", resourcesVersion, "welcome", "keycloak", "css", "welcome.css.gz").toFile().isFile());
-                assertFalse(Paths.get(System.getProperty("java.io.tmpdir"), "kc-gzip-cache", resourcesVersion, "js", "keycloak.js.gz").toFile().isFile());
-            });
-        }
-
         testingClient.server().run(session -> {
             String serverTmpDir = Platform.getPlatform().getTmpDirectory().toString();
             assertTrue(Paths.get(serverTmpDir, "kc-gzip-cache", resourcesVersion, "welcome", "keycloak", "css", "welcome.css.gz").toFile().isFile());
-            assertTrue(Paths.get(serverTmpDir, "kc-gzip-cache", resourcesVersion, "js", "keycloak.js.gz").toFile().isFile());
+            assertTrue(Paths.get(serverTmpDir, "kc-gzip-cache", Version.VERSION, "js", "keycloak.js.gz").toFile().isFile());
         });
     }
 
