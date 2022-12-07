@@ -31,7 +31,7 @@ public class IframeUtil {
     public static Response returnIframeFromResources(String fileName, String version, KeycloakSession session) {
         CacheControl cacheControl;
         if (version != null) {
-            if (!version.equals(Version.RESOURCES_VERSION)) {
+            if (!version.equals(Version.VERSION)) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
             cacheControl = CacheControlUtil.getDefaultCacheControl();

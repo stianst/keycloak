@@ -20,7 +20,6 @@ import javax.ws.rs.core.UriInfo;
 import org.jboss.resteasy.annotations.cache.NoCache;
 import org.keycloak.authentication.requiredactions.DeleteAccount;
 import org.keycloak.common.Profile;
-import org.keycloak.common.Version;
 import org.keycloak.events.EventStoreProvider;
 import org.keycloak.models.AccountRoles;
 import org.keycloak.models.ClientModel;
@@ -96,9 +95,9 @@ public class AccountConsole {
             map.put("authUrl", authUrl.getPath().endsWith("/") ? authUrl : authUrl + "/");
             map.put("baseUrl", accountBaseUrl);
             map.put("realm", realm);
-            map.put("resourceUrl", Urls.themeRoot(authUrl).getPath() + "/" + Constants.ACCOUNT_MANAGEMENT_CLIENT_ID + "/" + theme.getName());
-            map.put("resourceCommonUrl", Urls.themeRoot(adminBaseUri).getPath() + "/common/keycloak");
-            map.put("resourceVersion", Version.RESOURCES_VERSION);
+            map.put("resourceUrl", Urls.themeRoot(authUrl, theme).getPath() + "/" + Constants.ACCOUNT_MANAGEMENT_CLIENT_ID + "/" + theme.getName());
+            map.put("resourceCommonUrl", Urls.themeRoot(adminBaseUri, session.theme().getTheme(Theme.Type.COMMON)).getPath() + "/common/keycloak");
+            map.put("resourceVersion", theme.getResourceVersion());
             
             String[] referrer = getReferrer();
             if (referrer != null) {

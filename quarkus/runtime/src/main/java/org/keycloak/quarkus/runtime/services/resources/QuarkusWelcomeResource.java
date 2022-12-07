@@ -169,8 +169,8 @@ public class QuarkusWelcomeResource {
             map.put("properties", theme.getProperties());
             map.put("adminUrl", session.getContext().getUri(UrlType.ADMIN).getBaseUriBuilder().path("/admin/").build());
 
-            map.put("resourcesPath", "resources/" + Version.RESOURCES_VERSION + "/" + theme.getType().toString().toLowerCase() +"/" + theme.getName());
-            map.put("resourcesCommonPath", "resources/" + Version.RESOURCES_VERSION + "/common/keycloak");
+            map.put("resourcesPath", "resources/" + theme.getResourceVersion() + "/" + theme.getType().toString().toLowerCase() +"/" + theme.getName());
+            map.put("resourcesCommonPath", "resources/" + getCommonTheme().getResourceVersion() + "/common/keycloak");
 
             boolean bootstrap = shouldBootstrap();
             map.put("bootstrap", bootstrap);
@@ -222,11 +222,11 @@ public class QuarkusWelcomeResource {
     }
 
     private Theme getTheme() {
-        try {
-            return session.theme().getTheme(Theme.Type.WELCOME);
-        } catch (IOException e) {
-            throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
-        }
+        return session.theme().getTheme(Theme.Type.WELCOME);
+    }
+
+    private Theme getCommonTheme() {
+        return session.theme().getTheme(Theme.Type.COMMON);
     }
 
     private boolean shouldBootstrap() {

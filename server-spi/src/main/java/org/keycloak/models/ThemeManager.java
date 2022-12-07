@@ -14,7 +14,7 @@ public interface ThemeManager {
      * @return
      * @throws IOException
      */
-    Theme getTheme(Theme.Type type) throws IOException;
+    Theme getTheme(Theme.Type type);
 
     /**
      * Returns the specified theme for the specified type.

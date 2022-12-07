@@ -41,6 +41,8 @@ public class FolderTheme implements Theme {
     private Type type;
     private final Properties properties;
 
+    private String resourceVersion;
+
     public FolderTheme(File themeDir, String name, Type type) throws IOException {
         this.themeDir = themeDir;
         this.name = name;
@@ -127,4 +129,13 @@ public class FolderTheme implements Theme {
     public Properties getProperties() {
         return properties;
     }
+
+    public String getResourceVersion() {
+        if (resourceVersion == null) {
+            resourceVersion = ThemeResourceVersion.createResourceVersion(this);
+        }
+        return resourceVersion;
+    }
+
+
 }

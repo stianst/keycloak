@@ -105,11 +105,7 @@ public class AccountLoader {
     }
 
     private Theme getTheme(KeycloakSession session) {
-        try {
-            return session.theme().getTheme(Theme.Type.ACCOUNT);
-        } catch (IOException e) {
-            throw new InternalServerErrorException(e);
-        }
+        return session.theme().getTheme(Theme.Type.ACCOUNT);
     }
 
     private boolean isDeprecatedFormsAccountConsole(Theme theme) {

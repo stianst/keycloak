@@ -146,6 +146,8 @@ public class DefaultThemeManager implements ThemeManager {
 
         private Properties properties;
 
+        private String resourceVersion;
+
         private ConcurrentHashMap<String, ConcurrentHashMap<Locale, Properties>> messages = new ConcurrentHashMap<>();
 
         public ExtendingTheme(List<Theme> themes, Set<ThemeResourceProvider> themeResourceProviders) {
@@ -265,6 +267,14 @@ public class DefaultThemeManager implements ThemeManager {
             } else {
                 return properties;
             }
+        }
+
+        @Override
+        public String getResourceVersion() {
+            if (resourceVersion == null) {
+                resourceVersion = ThemeResourceVersion.createResourceVersion(themes);
+            }
+            return resourceVersion;
         }
 
         /**

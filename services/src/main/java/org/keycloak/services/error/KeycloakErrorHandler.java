@@ -153,7 +153,7 @@ public class KeycloakErrorHandler implements ExceptionMapper<Throwable> {
         attributes.put("statusCode", statusCode);
 
         attributes.put("realm", realm);
-        attributes.put("url", new UrlBean(realm, theme, session.getContext().getUri().getBaseUri(), null));
+        attributes.put("url", new UrlBean(realm, theme, session.theme().getTheme(Theme.Type.COMMON), session.getContext().getUri().getBaseUri(), null));
         attributes.put("locale", new LocaleBean(realm, locale, session.getContext().getUri().getRequestUriBuilder(), messagesBundle));
 
 

@@ -65,4 +65,6 @@ public interface Theme {
 
     Properties getProperties() throws IOException;
 
+    String getResourceVersion();
+
 }

@@ -19,6 +19,7 @@ package org.keycloak.services.managers;
 import org.keycloak.Config;
 import org.keycloak.common.Version;
 import org.keycloak.common.enums.SslRequired;
+import org.keycloak.common.util.SecretGenerator;
 import org.keycloak.models.AdminRoles;
 import org.keycloak.models.Constants;
 import org.keycloak.models.KeycloakSession;
@@ -29,6 +30,7 @@ import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.DefaultKeyProviders;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.services.ServicesLogger;
+import org.keycloak.theme.ThemeResourceVersion;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
@@ -37,13 +39,17 @@ import org.keycloak.services.ServicesLogger;
 public class ApplianceBootstrap {
 
     private final KeycloakSession session;
+    private final String themeResourcesNonceKey = "themeResourcesNonce";
 
     public ApplianceBootstrap(KeycloakSession session) {
         this.session = session;
     }
 
     public boolean isNewInstall() {
-        if (session.realms().getRealmByName(Config.getAdminRealm()) != null) {
+        RealmModel realm = session.realms().getRealmByName(Config.getAdminRealm());
+        if (realm != null) {
+            String themeResourceNonce = realm.getAttribute(themeResourcesNonceKey);
+            ThemeResourceVersion.setNone(themeResourceNonce);
             return false;
         } else {
             return true;
@@ -85,6 +91,11 @@ public class ApplianceBootstrap {
         realm.setSslRequired(SslRequired.EXTERNAL);
         realm.setRegistrationAllowed(false);
         realm.setRegistrationEmailAsUsername(false);
+
+        String themeResourceNonce = SecretGenerator.getInstance().randomString(32);
+        ThemeResourceVersion.setNone(themeResourceNonce);
+
+        realm.setAttribute(themeResourcesNonceKey, themeResourceNonce);
 
         session.getContext().setRealm(realm);
         DefaultKeyProviders.createProviders(realm);

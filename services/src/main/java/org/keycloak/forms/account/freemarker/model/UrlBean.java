@@ -93,12 +93,12 @@ public class UrlBean {
     }
 
     public String getResourcesPath() {
-        URI uri = Urls.themeRoot(baseURI);
+        URI uri = Urls.themeRoot(baseURI, theme);
         return uri.getPath() + "/" + theme.getType().toString().toLowerCase() +"/" + theme.getName();
     }
 
     public String getResourcesCommonPath() {
-        URI uri = Urls.themeRoot(baseURI);
+        URI uri = Urls.themeRoot(baseURI, theme);
         return uri.getPath() + "/common/keycloak";
     }
 }

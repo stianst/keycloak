@@ -224,7 +224,7 @@ public class FreeMarkerEmailTemplateProvider implements EmailTemplateProvider {
             attributes.put("properties", theme.getProperties());
             attributes.put("realmName", getRealmName());
             attributes.put("user", new ProfileBean(user));
-            attributes.put("url", new UrlBean(realm, theme, uriInfo.getBaseUri(), null));
+            attributes.put("url", new UrlBean(realm, theme, session.theme().getTheme(Theme.Type.COMMON), uriInfo.getBaseUri(), null));
             String subject = new MessageFormat(rb.getProperty(subjectKey, subjectKey), locale).format(subjectAttributes.toArray());
             String textTemplate = String.format("text/%s", template);
             String textBody;

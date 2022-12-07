@@ -47,21 +47,6 @@ public class MapDeploymentStateProviderFactory implements DeploymentStateProvide
 
     @Override
     public void init(Config.Scope config) {
-        String seed = config.get(RESOURCES_VERSION_SEED);
-        if (seed == null) {
-            // hardcoded until https://github.com/keycloak/keycloak/issues/13828 has been implemented
-            Logger.getLogger(DeploymentStateProviderFactory.class)
-                    .warnf("Version seed for deployment state set with a random number. Caution: This can lead to unstable operations when serving resources from the cluster without a sticky loadbalancer or when restarting nodes. Set the 'storage-deployment-state-version-seed' option with a secret seed to ensure stable operations.", RESOURCES_VERSION_SEED, PROVIDER_ID, DeploymentStateSpi.NAME);
-            //generate random string for this installation
-            seed = SecretGenerator.getInstance().randomString(10);
-        }
-        try {
-            Version.RESOURCES_VERSION = Base64Url.encode(MessageDigest.getInstance("SHA-256")
-                    .digest((seed + Version.RESOURCES_VERSION).getBytes()))
-                    .substring(0, 5);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Override

@@ -462,7 +462,7 @@ public class FreeMarkerLoginFormsProvider implements LoginFormsProvider {
                     .filterIdentityProvidersForTheme(realm.getIdentityProvidersStream(), session, context);
             attributes.put("social", new IdentityProviderBean(realm, session, identityProviders, baseUriWithCodeAndClientId));
 
-            attributes.put("url", new UrlBean(realm, theme, baseUri, this.actionUri));
+            attributes.put("url", new UrlBean(realm, theme, session.theme().getTheme(Theme.Type.COMMON), baseUri, this.actionUri));
             attributes.put("requiredActionUrl", new RequiredActionUrlFormatterMethod(realm, baseUri));
             attributes.put("auth", new AuthenticationContextBean(context, page));
             attributes.put(Constants.EXECUTION, execution);

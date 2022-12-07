@@ -49,6 +49,8 @@ public class ClassLoaderTheme implements Theme {
 
     private Properties properties;
 
+    private String resourceVersion;
+
     public ClassLoaderTheme(String name, Type type, ClassLoader classLoader) throws IOException {
         init(name, type, classLoader);
     }
@@ -153,4 +155,10 @@ public class ClassLoaderTheme implements Theme {
         return properties;
     }
 
+    public String getResourceVersion() {
+        if (resourceVersion == null) {
+            resourceVersion = ThemeResourceVersion.createResourceVersion(this);
+        }
+        return resourceVersion;
+    }
 }

@@ -30,13 +30,15 @@ import java.net.URI;
 public class UrlBean {
 
     private final URI actionuri;
+    private Theme commonTheme;
     private URI baseURI;
     private Theme theme;
     private String realm;
 
-    public UrlBean(RealmModel realm, Theme theme, URI baseURI, URI actionUri) {
+    public UrlBean(RealmModel realm, Theme theme, Theme commonTheme, URI baseURI, URI actionUri) {
         this.realm = realm != null ? realm.getName() : null;
         this.theme = theme;
+        this.commonTheme = commonTheme;
         this.baseURI = baseURI;
         this.actionuri = actionUri;
     }
@@ -99,10 +101,6 @@ public class UrlBean {
         return Urls.logoutConfirm(baseURI, realm).toString();
     }
 
-    public String getResourcesUrl() {
-        return Urls.themeRoot(baseURI).toString() + "/" + theme.getType().toString().toLowerCase() +"/" + theme.getName();
-    }
-
     public String getOauthAction() {
         if (this.actionuri != null) {
             return this.actionuri.getPath();
@@ -120,12 +118,12 @@ public class UrlBean {
     }
 
     public String getResourcesPath() {
-        URI uri = Urls.themeRoot(baseURI);
+        URI uri = Urls.themeRoot(baseURI, theme);
         return uri.getPath() + "/" + theme.getType().toString().toLowerCase() +"/" + theme.getName();
     }
 
     public String getResourcesCommonPath() {
-        URI uri = Urls.themeRoot(baseURI);
+        URI uri = Urls.themeRoot(baseURI, commonTheme);
         return uri.getPath() + "/common/keycloak";
     }
 }

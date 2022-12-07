@@ -16,7 +16,6 @@
  */
 package org.keycloak.services.resources;
 
-import org.keycloak.common.Version;
 import org.keycloak.common.util.MimeTypeUtil;
 import org.keycloak.encoding.ResourceEncodingHelper;
 import org.keycloak.encoding.ResourceEncodingProvider;
@@ -55,13 +54,13 @@ public class ThemeResource {
     @GET
     @Path("/{version}/{themeType}/{themeName}/{path:.*}")
     public Response getResource(@PathParam("version") String version, @PathParam("themeType") String themType, @PathParam("themeName") String themeName, @PathParam("path") String path) {
-        if (!version.equals(Version.RESOURCES_VERSION)) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-
         try {
             String contentType = MimeTypeUtil.getContentType(path);
             Theme theme = session.theme().getTheme(themeName, Theme.Type.valueOf(themType.toUpperCase()));
+            if (!version.equals(theme.getResourceVersion())) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+
             ResourceEncodingProvider encodingProvider = session.theme().isCacheEnabled() ? ResourceEncodingHelper.getResourceEncodingProvider(session, contentType) : null;
 
             InputStream resource;

@@ -30,7 +30,7 @@ public class Version {
     public static final String NAME = "Keycloak";
     public static final String NAME_HTML = "<div class=\"kc-logo-text\"><span>Keycloak</span></div>";
     public static String VERSION;
-    public static String RESOURCES_VERSION;
+
     public static String BUILD_TIME;
 
     static {
@@ -39,11 +39,6 @@ public class Version {
             props.load(is);
             Version.VERSION = props.getProperty("version");
             Version.BUILD_TIME = props.getProperty("build-time");
-            Version.RESOURCES_VERSION = Version.VERSION.toLowerCase();
-
-            if (Version.RESOURCES_VERSION.endsWith("-snapshot")) {
-                Version.RESOURCES_VERSION = Version.RESOURCES_VERSION.replace("-snapshot", "-" + Version.BUILD_TIME.replace(" ", "").replace(":", "").replace("-", ""));
-            }
         } catch (IOException e) {
             Version.VERSION = Version.UNKNOWN;
             Version.BUILD_TIME = Version.UNKNOWN;

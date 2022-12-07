@@ -17,7 +17,6 @@
 package org.keycloak.services;
 
 import org.keycloak.OAuth2Constants;
-import org.keycloak.common.Version;
 import org.keycloak.models.Constants;
 import org.keycloak.protocol.oidc.OIDCLoginProtocol;
 import org.keycloak.protocol.oidc.OIDCLoginProtocolService;
@@ -29,6 +28,7 @@ import org.keycloak.services.resources.LoginActionsService;
 import org.keycloak.services.resources.RealmsResource;
 import org.keycloak.services.resources.ThemeResource;
 import org.keycloak.services.resources.admin.AdminRoot;
+import org.keycloak.theme.Theme;
 
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
@@ -260,8 +260,8 @@ public class Urls {
         return realmBase(baseUri).path(realmName).build().getRawPath();
     }
 
-    public static URI themeRoot(URI baseUri) {
-        return themeBase(baseUri).path(Version.RESOURCES_VERSION).build();
+    public static URI themeRoot(URI baseUri, Theme theme) {
+        return themeBase(baseUri).path(theme.getResourceVersion()).build();
     }
 
     public static UriBuilder loginActionsBase(URI baseUri) {

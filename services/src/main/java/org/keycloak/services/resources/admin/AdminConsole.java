@@ -24,7 +24,6 @@ import org.keycloak.http.HttpResponse;
 import javax.ws.rs.NotFoundException;
 import org.keycloak.Config;
 import org.keycloak.common.ClientConnection;
-import org.keycloak.common.Version;
 import org.keycloak.common.util.UriUtils;
 import org.keycloak.headers.SecurityHeadersProvider;
 import org.keycloak.models.AdminRoles;
@@ -338,11 +337,11 @@ public class AdminConsole {
             map.put("authServerUrl", authServerBaseUrl);
             map.put("authUrl", adminBaseUrl);
             map.put("consoleBaseUrl", Urls.adminConsoleRoot(adminBaseUri, realm.getName()).getPath());
-            map.put("resourceUrl", Urls.themeRoot(adminBaseUri).getPath() + "/admin/" + theme.getName());
-            map.put("resourceCommonUrl", Urls.themeRoot(adminBaseUri).getPath() + "/common/keycloak");
-            map.put("keycloakJsUrl", kcJsRelativeBasePath + "js/keycloak.js?version=" + Version.RESOURCES_VERSION);
+            map.put("resourceUrl", Urls.themeRoot(adminBaseUri, theme).getPath() + "/admin/" + theme.getName());
+            map.put("resourceCommonUrl", Urls.themeRoot(adminBaseUri, theme).getPath() + "/common/keycloak");
+            map.put("keycloakJsUrl", kcJsRelativeBasePath + "js/keycloak.js?version=" + theme.getResourceVersion());
             map.put("masterRealm", Config.getAdminRealm());
-            map.put("resourceVersion", Version.RESOURCES_VERSION);
+            map.put("resourceVersion", theme.getResourceVersion());
             map.put("loginRealm", realm.getName());
             map.put("properties", theme.getProperties());
 

@@ -68,19 +68,19 @@ public class GzipResourceEncodingProviderFactory implements ResourceEncodingProv
         }
 
         File cacheRoot = new File(Platform.getPlatform().getTmpDirectory(), "kc-gzip-cache");
-        File cacheDir = new File(cacheRoot, Version.RESOURCES_VERSION);
+        File cacheDir = cacheRoot;
 
-        if (cacheRoot.isDirectory()) {
-            for (File f : cacheRoot.listFiles()) {
-                if (!f.getName().equals(Version.RESOURCES_VERSION)) {
-                    try {
-                        FileUtils.deleteDirectory(f);
-                    } catch (IOException e) {
-                        logger.warn("Failed to delete old gzip cache directory", e);
-                    }
-                }
-            }
-        }
+//        if (cacheRoot.isDirectory()) {
+//            for (File f : cacheRoot.listFiles()) {
+//                if (!f.getName().equals(Version.RESOURCES_VERSION)) {
+//                    try {
+//                        FileUtils.deleteDirectory(f);
+//                    } catch (IOException e) {
+//                        logger.warn("Failed to delete old gzip cache directory", e);
+//                    }
+//                }
+//            }
+//        }
 
         if (!cacheDir.isDirectory() && !cacheDir.mkdirs()) {
             logger.warn("Failed to create gzip cache directory");

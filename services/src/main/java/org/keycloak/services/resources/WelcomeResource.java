@@ -43,7 +43,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -179,8 +178,8 @@ public class WelcomeResource {
 
             map.put("properties", theme.getProperties());
             map.put("adminUrl", session.getContext().getUri(UrlType.ADMIN).getBaseUriBuilder().path("/admin/").build());
-            map.put("resourcesPath", "resources/" + Version.RESOURCES_VERSION + "/" + theme.getType().toString().toLowerCase() +"/" + theme.getName());
-            map.put("resourcesCommonPath", "resources/" + Version.RESOURCES_VERSION + "/common/keycloak");
+            map.put("resourcesPath", "resources/" + theme.getResourceVersion() + "/" + theme.getType().toString().toLowerCase() +"/" + theme.getName());
+            map.put("resourcesCommonPath", "resources/" + getCommonTheme().getResourceVersion() + "/common/keycloak");
 
             boolean bootstrap = shouldBootstrap();
             map.put("bootstrap", bootstrap);
@@ -218,11 +217,11 @@ public class WelcomeResource {
     }
 
     private Theme getTheme() {
-        try {
-            return session.theme().getTheme(Theme.Type.WELCOME);
-        } catch (IOException e) {
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        }
+        return session.theme().getTheme(Theme.Type.WELCOME);
+    }
+
+    private Theme getCommonTheme() {
+        return session.theme().getTheme(Theme.Type.COMMON);
     }
 
     private void checkBootstrap() {

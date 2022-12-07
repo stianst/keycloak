@@ -114,7 +114,7 @@ public class JsResource {
     private Response getJs(String name, String version) {
         CacheControl cacheControl;
         if (version != null) {
-            if (!version.equals(Version.RESOURCES_VERSION)) {
+            if (!version.equals(Version.VERSION)) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
             cacheControl = CacheControlUtil.getDefaultCacheControl();
