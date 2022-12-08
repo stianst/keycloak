@@ -97,8 +97,8 @@ public class ThemeResourceProviderTest extends AbstractTestRealmKeycloakTest {
 
         testingClient.server().run(session -> {
             String serverTmpDir = Platform.getPlatform().getTmpDirectory().toString();
-            assertTrue(Paths.get(serverTmpDir, "kc-gzip-cache", resourcesVersion, "welcome", "keycloak", "css", "welcome.css.gz").toFile().isFile());
-            assertTrue(Paths.get(serverTmpDir, "kc-gzip-cache", Version.VERSION, "js", "keycloak.js.gz").toFile().isFile());
+            assertTrue(Paths.get(serverTmpDir, "kc-gzip-cache", "welcome", "keycloak", resourcesVersion, "css", "welcome.css.gz").toFile().isFile());
+            assertTrue(Paths.get(serverTmpDir, "kc-gzip-cache", "js", Version.VERSION, "keycloak.js.gz").toFile().isFile());
         });
     }
 

@@ -17,16 +17,16 @@ public class ThemeResourceVersion {
 
     public static String createResourceVersion(Theme theme) {
         try {
-            String themeVersion = theme.getProperties().getProperty("version", "none");
-
-
             MessageDigest digest = MessageDigest.getInstance("MD5");
             digest.update(NONCE);
+
+            String themeVersion = theme.getProperties().getProperty("version", "none");
             if (themeVersion != null) {
                 digest.update(themeVersion.getBytes(StandardCharsets.UTF_8));
             } else {
                 digest.update(Version.VERSION.getBytes(StandardCharsets.UTF_8));
             }
+
             String resourceVersion =  Base64Url.encode(digest.digest());
             System.out.println(theme.getType() + " " + theme.getName() + " " + resourceVersion);
             return resourceVersion;
@@ -37,11 +37,12 @@ public class ThemeResourceVersion {
     public static String createResourceVersion(List<Theme> themes) {
         try {
             MessageDigest digest = MessageDigest.getInstance("MD5");
+
             for (Theme t : themes) {
                 digest.update(t.getResourceVersion().getBytes(StandardCharsets.UTF_8));
             }
+
             String resourceVersion = Base64Url.encode(digest.digest());
-            System.out.println("Extending: " + themes.get(0).getType() + " " + themes.get(0).getName() + " " + resourceVersion);
             return resourceVersion;
         } catch (Exception e) {
             throw new RuntimeException(e);
