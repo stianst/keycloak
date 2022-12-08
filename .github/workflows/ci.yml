@@ -142,7 +142,7 @@ jobs:
     name: New Store IT
     needs: build
     runs-on: ubuntu-latest
-    timeout-minutes: 100
+    timeout-minutes: 30
     strategy:
       matrix:
         db: ['chm', 'hot-rod', 'jpa']
@@ -169,7 +169,7 @@ jobs:
     name: Legacy Store IT
     needs: build
     runs-on: ubuntu-latest
-    timeout-minutes: 100
+    timeout-minutes: 30
     strategy:
       matrix:
         db: ['postgres', 'mysql'] # 'mariadb' is not always shutting down, 'mssql', 'oracle11g' containers not available
