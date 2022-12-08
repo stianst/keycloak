@@ -4,11 +4,11 @@ adapter,2
 admin,1
 authz,3
 broker,3
-client,4
 cli,4
+client,4
+cluster,IGNORED
 composites,4
 cookies,4
-cluster,IGNORED
 crossdc,IGNORED
 docker,4
 domainextension,4
