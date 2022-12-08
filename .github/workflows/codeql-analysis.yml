@@ -7,11 +7,12 @@ on:
       - 'dependabot/**'
   pull_request:
     branches: [main]
-    paths: 
-      - '.github/workflows/codeql-analysis.yml'
-      - '**.java'
-      - 'adapters/oidc/js/**'
-      - 'themes/src/main/**'
+    # Disable paths for now, as it breaks branch protection, needs some workarounds
+    # paths: 
+    #  - '.github/workflows/codeql-analysis.yml'
+    #  - '**.java'
+    #  - 'adapters/oidc/js/**'
+    #  - 'themes/src/main/**'
   schedule:
     - cron: '0 9 * * 2'
 
