@@ -14,13 +14,4 @@ SSOTest
 SamlClientTest
 TransactionsTest
 UserProfileTest
-org.keycloak.testsuite.admin.*
-org.keycloak.testsuite.admin.authentication.*
-org.keycloak.testsuite.admin.client.*
-org.keycloak.testsuite.admin.concurrency.*
-org.keycloak.testsuite.admin.event.*
-org.keycloak.testsuite.admin.group.*
-org.keycloak.testsuite.admin.partialexport.*
-org.keycloak.testsuite.admin.partialimport.*
-org.keycloak.testsuite.admin.realm.*
-org.keycloak.testsuite.admin.userprofile.*
+org.keycloak.testsuite.admin.**
