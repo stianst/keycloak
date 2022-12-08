@@ -6,13 +6,14 @@ on:
       - 'main'
       - 'dependabot/**'
   pull_request:
-    paths:
-      - '.github/actions/**'
-      - '.github/workflows/ci.yml'
-      - '**/pom.xml'
-      - '**/src/main/java/**'
-      - '**/src/main/resources/**'
-      - '**/src/main/test/**'
+    # Disable paths for now, as it breaks branch protection, needs some workarounds
+    # paths:
+    #  - '.github/actions/**'
+    #  - '.github/workflows/ci.yml'
+    #  - '**/pom.xml'
+    #  - '**/src/main/java/**'
+    #  - '**/src/main/resources/**'
+    #  - '**/src/main/test/**'
   schedule:
     - cron: '0 20,23,2,5 * * *'
   workflow_dispatch:
