@@ -172,7 +172,7 @@ jobs:
     timeout-minutes: 100
     strategy:
       matrix:
-        db: ['postgres', 'mariadb', 'mysql'] # 'mssql', 'oracle11g' containers not available
+        db: ['postgres', 'mysql'] # 'mariadb' is not always shutting down, 'mssql', 'oracle11g' containers not available
       fail-fast: false
     steps:
       - uses: actions/checkout@v3
