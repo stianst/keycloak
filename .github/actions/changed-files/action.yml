@@ -18,6 +18,7 @@ runs:
       run: |
         git status
         git remote -v
+        git branch -r
 
     - id: changes
       shell: bash

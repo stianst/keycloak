@@ -75,8 +75,8 @@ jobs:
     steps:
       - run: |
           echo "Oki doey"
-          [ '${{ needs.java.outputs.check }}' != 'success' ] && exit 1
-          [ '${{ needs.js.outputs.check }}' != 'success' ] && exit 1
+          [ '${{ needs.changes.outputs.java }}' == 'true' ] && [ '${{ needs.java.outputs.check }}' != 'success' ] && exit 1
+          [ '${{ needs.changes.outputs.js-adapter }}' == 'true' ] && [ '${{ needs.js.outputs.check }}' != 'success' ] && exit 1
 
 #    outputs:
 #      java: ${{ steps.diff.outputs.java }}
