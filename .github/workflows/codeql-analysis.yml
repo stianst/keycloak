@@ -44,7 +44,6 @@ jobs:
   java:
     name: CodeQL Java
     needs: changes
-    if: needs.changes.outputs.java == 'true'
     runs-on: ubuntu-latest
 
     steps:
