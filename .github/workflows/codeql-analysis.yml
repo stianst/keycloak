@@ -75,8 +75,8 @@ jobs:
     steps:
       - run: |
           echo "Oki doey"
-          echo "Java: ${{ needs.java.outputs.success }}"
-          echo "JS: ${{ needs.js.outputs.success }}"
+          echo "Java: ${{ needs.java.outputs.check }}"
+          echo "JS: ${{ needs.js.outputs.check }}"
 
 #    outputs:
 #      java: ${{ steps.diff.outputs.java }}
