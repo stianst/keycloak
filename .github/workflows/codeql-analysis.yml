@@ -64,6 +64,11 @@ jobs:
   check:
     name: CodeQL Check
     needs: [java, js]
+    runs-on: ubuntu-latest
+
+    steps:
+      - run: |
+          echo "Oki doey"
 
 #    outputs:
 #      java: ${{ steps.diff.outputs.java }}
