@@ -50,22 +50,20 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-#      - name: Initialize CodeQL
-#        uses: github/codeql-action/init@v2.1.34
-#        with:
-#          languages: java
-#
-#      - name: Build Keycloak
-#        uses: ./.github/actions/build-keycloak
-#
-#      - name: Perform CodeQL Analysis
-#        uses: github/codeql-action/analyze@v2.1.34
-#        with:
-#          wait-for-processing: true
-#        env:
-#          CODEQL_ACTION_EXTRA_OPTIONS: '{"database":{"interpret-results":["--max-paths",0]}}'
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2.1.34
+        with:
+          languages: java
 
-      - run: exit 1
+      - name: Build Keycloak
+        uses: ./.github/actions/build-keycloak
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2.1.34
+        with:
+          wait-for-processing: true
+        env:
+          CODEQL_ACTION_EXTRA_OPTIONS: '{"database":{"interpret-results":["--max-paths",0]}}'
 
       - id: check
         run: echo "status=success" >> $GITHUB_OUTPUT
@@ -81,20 +79,20 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-#      - name: Initialize CodeQL
-#        uses: github/codeql-action/init@v2.1.34
-#        env:
-#          CODEQL_ACTION_EXTRA_OPTIONS: '{"database":{"finalize":["--no-run-unnecessary-builds"]}}'
-#        with:
-#          languages: javascript
-#          source-root: adapters/oidc/js/src/
-#
-#      - name: Perform CodeQL Analysis
-#        uses: github/codeql-action/analyze@v2.1.34
-#        with:
-#          wait-for-processing: true
-#        env:
-#          CODEQL_ACTION_EXTRA_OPTIONS: '{"database":{"interpret-results":["--max-paths",0]}}'
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2.1.34
+        env:
+          CODEQL_ACTION_EXTRA_OPTIONS: '{"database":{"finalize":["--no-run-unnecessary-builds"]}}'
+        with:
+          languages: javascript
+          source-root: adapters/oidc/js/src/
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2.1.34
+        with:
+          wait-for-processing: true
+        env:
+          CODEQL_ACTION_EXTRA_OPTIONS: '{"database":{"interpret-results":["--max-paths",0]}}'
 
       - id: check
         run: echo "status=success" >> $GITHUB_OUTPUT
@@ -110,20 +108,20 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-#      - name: Initialize CodeQL
-#        uses: github/codeql-action/init@v2.1.34
-#        env:
-#          CODEQL_ACTION_EXTRA_OPTIONS: '{"database":{"finalize":["--no-run-unnecessary-builds"]}}'
-#        with:
-#          languages: javascript
-#          source-root: themes/src/main/
-#
-#      - name: Perform CodeQL Analysis
-#        uses: github/codeql-action/analyze@v2.1.34
-#        with:
-#          wait-for-processing: true
-#        env:
-#          CODEQL_ACTION_EXTRA_OPTIONS: '{"database":{"interpret-results":["--max-paths",0]}}'
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2.1.34
+        env:
+          CODEQL_ACTION_EXTRA_OPTIONS: '{"database":{"finalize":["--no-run-unnecessary-builds"]}}'
+        with:
+          languages: javascript
+          source-root: themes/src/main/
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2.1.34
+        with:
+          wait-for-processing: true
+        env:
+          CODEQL_ACTION_EXTRA_OPTIONS: '{"database":{"interpret-results":["--max-paths",0]}}'
 
       - id: check
         run: echo "status=success" >> $GITHUB_OUTPUT
