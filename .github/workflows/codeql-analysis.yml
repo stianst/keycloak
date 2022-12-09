@@ -50,6 +50,7 @@ jobs:
     steps:
       - run: |
           echo "Java running"
+          exit 1
 
   js:
     name: CodeQL JS
