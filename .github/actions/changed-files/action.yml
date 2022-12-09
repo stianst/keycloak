@@ -32,7 +32,7 @@ runs:
         echo "Event: ${{ github.event_name }}"	
 
         changed () {
-          git diff --name-only origin/main | grep -E "$1" &>/dev/null && echo true || echo false
+          git diff --name-only origin/${{ github.base_ref }} | grep -E "$1" &>/dev/null && echo true || echo false
         }
         
         if [ "$BASE_REF" != "" ]; then
