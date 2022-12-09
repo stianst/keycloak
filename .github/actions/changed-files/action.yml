@@ -26,16 +26,24 @@ runs:
         JAVA=true
         THEMES=true
         JS_ADAPTER=true
+        
+        echo "Base ref: ${{ github.base_ref }}"
+        echo "Ref: ${{ github.ref }}"	
+        echo "Event: ${{ github.event_name }}"	
 
         changed () {
-          git diff --name-only origin/main | grep -E "^$1$" &>/dev/null && echo true || echo false
+          git diff --name-only origin/main | grep -E "$1" &>/dev/null && echo true || echo false
         }
         
         if [ "$BASE_REF" != "" ]; then
           JAVA=`changed '^.*/.*.java$'`
-          THEMES=`changed 'themes/src/main/.*'`
-          JS_ADAPTER=`changed 'adapters/oidc/js/.*'`
+          THEMES=`changed '^themes/src/main/.*$'`
+          JS_ADAPTER=`changed '^adapters/oidc/js/.*$'`
         fi
+        
+        echo "java=$JAVA"
+        echo "themes=$THEMES"
+        echo "js-adapter=$JS_ADAPTER"
 
         echo "java=$JAVA" >> $GITHUB_OUTPUT
         echo "themes=$THEMES" >> $GITHUB_OUTPUT
