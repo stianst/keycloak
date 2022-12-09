@@ -42,9 +42,6 @@ jobs:
       - name: Build Keycloak
         uses: ./.github/actions/build-keycloak
 
-      - name: Check base testsuite definition
-        run: testsuite/integration-arquillian/tests/base/testsuites/base-suite-check.sh
-
   unit-tests:
     name: Base UT
     runs-on: ubuntu-latest
