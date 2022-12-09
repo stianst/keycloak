@@ -57,10 +57,14 @@ jobs:
     needs: changes
     runs-on: ubuntu-latest
     if: needs.changes.outputs.js-adapter == 'true'
+    outputs:
+      check: ${{ steps.check.outputs.status }}
 
     steps:
       - run: |
           echo "JS running"
+      - id: check
+        run: echo "status=success" >> $GITHUB_OUTPUT
 
   check:
     name: CodeQL Check
@@ -71,8 +75,8 @@ jobs:
     steps:
       - run: |
           echo "Oki doey"
-          echo ${{ needs.java.status }}
-          echo ${{ needs.js.status }}
+          echo "Java: ${{ needs.java.outputs.success }}"
+          echo "JS: ${{ needs.js.outputs.success }}"
 
 #    outputs:
 #      java: ${{ steps.diff.outputs.java }}
