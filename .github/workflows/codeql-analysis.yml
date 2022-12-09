@@ -131,7 +131,7 @@ jobs:
   check:
     name: CodeQL Check
     if: always()
-    needs: [java, js-adapter, themes]
+    needs: [changes, java, js-adapter, themes]
     runs-on: ubuntu-latest
 
     steps:
