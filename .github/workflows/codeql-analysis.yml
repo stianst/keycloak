@@ -66,6 +66,7 @@ jobs:
 #          wait-for-processing: true
 #        env:
 #          CODEQL_ACTION_EXTRA_OPTIONS: '{"database":{"interpret-results":["--max-paths",0]}}'
+      - run: exit 1
 
       - id: check
         uses: ./.github/actions/checks-success
