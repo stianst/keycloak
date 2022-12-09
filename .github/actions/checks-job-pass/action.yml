@@ -27,4 +27,6 @@ runs:
             echo "${{ inputs.job }} was required to run, but didn't succeed"
             exit 1
           fi
+        else
+          echo "${{ inputs.job }} was not required to run, skipping"
         fi

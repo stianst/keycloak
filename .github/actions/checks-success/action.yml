@@ -3,7 +3,7 @@ description: Set a job as successful
 outputs:
   status:
     description: "Check status"
-    value: ${{ steps.changes.outputs.java }}
+    value: ${{ steps.changes.outputs.status }}
 
 runs:
   using: "composite"
