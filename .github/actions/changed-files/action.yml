@@ -16,36 +16,34 @@ runs:
   steps:
     - shell: bash
       run: |
-        git status
-        git remote -v
-        git fetch origin
-        git branch -r
 
     - id: changes
       shell: bash
       run: |
         BASE_REF=${{ github.base_ref }}
-        JAVA=true
-        THEMES=true
-        JS_ADAPTER=true
-        
-        echo "Base ref: ${{ github.base_ref }}"
-        echo "Ref: ${{ github.ref }}"	
-        echo "Event: ${{ github.event_name }}"	
 
         changed () {
           git diff --name-only origin/${{ github.base_ref }} | grep -E "$1" &>/dev/null && echo true || echo false
         }
         
         if [ "$BASE_REF" != "" ]; then
+          echo "Checking changes against orgin/$BASE_REF"
+          git fetch origin
+
           JAVA=`changed '^.*/.*.java$'`
           THEMES=`changed '^themes/src/main/.*$'`
           JS_ADAPTER=`changed '^adapters/oidc/js/.*$'`
+        else
+          echo "Not a pull"
+        
+          JAVA=true
+          THEMES=true
+          JS_ADAPTER=true        
         fi
         
-        echo "java=$JAVA"
-        echo "themes=$THEMES"
-        echo "js-adapter=$JS_ADAPTER"
+        echo "java changed:       $JAVA"
+        echo "themes changed:     $THEMES"
+        echo "js-adapter changed: $JS_ADAPTER"
 
         echo "java=$JAVA" >> $GITHUB_OUTPUT
         echo "themes=$THEMES" >> $GITHUB_OUTPUT
