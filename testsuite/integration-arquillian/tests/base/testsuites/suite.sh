@@ -11,7 +11,7 @@ if [ ! -f "$SUITE_FILE" ]; then
 fi
 
 SEP=""
-for i in `cat "$SUITE_FILE" | grep -v '^[[:space:]]*$' | grep -v '^[[:space:]]*#'`; do
+for i in `grep -v '^[[:space:]]*$' "$SUITE_FILE" | grep -v '^[[:space:]]*#'`; do
   # Check test exists, ignoring checking packages for now
   if [[ "$i" != *'.'* ]]; then
     SEARCH=`find "$TEST_DIR" -name "$i.java"`
