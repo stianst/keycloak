@@ -64,12 +64,15 @@ jobs:
 
   check:
     name: CodeQL Check
+    if: always()
     needs: [java, js]
     runs-on: ubuntu-latest
 
     steps:
       - run: |
           echo "Oki doey"
+          echo ${{ needs.java.status }}
+          echo ${{ needs.js.status }}
 
 #    outputs:
 #      java: ${{ steps.diff.outputs.java }}
