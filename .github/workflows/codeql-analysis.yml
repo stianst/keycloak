@@ -6,7 +6,7 @@ on:
       - 'main'
       - 'dependabot/**'
   pull_request:
-    branches: [main]
+    # branches: [main]
     # Disable paths for now, as it breaks branch protection, needs some workarounds
     # paths: 
     #  - '.github/workflows/codeql-analysis.yml'
