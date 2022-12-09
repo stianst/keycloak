@@ -1,0 +1,29 @@
+name: Check if a job passed
+description: Set a job as successful
+inputs:
+  job:
+    description: "The job to check"
+    required: true
+  should-run:
+    description: "Should the job have executed"
+    required: true
+  check-success:
+    description: "Job check status"
+    required: true
+
+outputs:
+  status:
+    description: "Check status"
+    value: ${{ steps.changes.outputs.java }}
+
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        if [ "${{ inputs.should-run }}" == "true"; then
+          if [ ! "${{ inputs.check-success }} ]; then
+            echo "${{ inputs.job }} was required to run, but didn't succeed"
+            exit 1
+          fi
+        fi

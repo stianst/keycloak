@@ -68,7 +68,7 @@ jobs:
 #          CODEQL_ACTION_EXTRA_OPTIONS: '{"database":{"interpret-results":["--max-paths",0]}}'
 
       - id: check
-        run: echo "status=success" >> $GITHUB_OUTPUT
+        uses: ./.github/actions/checks-success
 
   js-adapter:
     name: CodeQL JS
@@ -97,7 +97,7 @@ jobs:
 #          CODEQL_ACTION_EXTRA_OPTIONS: '{"database":{"interpret-results":["--max-paths",0]}}'
 
       - id: check
-        run: echo "status=success" >> $GITHUB_OUTPUT
+        uses: ./.github/actions/checks-success
 
   themes:
     name: CodeQL Themes
@@ -126,7 +126,7 @@ jobs:
 #          CODEQL_ACTION_EXTRA_OPTIONS: '{"database":{"interpret-results":["--max-paths",0]}}'
 
       - id: check
-        run: echo "status=success" >> $GITHUB_OUTPUT
+        uses: ./.github/actions/checks-success
 
   check:
     name: CodeQL Check
@@ -135,7 +135,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - run: |
-          [ '${{ needs.changes.outputs.java }}' == 'true' ] && [ '${{ needs.java.outputs.check }}' != 'success' ] && exit 1
-          [ '${{ needs.changes.outputs.js-adapter }}' == 'true' ] && [ '${{ needs.js-adapter.outputs.check }}' != 'success' ] && exit 1
-          [ '${{ needs.changes.outputs.themes }}' == 'true' ] && [ '${{ needs.themes.outputs.check }}' != 'success' ] && exit 1
+      - uses: ./.github/actions/checks-success
+        with:
+          job: 'java'
+          should-run: ${{ needs.changes.outputs.java }}
+          check-success: ${{ needs.java.outputs.check }}
+
+      - uses: ./.github/actions/checks-success
+        with:
+          job: 'js-adapter'
+          should-run: ${{ needs.changes.outputs.js-adapter }}
+          check-success: ${{ needs.js-adapter.outputs.check }}
+
+      - uses: ./.github/actions/checks-success
+        with:
+          job: 'themes'
+          should-run: ${{ needs.changes.outputs.themes }}
+          check-success: ${{ needs.themes.outputs.check }}

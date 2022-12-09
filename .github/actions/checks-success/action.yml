@@ -1,0 +1,14 @@
+name: Check status setter
+description: Set a job as successful
+outputs:
+  status:
+    description: "Check status"
+    value: ${{ steps.changes.outputs.java }}
+
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        echo "Job success"
+        echo "status=success" >> $GITHUB_OUTPUT
