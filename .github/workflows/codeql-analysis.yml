@@ -71,7 +71,7 @@ jobs:
         uses: ./.github/actions/checks-success
 
   js-adapter:
-    name: CodeQL JS
+    name: CodeQL JavaScript Adapter
     needs: changes
     runs-on: ubuntu-latest
     if: needs.changes.outputs.js-adapter == 'true'
@@ -137,21 +137,21 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - id: check-java
+      - name: CodeQL Java
         uses: ./.github/actions/checks-job-pass
         with:
           job: 'java'
           should-run: ${{ needs.changes.outputs.java }}
           check-success: ${{ needs.java.outputs.check }}
 
-      - id: check-js-adapter
+      - name: CodeQL JavaScript Adapter
         uses: ./.github/actions/checks-job-pass
         with:
           job: 'js-adapter'
           should-run: ${{ needs.changes.outputs.js-adapter }}
           check-success: ${{ needs.js-adapter.outputs.check }}
 
-      - id: check-themes
+      - name: CodeQL Themes
         uses: ./.github/actions/checks-job-pass
         with:
           job: 'themes'
