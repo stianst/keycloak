@@ -5,7 +5,7 @@ on:
     branches-ignore:
       - 'main'
       - 'dependabot/**'
-  pull_request:
+  #pull_request:
     # Disable paths for now, as it breaks branch protection, needs some workarounds
     # paths:
     #  - '.github/actions/**'

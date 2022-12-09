@@ -1,0 +1,21 @@
+name: Changed Files
+description: Checks changes against target branch
+outputs:
+  java: ${{ steps.diff.outputs.java }}
+  themes: ${{ steps.diff.outputs.themes }}
+  js-adapter: ${{ steps.diff.outputs.js-adapter }}
+
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        git status
+        git remote -v
+
+    - id: changes
+      shell: bash
+      run: |
+        echo "java=true" >> $GITHUB_OUTPUT
+        echo "themes=false" >> $GITHUB_OUTPUT
+        echo "js-adapter=false" >> $GITHUB_OUTPUT
