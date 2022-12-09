@@ -137,19 +137,19 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: ./.github/actions/checks-success
+      - uses: ./.github/actions/checks-job-pass
         with:
           job: 'java'
           should-run: ${{ needs.changes.outputs.java }}
           check-success: ${{ needs.java.outputs.check }}
 
-      - uses: ./.github/actions/checks-success
+      - uses: ./.github/actions/checks-job-pass
         with:
           job: 'js-adapter'
           should-run: ${{ needs.changes.outputs.js-adapter }}
           check-success: ${{ needs.js-adapter.outputs.check }}
 
-      - uses: ./.github/actions/checks-success
+      - uses: ./.github/actions/checks-job-pass
         with:
           job: 'themes'
           should-run: ${{ needs.changes.outputs.themes }}

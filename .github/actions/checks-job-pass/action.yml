@@ -4,6 +4,7 @@ inputs:
   job:
     description: "The job to check"
     required: true
+    default: "true"
   should-run:
     description: "Should the job have executed"
     required: true
