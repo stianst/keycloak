@@ -45,13 +45,21 @@ jobs:
     name: CodeQL Java
     needs: changes
     runs-on: ubuntu-latest
+    if: needs.changes.outputs.java == 'true'
 
     steps:
       - run: |
-          echo "java: ${{ needs.changes.outputs.java }}"
-          echo "themes: ${{ needs.changes.outputs.themes }}"
-          echo "js: ${{ needs.changes.outputs.js-adapter }}"
+          echo "Java running"
 
+  js:
+    name: CodeQL JS
+    needs: changes
+    runs-on: ubuntu-latest
+    if: needs.changes.outputs.js-adapter == 'true'
+
+    steps:
+      - run: |
+          echo "JS running"
 
 #    outputs:
 #      java: ${{ steps.diff.outputs.java }}

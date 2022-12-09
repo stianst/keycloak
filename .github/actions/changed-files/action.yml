@@ -22,6 +22,21 @@ runs:
     - id: changes
       shell: bash
       run: |
-        echo "java=true" >> $GITHUB_OUTPUT
-        echo "themes=false" >> $GITHUB_OUTPUT
-        echo "js-adapter=false" >> $GITHUB_OUTPUT
+        BASE_REF=${{ github.base_ref }}
+        JAVA=true
+        THEMES=true
+        JS_ADAPTER=true
+
+        changed () {
+          git diff --name-only origin/main | grep -E "^$1$" &>/dev/null && echo true || echo false
+        }
+        
+        if [ "$BASE_REF" != "" ]; then
+          JAVA=`changed '^.*/.*.java$'`
+          THEMES=`changed 'themes/src/main/.*'`
+          JS_ADAPTER=`changed 'adapters/oidc/js/.*'`
+        fi
+
+        echo "java=$JAVA" >> $GITHUB_OUTPUT
+        echo "themes=$THEMES" >> $GITHUB_OUTPUT
+        echo "js-adapter=$JS_ADAPTER" >> $GITHUB_OUTPUT
