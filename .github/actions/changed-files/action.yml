@@ -1,9 +1,15 @@
 name: Changed Files
 description: Checks changes against target branch
 outputs:
-  java: ${{ steps.changes.outputs.java }}
-  themes: ${{ steps.changes.outputs.themes }}
-  js-adapter: ${{ steps.changes.outputs.js-adapter }}
+  java:
+    description: "Changes to Java files"
+    value: ${{ steps.changes.outputs.java }}
+  themes:
+    description: "Changes to themes"
+    value: ${{ steps.changes.outputs.themes }}
+  js-adapter:
+    description: "Changes to JavaScript adapter"
+    value: ${{ steps.changes.outputs.js-adapter }}
 
 runs:
   using: "composite"
