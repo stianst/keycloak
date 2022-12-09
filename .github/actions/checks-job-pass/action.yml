@@ -23,7 +23,7 @@ runs:
     - shell: bash
       run: |
         if [ "${{ inputs.should-run }}" == "true" ]; then
-          if [ "${{ inputs.check-success }}" != "true" ]; then
+          if [ "${{ inputs.check-success }}" != "success" ]; then
             echo "${{ inputs.job }} was required to run, but didn't succeed"
             exit 1
           fi
