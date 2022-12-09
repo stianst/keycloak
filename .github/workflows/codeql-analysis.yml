@@ -32,8 +32,8 @@ jobs:
 #    if: github.repository == 'keycloak/keycloak'
     runs-on: ubuntu-latest
     outputs:
-      java: ${{ steps.diff.changes.java }}
-      themes: ${{ steps.diff.changes.themes }}
+      java: ${{ steps.diff.outputs.java }}
+      themes: ${{ steps.diff.outputs.themes }}
       js-adapter: ${{ steps.diff.outputs.js-adapter }}
     steps:
       - uses: actions/checkout@v3
@@ -50,6 +50,7 @@ jobs:
       - run: |
           echo "java: ${{ needs.changes.outputs.java }}"
           echo "themes: ${{ needs.changes.outputs.themes }}"
+          echo "js: ${{ needs.changes.outputs.js-adapter }}"
 
 
 #    outputs:
