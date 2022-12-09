@@ -46,6 +46,8 @@ jobs:
     needs: changes
     runs-on: ubuntu-latest
     if: needs.changes.outputs.java == 'true'
+    outputs:
+      check: ${{ steps.check.outputs.status }}
 
     steps:
       - uses: actions/checkout@v3
