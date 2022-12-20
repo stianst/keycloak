@@ -65,6 +65,19 @@ public interface Theme {
 
     Properties getProperties() throws IOException;
 
-    String getResourceVersion();
+    default String getResourceVersion() {
+        Properties properties = null;
+        try {
+            properties = getProperties();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        if (properties != null) {
+            return properties.getProperty("version");
+        } else {
+            return null;
+        }
+    }
 
 }

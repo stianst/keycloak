@@ -18,8 +18,6 @@
 package org.keycloak.theme;
 
 import org.jboss.logging.Logger;
-import org.keycloak.Config;
-import org.keycloak.common.Version;
 import org.keycloak.common.util.StringPropertyReplacer;
 import org.keycloak.common.util.SystemEnvProperties;
 import org.keycloak.models.KeycloakSession;
@@ -37,7 +35,6 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import org.keycloak.common.Profile;
 
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
@@ -123,7 +120,10 @@ public class DefaultThemeManager implements ThemeManager {
             }
         }
 
-        return new ExtendingTheme(themes, session.getAllProviders(ThemeResourceProvider.class));
+        ThemeResourceVersionProvider resourceVersionProvider = session.getProvider(ThemeResourceVersionProvider.class);
+        String themeResourceVersion = resourceVersionProvider.getThemeResourceVersion(themes);
+
+        return new ExtendingTheme(themeResourceVersion, themes, session.getAllProviders(ThemeResourceProvider.class));
     }
 
     private Theme findTheme(String name, Theme.Type type) {
@@ -150,7 +150,8 @@ public class DefaultThemeManager implements ThemeManager {
 
         private ConcurrentHashMap<String, ConcurrentHashMap<Locale, Properties>> messages = new ConcurrentHashMap<>();
 
-        public ExtendingTheme(List<Theme> themes, Set<ThemeResourceProvider> themeResourceProviders) {
+        public ExtendingTheme(String resourceVersion, List<Theme> themes, Set<ThemeResourceProvider> themeResourceProviders) {
+            this.resourceVersion = resourceVersion;
             this.themes = themes;
             this.themeResourceProviders = themeResourceProviders;
         }
@@ -271,9 +272,6 @@ public class DefaultThemeManager implements ThemeManager {
 
         @Override
         public String getResourceVersion() {
-            if (resourceVersion == null) {
-                resourceVersion = ThemeResourceVersion.createResourceVersion(themes);
-            }
             return resourceVersion;
         }
 
@@ -311,10 +309,6 @@ public class DefaultThemeManager implements ThemeManager {
         }
 
         return providers;
-    }
-
-    private static boolean isAccount2Enabled() {
-        return Profile.isFeatureEnabled(Profile.Feature.ACCOUNT2);
     }
 
 }

@@ -30,7 +30,6 @@ import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.DefaultKeyProviders;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.services.ServicesLogger;
-import org.keycloak.theme.ThemeResourceVersion;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
@@ -48,8 +47,6 @@ public class ApplianceBootstrap {
     public boolean isNewInstall() {
         RealmModel realm = session.realms().getRealmByName(Config.getAdminRealm());
         if (realm != null) {
-            String themeResourceNonce = realm.getAttribute(themeResourcesNonceKey);
-            ThemeResourceVersion.setNone(themeResourceNonce);
             return false;
         } else {
             return true;
@@ -91,11 +88,6 @@ public class ApplianceBootstrap {
         realm.setSslRequired(SslRequired.EXTERNAL);
         realm.setRegistrationAllowed(false);
         realm.setRegistrationEmailAsUsername(false);
-
-        String themeResourceNonce = SecretGenerator.getInstance().randomString(32);
-        ThemeResourceVersion.setNone(themeResourceNonce);
-
-        realm.setAttribute(themeResourcesNonceKey, themeResourceNonce);
 
         session.getContext().setRealm(realm);
         DefaultKeyProviders.createProviders(realm);

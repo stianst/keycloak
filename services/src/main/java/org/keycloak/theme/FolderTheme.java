@@ -130,12 +130,4 @@ public class FolderTheme implements Theme {
         return properties;
     }
 
-    public String getResourceVersion() {
-        if (resourceVersion == null) {
-            resourceVersion = ThemeResourceVersion.createResourceVersion(this);
-        }
-        return resourceVersion;
-    }
-
-
 }
