@@ -5,9 +5,13 @@ BASE_REF=$2
 
 if [ "$BASE_REF" != "" ]; then
   echo "--------------------------------------------------------------------------------"
-  echo "Changes compared to '$BASE_REF' in '`git remote get-url $REMOTE`'"
+  echo "Fetching '$BASE_REF' in '`git remote get-url $REMOTE`'"
   echo "--------------------------------------------------------------------------------"
   git fetch --depth 1 $REMOTE $BASE_REF
+
+  echo "--------------------------------------------------------------------------------"
+  echo "Changes compared to '$BASE_REF' in '`git remote get-url $REMOTE`'"
+  echo "--------------------------------------------------------------------------------"
   git diff $REMOTE/$BASE_REF --name-only
 else
   echo "--------------------------------------------------------------------------------"
