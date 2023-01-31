@@ -29,6 +29,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.keycloak.broker.provider.util.SimpleHttp;
@@ -48,6 +49,9 @@ import javax.ws.rs.core.UriBuilder;
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
  */
 public abstract class AbstractRestServiceTest extends AbstractTestRealmKeycloakTest {
+
+    @ClassRule
+    public static AccountClient accountClient = new AccountClient();
 
     @Rule
     public TokenUtil tokenUtil = new TokenUtil();

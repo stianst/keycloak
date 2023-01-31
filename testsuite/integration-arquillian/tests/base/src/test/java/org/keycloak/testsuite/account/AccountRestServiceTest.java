@@ -94,7 +94,7 @@ public class AccountRestServiceTest extends AbstractRestServiceTest {
     
     @Rule
     public AssertEvents events = new AssertEvents(this);
-    
+
     @Test
     public void testGetUserProfileMetadata_EditUsernameAllowed() throws IOException {
         
@@ -471,17 +471,9 @@ public class AccountRestServiceTest extends AbstractRestServiceTest {
     }
 
     protected UserRepresentation getUser(boolean fetchMetadata) throws IOException {
-        String accountUrl = getAccountUrl(null) + "?userProfileMetadata=" + fetchMetadata;
-        SimpleHttp a = SimpleHttp.doGet(accountUrl, httpClient).auth(tokenUtil.getToken());
-
-        try {
-            return a.asJson(UserRepresentation.class);
-        } catch (IOException e) {
-            System.err.println("Error during user reading: " + a.asString());
-            throw e;
-        }    
+        return accountClient.token(tokenUtil.getToken()).getUser(fetchMetadata);
     }
-    
+
     protected UserRepresentation updateAndGet(UserRepresentation user) throws IOException {
         SimpleHttp a = SimpleHttp.doPost(getAccountUrl(null), httpClient).auth(tokenUtil.getToken()).json(user);
         try {
