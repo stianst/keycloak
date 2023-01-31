@@ -10,17 +10,19 @@ import org.keycloak.testsuite.util.ServerURLs;
 import org.keycloak.testsuite.util.TokenUtil;
 
 import java.io.IOException;
-import java.util.function.Supplier;
 
 public class AccountClient extends TestWatcher {
 
-    private Supplier<CloseableHttpClient> httpClient = OAuthClient::newCloseableHttpClient;
-    private String realm = "test";
+    private String realm;
+    private String username;
+    private String password;
+    private CloseableHttpClient httpClient;
     private TokenUtil tokenUtil;
 
     protected AccountClient(String realm, String username, String password) {
         this.realm = realm;
-        this.tokenUtil = new TokenUtil();
+        this.username = username;
+        this.password = password;
     }
 
     public static AccountClient withDefaults() {
@@ -34,7 +36,15 @@ public class AccountClient extends TestWatcher {
     @Override
     protected void starting(Description description) {
         super.starting(description);
+
         httpClient = OAuthClient.newCloseableHttpClient();
+
+        OAuthClient oauth = new OAuthClient();
+        oauth.httpClient(() -> httpClient);
+        oauth.init(null);
+        oauth.clientId("direct-grant");
+
+        tokenUtil = new TokenUtil(username, password, oauth);
     }
 
     @Override
@@ -52,7 +62,7 @@ public class AccountClient extends TestWatcher {
 
     public UserRepresentation getUser(boolean fetchMetadata) throws AccountClientException {
         String accountUrl = getAccountUrl(null) + "?userProfileMetadata=" + fetchMetadata;
-        SimpleHttp a = SimpleHttp.doGet(accountUrl, httpClient).auth(token);
+        SimpleHttp a = SimpleHttp.doGet(accountUrl, httpClient).auth(tokenUtil.getToken());
 
         try {
             return a.asJson(UserRepresentation.class);

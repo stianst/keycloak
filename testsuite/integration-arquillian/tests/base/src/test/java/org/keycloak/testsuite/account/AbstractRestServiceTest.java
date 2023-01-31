@@ -51,7 +51,7 @@ import javax.ws.rs.core.UriBuilder;
 public abstract class AbstractRestServiceTest extends AbstractTestRealmKeycloakTest {
 
     @ClassRule
-    public static AccountClient accountClient = new AccountClient();
+    public static AccountClient accountClient = AccountClient.withDefaults();
 
     @Rule
     public TokenUtil tokenUtil = new TokenUtil();

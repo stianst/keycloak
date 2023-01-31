@@ -471,7 +471,7 @@ public class AccountRestServiceTest extends AbstractRestServiceTest {
     }
 
     protected UserRepresentation getUser(boolean fetchMetadata) throws IOException {
-        return accountClient.token(tokenUtil.getToken()).getUser(fetchMetadata);
+        return accountClient.getUser(fetchMetadata);
     }
 
     protected UserRepresentation updateAndGet(UserRepresentation user) throws IOException {

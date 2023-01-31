@@ -24,8 +24,6 @@ public class AccountClientBuilder {
     }
 
     public AccountClient build() {
-        TokenUtil tokenUtil = new TokenUtil(username, password);
-        tokenUtil.
         return new AccountClient(realm, username, password);
     }
 

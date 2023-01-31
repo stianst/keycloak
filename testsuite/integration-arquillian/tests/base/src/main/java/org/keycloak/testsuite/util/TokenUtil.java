@@ -47,6 +47,12 @@ public class TokenUtil implements TestRule {
         this.oauth.clientId("direct-grant");
     }
 
+    public TokenUtil(String username, String password, OAuthClient oauth) {
+        this.username = username;
+        this.password = password;
+        this.oauth = oauth;
+    }
+
     @Override
     public Statement apply(final Statement base, org.junit.runner.Description description) {
         return new Statement() {
