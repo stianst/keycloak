@@ -18,14 +18,21 @@ package org.keycloak.testsuite.util;
 
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
+import org.keycloak.models.credential.OTPCredentialModel;
+import org.keycloak.models.utils.TimeBasedOTP;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class AccountHelper {
 
-    public static boolean updatePassword(RealmResource realm, String username, String password) {
+    public static final String totpSecretKey = "MVBG QNDR OZFW YYSS MVKT E4DK JZXW EOKF";
+
+    private static UserResource getUserResource(RealmResource realm, String username) {
         Optional<UserRepresentation> userResult = realm.users().search(username).stream().findFirst();
         if (userResult.isEmpty()) {
             throw new RuntimeException("User with username " + username + " not found");
@@ -33,6 +40,11 @@ public class AccountHelper {
 
         UserRepresentation userRepresentation = userResult.get();
         UserResource user = realm.users().get(userRepresentation.getId());
+        return user;
+    }
+
+    public static boolean updatePassword(RealmResource realm, String username, String password) {
+        UserResource user = getUserResource(realm, username);
 
         CredentialRepresentation credentialRepresentation = CredentialBuilder.create().password(password).build();
 
@@ -44,4 +56,78 @@ public class AccountHelper {
         }
     }
 
+    private static Optional<CredentialRepresentation> getOtpCredentials(UserResource user, String userLabel) {
+        return user.credentials().stream().filter(c -> c.getType().equals(OTPCredentialModel.TYPE)).filter(l -> l.getUserLabel().equals(userLabel)).findFirst();
+    }
+
+    private static Optional<CredentialRepresentation> getOtpCredentials(UserResource user) {
+        return user.credentials().stream().filter(c -> c.getType().equals(OTPCredentialModel.TYPE)).findFirst();
+    }
+
+    public static void accountConsoleLogout(RealmResource realm, String username) {
+        UserResource user = getUserResource(realm, username);
+        user.logout();
+    }
+    public static boolean deleteTotpAuthentication(RealmResource realm, String username) {
+        UserResource user = getUserResource(realm, username);
+        Optional<CredentialRepresentation> credentials = getOtpCredentials(user);
+
+        if (credentials.isEmpty()) {
+            return false;
+        }
+
+        try {
+            user.removeCredential(credentials.get().getId());
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    public static boolean isTotpPresent(RealmResource realm, String username) {
+        UserResource user = getUserResource(realm, username);
+        Optional<CredentialRepresentation> credentials = getOtpCredentials(user);
+        return credentials.isPresent();
+    }
+
+    public static boolean totpUserLabelComparator(RealmResource realm, String username, String userLabel) {
+        UserResource user = getUserResource(realm, username);
+        Optional<CredentialRepresentation> credentials = getOtpCredentials(user, userLabel);
+
+        return credentials.get().getUserLabel().equals(userLabel);
+    }
+
+    public static boolean setupTotpAuthentication(RealmResource realm, String username, String userLabel) {
+        UserResource user = getUserResource(realm, username);
+        CredentialRepresentation otpCredential = new CredentialRepresentation();
+        TimeBasedOTP timeBasedOTP = new TimeBasedOTP();
+        timeBasedOTP.generateTOTP(totpSecretKey);
+        otpCredential.setSecretData(timeBasedOTP.toString()); //secret: eBh4qvKlbReU2pjNob9E
+        otpCredential.setType(CredentialRepresentation.TOTP);
+        otpCredential.setUserLabel(userLabel);
+
+        UserRepresentation userRep = user.toRepresentation();
+        List<CredentialRepresentation> creds = userRep.getCredentials();
+        creds.add(otpCredential);
+        userRep.setCredentials(creds);
+
+        try {
+            user.update(userRep);
+            return true;
+        } catch(Throwable t) {
+            return false;
+        }
+    }
+
+    public static boolean updateTotpUserLabel(RealmResource realm, String username, String userLabel) {
+        UserResource user = getUserResource(realm, username);
+        Optional<CredentialRepresentation> credentials = getOtpCredentials(user);
+
+        try {
+            credentials.get().setUserLabel(userLabel);
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
 }

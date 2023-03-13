@@ -38,10 +38,10 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.keycloak.testsuite.AssertEvents;
 import org.keycloak.testsuite.admin.ApiUtil;
 import org.keycloak.testsuite.arquillian.annotation.DisableFeature;
-import org.keycloak.testsuite.pages.AccountTotpPage;
 import org.keycloak.testsuite.pages.LoginConfigTotpPage;
 import org.keycloak.testsuite.pages.LoginTotpPage;
 import org.keycloak.testsuite.pages.RegisterPage;
+import org.keycloak.testsuite.util.AccountHelper;
 import org.keycloak.testsuite.util.OAuthClient;
 import org.keycloak.testsuite.util.RealmBuilder;
 import org.keycloak.testsuite.util.UserBuilder;
@@ -92,9 +92,6 @@ public class AppInitiatedActionTotpSetupTest extends AbstractAppInitiatedActionT
 
     @Page
     protected LoginConfigTotpPage totpPage;
-
-    @Page
-    protected AccountTotpPage accountTotpPage;
 
     @Page
     protected RegisterPage registerPage;
@@ -374,7 +371,6 @@ public class AppInitiatedActionTotpSetupTest extends AbstractAppInitiatedActionT
     }
 
     @Test
-    @DisableFeature(value = Profile.Feature.ACCOUNT2, skipRestart = true) // TODO remove this (KEYCLOAK-16228)
     public void setupTotpRegisteredAfterTotpRemoval() {
         // Register new user
         loginPage.open();
@@ -418,21 +414,11 @@ public class AppInitiatedActionTotpSetupTest extends AbstractAppInitiatedActionT
 
         // Login with one-time password
         loginTotpPage.login(totp.generateTOTP(totpCode));
+        events.expectLogin().user(userId).detail(Details.USERNAME, "setupTotp2").assertEvent();
 
-        loginEvent = events.expectLogin().user(userId).detail(Details.USERNAME, "setupTotp2").assertEvent();
-
-        // Open account page
-        accountTotpPage.open();
-        accountTotpPage.assertCurrent();
-
-        // Remove google authentificator
-        accountTotpPage.removeTotp();
-
-        events.expectAccount(EventType.REMOVE_TOTP).user(userId).assertEvent();
-
-        // Logout
-        accountTotpPage.logout();
-        events.expectLogout(loginEvent.getSessionId()).user(userId).detail(Details.REDIRECT_URI, oauth.AUTH_SERVER_ROOT + "/realms/test/account/totp").assertEvent();
+        // Remove google authenticator
+        Assert.assertTrue(AccountHelper.deleteTotpAuthentication(testRealm(),"setupTotp2"));
+        AccountHelper.accountConsoleLogout(testRealm(),"setupTotp2");
 
         // Try to login
         loginPage.open();

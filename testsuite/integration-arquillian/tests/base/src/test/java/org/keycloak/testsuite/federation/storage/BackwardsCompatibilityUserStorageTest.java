@@ -48,13 +48,14 @@ import org.keycloak.testsuite.ProfileAssume;
 import org.keycloak.testsuite.admin.ApiUtil;
 import org.keycloak.testsuite.arquillian.annotation.DisableFeature;
 import org.keycloak.testsuite.federation.BackwardsCompatibilityUserStorageFactory;
-import org.keycloak.testsuite.pages.AccountTotpPage;
 import org.keycloak.testsuite.pages.AppPage;
 import org.keycloak.testsuite.pages.LoginConfigTotpPage;
 import org.keycloak.testsuite.pages.LoginPage;
 import org.keycloak.testsuite.pages.LoginTotpPage;
 
 import org.junit.BeforeClass;
+import org.keycloak.testsuite.util.AccountHelper;
+
 import static org.keycloak.testsuite.util.URLAssert.assertCurrentUrlDoesntStartWith;
 import static org.keycloak.testsuite.util.URLAssert.assertCurrentUrlStartsWith;
 
@@ -63,7 +64,6 @@ import static org.keycloak.testsuite.util.URLAssert.assertCurrentUrlStartsWith;
  *
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-@DisableFeature(value = Profile.Feature.ACCOUNT2, skipRestart = true) // TODO remove this (KEYCLOAK-16228)
 public class BackwardsCompatibilityUserStorageTest extends AbstractAuthTest {
 
     private String backwardsCompProviderId;
@@ -76,9 +76,6 @@ public class BackwardsCompatibilityUserStorageTest extends AbstractAuthTest {
 
     @Page
     protected LoginTotpPage loginTotpPage;
-
-    @Page
-    protected AccountTotpPage accountTotpSetupPage;
 
     @Page
     protected LoginConfigTotpPage configureTotpRequiredActionPage;
@@ -198,31 +195,30 @@ public class BackwardsCompatibilityUserStorageTest extends AbstractAuthTest {
         getCleanup().addUserId(userId);
 
         // Login as user to account mgmt
-        accountTotpSetupPage.open();
+        loginPage.open();
         loginPage.login("otp1", "pass");
 
         // Setup OTP
-        String totpSecret = accountTotpSetupPage.getTotpSecret();
-        accountTotpSetupPage.configure(totp.generateTOTP(totpSecret));
+        Assert.assertTrue(AccountHelper.setupTotpAuthentication(testRealmResource(), "otp1", ""));
 
         assertUserDontHaveDBCredentials();
         assertUserHasOTPCredentialInUserStorage(true);
 
         // Logout and assert user can login with hardcoded OTP
-        accountTotpSetupPage.logout();
+        AccountHelper.accountConsoleLogout(testRealmResource(), "otp1");
         loginPage.login("otp1", "pass");
         loginTotpPage.login("123456");
         assertCurrentUrlStartsWith(testRealmAccountPage);
 
         // Logout and assert user can login with valid credential
-        accountTotpSetupPage.logout();
+        AccountHelper.accountConsoleLogout(testRealmResource(), "otp1");
         loginPage.login("otp1", "pass");
-        loginTotpPage.login(totp.generateTOTP(totpSecret));
+        loginTotpPage.login(totp.generateTOTP(AccountHelper.totpSecretKey));
         assertCurrentUrlStartsWith(testRealmAccountPage);
 
         // Delete OTP credential in account console
-        accountTotpSetupPage.removeTotp();
-        accountTotpSetupPage.logout();
+        Assert.assertTrue(AccountHelper.deleteTotpAuthentication(testRealmResource(), "otp1"));
+        AccountHelper.accountConsoleLogout(testRealmResource(), "otp1");
 
         assertUserDontHaveDBCredentials();
         assertUserHasOTPCredentialInUserStorage(false);
