@@ -28,6 +28,8 @@ import org.keycloak.testsuite.auth.page.account.Account;
 import org.keycloak.testsuite.auth.page.login.OIDCLogin;
 import org.keycloak.testsuite.auth.page.login.SAMLPostLogin;
 import org.keycloak.testsuite.auth.page.login.SAMLRedirectLogin;
+import org.keycloak.testsuite.util.ClientBuilder;
+import org.keycloak.testsuite.util.RealmBuilder;
 import org.openqa.selenium.Cookie;
 
 import java.text.MessageFormat;
@@ -64,10 +66,9 @@ public abstract class AbstractAuthTest extends AbstractKeycloakTest {
 
     @Override
     public void addTestRealms(List<RealmRepresentation> testRealms) {
-        RealmRepresentation testRealmRep = new RealmRepresentation();
-        testRealmRep.setId(TEST);
-        testRealmRep.setRealm(TEST);
-        testRealmRep.setEnabled(true);
+        RealmRepresentation testRealmRep = RealmBuilder.create().name(TEST)
+                .client(ClientBuilder.create().clientId("test-app").secret("password").redirectUris("http://localhost:8081/app"))
+                .build();
         testRealms.add(testRealmRep);
     }
 

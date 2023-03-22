@@ -20,6 +20,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.testsuite.pages.AppPage;
 import org.keycloak.testsuite.pages.LoginPage;
+import org.keycloak.testsuite.pages.LoginTotpPage;
 
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -28,10 +29,17 @@ import java.net.URISyntaxException;
 public class TestAppHelper {
     private OAuthClient oauth;
     private LoginPage loginPage;
+
+    private LoginTotpPage loginTotpPage;
     private AppPage appPage;
     private String refreshToken;
 
     public TestAppHelper(OAuthClient oauth, LoginPage loginPage, AppPage appPage) {
+        this.oauth = oauth;
+        this.loginPage = loginPage;
+        this.appPage = appPage;
+    }
+    public TestAppHelper(OAuthClient oauth, LoginPage loginPage, LoginTotpPage loginTotpPage, AppPage appPage) {
         this.oauth = oauth;
         this.loginPage = loginPage;
         this.appPage = appPage;
@@ -42,6 +50,26 @@ public class TestAppHelper {
         loginPage.login(username, password);
 
         if (loginPage.isCurrent()) {
+            return false;
+        }
+
+        String code = oauth.getCurrentQuery().get(OAuth2Constants.CODE);
+        OAuthClient.AccessTokenResponse tokenResponse = oauth.doAccessTokenRequest(code, "password");
+        refreshToken = tokenResponse.getRefreshToken();
+
+        return appPage.isCurrent();
+    }
+
+    public boolean login(String username, String password, String otp) throws URISyntaxException, IOException {
+        loginPage.open();
+        loginPage.login(username, password);
+
+        if (loginPage.isCurrent()) {
+            return false;
+        }
+
+        loginTotpPage.login(otp);
+        if (loginTotpPage.isCurrent()) {
             return false;
         }
 
