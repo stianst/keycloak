@@ -1,1 +1,0 @@
-$evaluation.getPermission().getResource().setName('test');

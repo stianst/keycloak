@@ -1,1 +1,0 @@
-new java.util.ArrayList(['A','B']);

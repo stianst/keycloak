@@ -1,1 +1,0 @@
-$evaluation.getPermission().addClaim('claim-b', 'claim-b');$evaluation.grant();

@@ -1,5 +1,23 @@
 package org.keycloak.quarkus.deployment;
 
+import io.quarkus.agroal.spi.JdbcDataSourceBuildItem;
+import io.quarkus.deployment.annotations.BuildStep;
+import io.quarkus.deployment.annotations.ExecutionTime;
+import io.quarkus.deployment.annotations.Record;
+import io.quarkus.deployment.builditem.CombinedIndexBuildItem;
+import liquibase.database.Database;
+import liquibase.lockservice.LockService;
+import liquibase.parser.ChangeLogParser;
+import liquibase.parser.core.xml.XMLChangeLogSAXParser;
+import liquibase.servicelocator.LiquibaseService;
+import liquibase.sqlgenerator.SqlGenerator;
+import org.jboss.jandex.AnnotationInstance;
+import org.jboss.jandex.ClassInfo;
+import org.jboss.jandex.DotName;
+import org.jboss.jandex.IndexView;
+import org.keycloak.connections.jpa.updater.liquibase.lock.DummyLockService;
+import org.keycloak.quarkus.runtime.KeycloakRecorder;
+
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,31 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import io.quarkus.agroal.spi.JdbcDataSourceBuildItem;
-import io.quarkus.deployment.builditem.CombinedIndexBuildItem;
-import org.jboss.jandex.AnnotationInstance;
-import org.jboss.jandex.ClassInfo;
-import org.jboss.jandex.DotName;
-import org.jboss.jandex.IndexView;
-import org.keycloak.config.StorageOptions;
-import org.keycloak.connections.jpa.updater.liquibase.lock.DummyLockService;
-
-import io.quarkus.deployment.annotations.BuildStep;
-import io.quarkus.deployment.annotations.ExecutionTime;
-import io.quarkus.deployment.annotations.Record;
-import liquibase.database.Database;
-import liquibase.lockservice.LockService;
-import liquibase.parser.ChangeLogParser;
-import liquibase.parser.core.xml.XMLChangeLogSAXParser;
-import liquibase.servicelocator.LiquibaseService;
-import liquibase.sqlgenerator.SqlGenerator;
-import org.keycloak.models.map.storage.jpa.liquibase.lockservice.KeycloakLockService;
-import org.keycloak.quarkus.runtime.KeycloakRecorder;
-
-import static org.keycloak.config.StorageOptions.STORAGE;
 import static org.keycloak.quarkus.deployment.KeycloakProcessor.getDefaultDataSource;
-import static org.keycloak.quarkus.runtime.configuration.Configuration.getOptionalValue;
-import static org.keycloak.quarkus.runtime.configuration.MicroProfileConfigProvider.NS_KEYCLOAK_PREFIX;
 
 class LiquibaseProcessor {
 
@@ -80,11 +74,7 @@ class LiquibaseProcessor {
             }
         }
 
-        if (StorageOptions.StorageType.jpa.name().equals(getOptionalValue(NS_KEYCLOAK_PREFIX.concat(STORAGE.getKey())).orElse(null))) {
-            services.put(LockService.class.getName(), Collections.singletonList(KeycloakLockService.class.getName()));
-        } else {
-            services.put(LockService.class.getName(), Collections.singletonList(DummyLockService.class.getName()));
-        }
+        services.put(LockService.class.getName(), Collections.singletonList(DummyLockService.class.getName()));
         services.put(ChangeLogParser.class.getName(), Collections.singletonList(XMLChangeLogSAXParser.class.getName()));
 
         recorder.configureLiquibase(services);

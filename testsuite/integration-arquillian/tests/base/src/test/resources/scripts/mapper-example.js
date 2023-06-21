@@ -1,1 +1,0 @@
-'hello_' + user.username
