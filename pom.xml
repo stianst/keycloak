@@ -288,7 +288,6 @@
         <module>server-spi-private</module>
         <module>saml-core-api</module>
         <module>saml-core</module>
-        <module>federation</module>
         <module>services</module>
         <module>model</module>
         <module>rest</module>
@@ -1156,39 +1155,6 @@
                 <groupId>org.keycloak</groupId>
                 <artifactId>keycloak-client-api</artifactId>
                 <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-kerberos-federation</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <!-- Dependencies for RHEL IdM -->
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-sssd-federation</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.java.dev.jna</groupId>
-                <artifactId>jna</artifactId>
-                <version>${jna.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-ldap-federation</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-dependencies-server-min</artifactId>
-                <version>${project.version}</version>
-                <type>pom</type>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-dependencies-server-all</artifactId>
-                <version>${project.version}</version>
-                <type>pom</type>
             </dependency>
             <dependency>
                 <groupId>org.keycloak</groupId>

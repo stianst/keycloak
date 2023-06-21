@@ -16,25 +16,9 @@
  */
 package org.keycloak.services.resources.admin;
 
-import org.jboss.logging.Logger;
-import org.jboss.resteasy.annotations.cache.NoCache;
-import jakarta.ws.rs.NotFoundException;
-import org.keycloak.common.ClientConnection;
-import org.keycloak.component.ComponentModel;
-import org.keycloak.events.admin.OperationType;
-import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.RealmModel;
-import org.keycloak.services.ServicesLogger;
-import org.keycloak.storage.managers.UserStorageSyncManager;
-import org.keycloak.services.resources.admin.permissions.AdminPermissionEvaluator;
-import org.keycloak.storage.UserStorageProvider;
-import org.keycloak.storage.UserStorageProviderModel;
-import org.keycloak.storage.ldap.LDAPStorageProvider;
-import org.keycloak.storage.ldap.mappers.LDAPStorageMapper;
-import org.keycloak.storage.user.SynchronizationResult;
-
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -42,6 +26,19 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
+import org.jboss.logging.Logger;
+import org.jboss.resteasy.annotations.cache.NoCache;
+import org.keycloak.common.ClientConnection;
+import org.keycloak.component.ComponentModel;
+import org.keycloak.events.admin.OperationType;
+import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.RealmModel;
+import org.keycloak.services.resources.admin.permissions.AdminPermissionEvaluator;
+import org.keycloak.storage.UserStorageProvider;
+import org.keycloak.storage.UserStorageProviderModel;
+import org.keycloak.storage.managers.UserStorageSyncManager;
+import org.keycloak.storage.user.SynchronizationResult;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -216,31 +213,32 @@ public class UserStorageProviderResource {
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
     public SynchronizationResult syncMapperData(@PathParam("parentId") String parentId, @PathParam("id") String mapperId, @QueryParam("direction") String direction) {
-        auth.users().requireManage();
-
-        ComponentModel parentModel = realm.getComponent(parentId);
-        if (parentModel == null) throw new NotFoundException("Parent model not found");
-        ComponentModel mapperModel = realm.getComponent(mapperId);
-        if (mapperModel == null) throw new NotFoundException("Mapper model not found");
-
-        LDAPStorageProvider ldapProvider = (LDAPStorageProvider) session.getProvider(UserStorageProvider.class, parentModel);
-        LDAPStorageMapper mapper = session.getProvider(LDAPStorageMapper.class, mapperModel);
-
-        ServicesLogger.LOGGER.syncingDataForMapper(mapperModel.getName(), mapperModel.getProviderId(), direction);
-
-        SynchronizationResult syncResult;
-        if ("fedToKeycloak".equals(direction)) {
-            syncResult = mapper.syncDataFromFederationProviderToKeycloak(realm);
-        } else if ("keycloakToFed".equals(direction)) {
-            syncResult = mapper.syncDataFromKeycloakToFederationProvider(realm);
-        } else {
-            throw new BadRequestException("Unknown direction: " + direction);
-        }
-
-        Map<String, Object> eventRep = new HashMap<>();
-        eventRep.put("action", direction);
-        eventRep.put("result", syncResult);
-        adminEvent.operation(OperationType.ACTION).resourcePath(session.getContext().getUri()).representation(eventRep).success();
-        return syncResult;
+//        auth.users().requireManage();
+//
+//        ComponentModel parentModel = realm.getComponent(parentId);
+//        if (parentModel == null) throw new NotFoundException("Parent model not found");
+//        ComponentModel mapperModel = realm.getComponent(mapperId);
+//        if (mapperModel == null) throw new NotFoundException("Mapper model not found");
+//
+//        LDAPStorageProvider ldapProvider = (LDAPStorageProvider) session.getProvider(UserStorageProvider.class, parentModel);
+//        LDAPStorageMapper mapper = session.getProvider(LDAPStorageMapper.class, mapperModel);
+//
+//        ServicesLogger.LOGGER.syncingDataForMapper(mapperModel.getName(), mapperModel.getProviderId(), direction);
+//
+//        SynchronizationResult syncResult;
+//        if ("fedToKeycloak".equals(direction)) {
+//            syncResult = mapper.syncDataFromFederationProviderToKeycloak(realm);
+//        } else if ("keycloakToFed".equals(direction)) {
+//            syncResult = mapper.syncDataFromKeycloakToFederationProvider(realm);
+//        } else {
+//            throw new BadRequestException("Unknown direction: " + direction);
+//        }
+//
+//        Map<String, Object> eventRep = new HashMap<>();
+//        eventRep.put("action", direction);
+//        eventRep.put("result", syncResult);
+//        adminEvent.operation(OperationType.ACTION).resourcePath(session.getContext().getUri()).representation(eventRep).success();
+//        return syncResult;
+        throw new RuntimeException("Unsupported");
     }
 }
