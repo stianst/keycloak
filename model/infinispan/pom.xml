@@ -85,12 +85,6 @@
             <artifactId>wildfly-clustering-infinispan-marshalling</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-
         <!-- Needed for infinispan statistics -->
         <dependency>
             <groupId>org.eclipse.microprofile.metrics</groupId>
