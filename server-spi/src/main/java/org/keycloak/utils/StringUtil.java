@@ -52,4 +52,25 @@ public class StringUtil {
         return options.toString();
     }
 
+    /**
+     * Check whether the passed string is null or empty
+     *
+     * @param str
+     *
+     * @return
+     */
+    public static boolean isNotNull(String str) {
+        return str != null && !"".equals(str.trim());
+    }
+
+    /**
+     * Check whether the string is null or empty
+     *
+     * @param str
+     *
+     * @return
+     */
+    public static boolean isNullOrEmpty(String str) {
+        return str == null || str.isEmpty();
+    }
 }

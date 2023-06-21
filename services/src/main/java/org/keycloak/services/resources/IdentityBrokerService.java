@@ -16,9 +16,20 @@
  */
 package org.keycloak.services.resources;
 
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.OPTIONS;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.UriBuilder;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.annotations.cache.NoCache;
-import org.keycloak.http.HttpRequest;
 import org.keycloak.OAuthErrorException;
 import org.keycloak.authentication.AuthenticationProcessor;
 import org.keycloak.authentication.authenticators.broker.AbstractIdpAuthenticator;
@@ -33,17 +44,16 @@ import org.keycloak.broker.provider.IdentityProviderFactory;
 import org.keycloak.broker.provider.IdentityProviderMapper;
 import org.keycloak.broker.provider.IdentityProviderMapperSyncModeDelegate;
 import org.keycloak.broker.provider.util.IdentityBrokerState;
-import org.keycloak.broker.saml.SAMLEndpoint;
 import org.keycloak.broker.social.SocialIdentityProvider;
 import org.keycloak.common.ClientConnection;
 import org.keycloak.common.util.Base64Url;
 import org.keycloak.common.util.ObjectUtil;
 import org.keycloak.common.util.Time;
-import org.keycloak.dom.saml.v2.protocol.StatusResponseType;
 import org.keycloak.events.Details;
 import org.keycloak.events.Errors;
 import org.keycloak.events.EventBuilder;
 import org.keycloak.events.EventType;
+import org.keycloak.http.HttpRequest;
 import org.keycloak.locale.LocaleSelectorProvider;
 import org.keycloak.models.AccountRoles;
 import org.keycloak.models.AuthenticatedClientSessionModel;
@@ -67,8 +77,6 @@ import org.keycloak.protocol.LoginProtocol;
 import org.keycloak.protocol.oidc.OIDCLoginProtocol;
 import org.keycloak.protocol.oidc.TokenManager;
 import org.keycloak.protocol.oidc.utils.RedirectUtils;
-import org.keycloak.protocol.saml.SamlSessionUtils;
-import org.keycloak.protocol.saml.preprocessor.SamlAuthenticationPreprocessor;
 import org.keycloak.representations.AccessToken;
 import org.keycloak.services.ErrorPage;
 import org.keycloak.services.ErrorPageException;
@@ -91,24 +99,11 @@ import org.keycloak.sessions.AuthenticationSessionModel;
 import org.keycloak.sessions.RootAuthenticationSessionModel;
 import org.keycloak.util.JsonSerialization;
 
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.OPTIONS;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.WebApplicationException;
-import jakarta.ws.rs.core.HttpHeaders;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
-import jakarta.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -505,13 +500,6 @@ public class IdentityBrokerService implements IdentityProvider.AuthenticationCal
                 logger.debugf("Token will not be stored for identity provider [%s].", providerId);
             }
             context.setToken(null);
-        }
-        
-        StatusResponseType loginResponse = (StatusResponseType) context.getContextData().get(SAMLEndpoint.SAML_LOGIN_RESPONSE);
-        if (loginResponse != null) {
-            for(Iterator<SamlAuthenticationPreprocessor> it = SamlSessionUtils.getSamlAuthenticationPreprocessorIterator(session); it.hasNext();) {
-                loginResponse = it.next().beforeProcessingLoginResponse(loginResponse, authenticationSession);
-            }
         }
 
         session.getContext().setClient(authenticationSession.getClient());

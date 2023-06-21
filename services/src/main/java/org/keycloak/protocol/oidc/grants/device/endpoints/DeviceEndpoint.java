@@ -45,7 +45,6 @@ import org.keycloak.protocol.oidc.grants.device.DeviceGrantType;
 import org.keycloak.protocol.oidc.grants.device.clientpolicy.context.DeviceAuthorizationRequestContext;
 import org.keycloak.protocol.oidc.utils.AuthorizeClientUtil;
 import org.keycloak.representations.OAuth2DeviceAuthorizationResponse;
-import org.keycloak.saml.common.util.StringUtil;
 import org.keycloak.services.ErrorResponseException;
 import org.keycloak.services.ServicesLogger;
 import org.keycloak.services.Urls;
@@ -68,6 +67,7 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
+import org.keycloak.utils.StringUtil;
 
 import java.util.Map;
 
@@ -212,7 +212,7 @@ public class DeviceEndpoint extends AuthorizationEndpointBase implements RealmRe
         CacheControlUtil.noBackButtonCacheControlHeader(session);
 
         // code is not known, we can infer the client neither. ask the user to provide the code.
-        if (StringUtil.isNullOrEmpty(userCode)) {
+        if (org.keycloak.utils.StringUtil.isNullOrEmpty(userCode)) {
             return createVerificationPage(null);
         } else {
             // code exists, probably due to using a verification_uri_complete. Start the authentication considering the client

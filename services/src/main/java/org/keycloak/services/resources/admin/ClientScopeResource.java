@@ -29,7 +29,6 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.utils.ModelToRepresentation;
 import org.keycloak.models.utils.RepresentationToModel;
 import org.keycloak.representations.idm.ClientScopeRepresentation;
-import org.keycloak.saml.common.util.StringUtil;
 import org.keycloak.services.ErrorResponse;
 import org.keycloak.services.ErrorResponseException;
 import org.keycloak.services.resources.admin.permissions.AdminPermissionEvaluator;
@@ -42,6 +41,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.keycloak.utils.StringUtil;
 
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -162,7 +162,7 @@ public class ClientScopeResource {
         String regexp = clientScope.getAttributes().get(ClientScopeModel.DYNAMIC_SCOPE_REGEXP);
         if (Profile.isFeatureEnabled(Profile.Feature.DYNAMIC_SCOPES)) {
             // if the scope is dynamic but the regexp is empty, it's not considered valid
-            if (isDynamic && StringUtil.isNullOrEmpty(regexp)) {
+            if (isDynamic && org.keycloak.utils.StringUtil.isNullOrEmpty(regexp)) {
                 throw ErrorResponse.error("Dynamic scope regexp must not be null or empty", Response.Status.BAD_REQUEST);
             }
             // Always validate the dynamic scope regexp to avoid inserting a wrong value even when the feature is disabled

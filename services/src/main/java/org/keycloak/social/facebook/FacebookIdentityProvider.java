@@ -27,7 +27,7 @@ import org.keycloak.broker.provider.util.SimpleHttp;
 import org.keycloak.broker.social.SocialIdentityProvider;
 import org.keycloak.events.EventBuilder;
 import org.keycloak.models.KeycloakSession;
-import org.keycloak.saml.common.util.StringUtil;
+import org.keycloak.utils.StringUtil;
 
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>

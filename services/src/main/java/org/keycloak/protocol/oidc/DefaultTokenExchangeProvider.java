@@ -17,6 +17,10 @@
  */
 package org.keycloak.protocol.oidc;
 
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
 import org.jboss.logging.Logger;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.OAuthErrorException;
@@ -29,7 +33,6 @@ import org.keycloak.broker.provider.IdentityProviderMapper;
 import org.keycloak.broker.provider.IdentityProviderMapperSyncModeDelegate;
 import org.keycloak.common.ClientConnection;
 import org.keycloak.common.constants.ServiceAccountConstants;
-import org.keycloak.common.util.Base64Url;
 import org.keycloak.events.Details;
 import org.keycloak.events.Errors;
 import org.keycloak.events.EventBuilder;
@@ -45,16 +48,9 @@ import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.UserSessionModel;
-import org.keycloak.protocol.LoginProtocol;
-import org.keycloak.protocol.LoginProtocolFactory;
-import org.keycloak.protocol.oidc.endpoints.TokenEndpoint.TokenExchangeSamlProtocol;
-import org.keycloak.protocol.saml.SamlClient;
-import org.keycloak.protocol.saml.SamlProtocol;
-import org.keycloak.protocol.saml.SamlService;
 import org.keycloak.representations.AccessToken;
 import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.JsonWebToken;
-import org.keycloak.saml.common.constants.GeneralConstants;
 import org.keycloak.services.CorsErrorResponseException;
 import org.keycloak.services.Urls;
 import org.keycloak.services.managers.AuthenticationManager;
@@ -70,21 +66,16 @@ import org.keycloak.sessions.AuthenticationSessionModel;
 import org.keycloak.sessions.RootAuthenticationSessionModel;
 import org.keycloak.util.TokenUtil;
 
-import static org.keycloak.authentication.authenticators.util.AuthenticatorUtils.getDisabledByBruteForceEventError;
-import static org.keycloak.models.ImpersonationSessionNote.IMPERSONATOR_CLIENT;
-import static org.keycloak.models.ImpersonationSessionNote.IMPERSONATOR_ID;
-import static org.keycloak.models.ImpersonationSessionNote.IMPERSONATOR_USERNAME;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import jakarta.ws.rs.core.HttpHeaders;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.MultivaluedMap;
-import jakarta.ws.rs.core.Response;
+import static org.keycloak.authentication.authenticators.util.AuthenticatorUtils.getDisabledByBruteForceEventError;
+import static org.keycloak.models.ImpersonationSessionNote.IMPERSONATOR_CLIENT;
+import static org.keycloak.models.ImpersonationSessionNote.IMPERSONATOR_ID;
+import static org.keycloak.models.ImpersonationSessionNote.IMPERSONATOR_USERNAME;
 
 /**
  * Default token exchange implementation
@@ -421,53 +412,7 @@ public class DefaultTokenExchangeProvider implements TokenExchangeProvider {
     }
 
     protected Response exchangeClientToSAML2Client(UserModel targetUser, UserSessionModel targetUserSession, String requestedTokenType, ClientModel targetClient) {
-        // Create authSession with target SAML 2.0 client and authenticated user
-        LoginProtocolFactory factory = (LoginProtocolFactory) session.getKeycloakSessionFactory()
-                .getProviderFactory(LoginProtocol.class, SamlProtocol.LOGIN_PROTOCOL);
-        SamlService samlService = (SamlService) factory.createProtocolEndpoint(session, event);
-        AuthenticationSessionModel authSession = samlService.getOrCreateLoginSessionForIdpInitiatedSso(session, realm,
-                targetClient, null);
-        if (authSession == null) {
-            logger.error("SAML assertion consumer url not set up");
-            throw new CorsErrorResponseException(cors, OAuthErrorException.INVALID_CLIENT, "Client requires assertion consumer url set up", Response.Status.BAD_REQUEST);
-        }
-
-        authSession.setAuthenticatedUser(targetUser);
-
-        event.session(targetUserSession);
-
-        AuthenticationManager.setClientScopesInSession(authSession);
-        ClientSessionContext clientSessionCtx = TokenManager.attachAuthenticationSession(this.session, targetUserSession,
-                authSession);
-
-        updateUserSessionFromClientAuth(targetUserSession);
-
-        // Create SAML 2.0 Assertion Response
-        SamlClient samlClient = new SamlClient(targetClient);
-        SamlProtocol samlProtocol = new TokenExchangeSamlProtocol(samlClient).setEventBuilder(event).setHttpHeaders(headers).setRealm(realm)
-                .setSession(session).setUriInfo(session.getContext().getUri());
-
-        Response samlAssertion = samlProtocol.authenticated(authSession, targetUserSession, clientSessionCtx);
-        if (samlAssertion.getStatus() != 200) {
-            throw new CorsErrorResponseException(cors, OAuthErrorException.INVALID_REQUEST, "Can not get SAML 2.0 token", Response.Status.BAD_REQUEST);
-        }
-        String xmlString = (String) samlAssertion.getEntity();
-        String encodedXML = Base64Url.encode(xmlString.getBytes(GeneralConstants.SAML_CHARSET));
-
-        int assertionLifespan = samlClient.getAssertionLifespan();
-
-        AccessTokenResponse res = new AccessTokenResponse();
-        res.setToken(encodedXML);
-        res.setTokenType("Bearer");
-        res.setExpiresIn(assertionLifespan <= 0 ? realm.getAccessCodeLifespan() : assertionLifespan);
-        res.setOtherClaims(OAuth2Constants.ISSUED_TOKEN_TYPE, requestedTokenType);
-
-        event.detail(Details.AUDIENCE, targetClient.getClientId())
-            .user(targetUser);
-
-        event.success();
-
-        return cors.builder(Response.ok(res, MediaType.APPLICATION_JSON_TYPE)).build();
+        throw new RuntimeException("Unsupported");
     }
 
     protected Response exchangeExternalToken(String issuer, String subjectToken) {

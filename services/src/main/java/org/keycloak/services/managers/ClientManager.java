@@ -35,9 +35,6 @@ import org.keycloak.protocol.LoginProtocol;
 import org.keycloak.protocol.LoginProtocolFactory;
 import org.keycloak.protocol.oidc.OIDCLoginProtocol;
 import org.keycloak.protocol.oidc.mappers.UserSessionNoteMapper;
-import org.keycloak.protocol.saml.SamlClient;
-import org.keycloak.protocol.saml.SamlConfigAttributes;
-import org.keycloak.protocol.saml.SamlProtocol;
 import org.keycloak.representations.adapters.config.BaseRealmConfig;
 import org.keycloak.representations.adapters.config.PolicyEnforcerConfig;
 import org.keycloak.representations.idm.ClientRepresentation;
@@ -204,12 +201,6 @@ public class ClientManager {
             serviceAccountUser.setUsername(username);
         }
 
-        if (SamlProtocol.LOGIN_PROTOCOL.equals(client.getProtocol())) {
-            SamlClient samlClient = new SamlClient(client);
-            samlClient.setArtifactBindingIdentifierFrom(newClientId);
-
-            newClientRepresentation.getAttributes().put(SamlConfigAttributes.SAML_ARTIFACT_BINDING_IDENTIFIER, samlClient.getArtifactBindingIdentifier());
-        }
     }
 
     @JsonPropertyOrder({"realm", "realm-public-key", "bearer-only", "auth-server-url", "ssl-required",

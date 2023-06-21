@@ -80,8 +80,6 @@ public class Templates {
                 return "login-page-expired.ftl";
             case X509_CONFIRM:
                 return "login-x509-info.ftl";
-            case SAML_POST_FORM:
-                return "saml-post-form.ftl";
             case UPDATE_USER_PROFILE:
                 return "update-user-profile.ftl";
             case IDP_REVIEW_USER_PROFILE:

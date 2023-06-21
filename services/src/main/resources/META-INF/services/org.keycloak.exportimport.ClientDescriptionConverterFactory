@@ -17,4 +17,3 @@
 
 org.keycloak.exportimport.KeycloakClientDescriptionConverter
 org.keycloak.protocol.oidc.OIDCClientDescriptionConverterFactory
-org.keycloak.protocol.saml.EntityDescriptorDescriptionConverter

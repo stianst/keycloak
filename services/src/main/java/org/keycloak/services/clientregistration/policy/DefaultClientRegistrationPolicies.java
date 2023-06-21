@@ -27,9 +27,6 @@ import org.keycloak.protocol.oidc.mappers.FullNameMapper;
 import org.keycloak.protocol.oidc.mappers.SHA256PairwiseSubMapper;
 import org.keycloak.protocol.oidc.mappers.UserAttributeMapper;
 import org.keycloak.protocol.oidc.mappers.UserPropertyMapper;
-import org.keycloak.protocol.saml.mappers.RoleListMapper;
-import org.keycloak.protocol.saml.mappers.UserAttributeStatementMapper;
-import org.keycloak.protocol.saml.mappers.UserPropertyAttributeStatementMapper;
 import org.keycloak.services.clientregistration.policy.impl.ClientScopesClientRegistrationPolicyFactory;
 import org.keycloak.services.clientregistration.policy.impl.ConsentRequiredClientRegistrationPolicyFactory;
 import org.keycloak.services.clientregistration.policy.impl.MaxClientsClientRegistrationPolicyFactory;
@@ -43,14 +40,11 @@ import org.keycloak.services.clientregistration.policy.impl.TrustedHostClientReg
 public class DefaultClientRegistrationPolicies {
 
     private static String[] DEFAULT_ALLOWED_PROTOCOL_MAPPERS = {
-            UserAttributeStatementMapper.PROVIDER_ID,
             UserAttributeMapper.PROVIDER_ID,
-            UserPropertyAttributeStatementMapper.PROVIDER_ID,
             UserPropertyMapper.PROVIDER_ID,
             FullNameMapper.PROVIDER_ID,
             AddressMapper.PROVIDER_ID,
-            new SHA256PairwiseSubMapper().getId(),
-            RoleListMapper.PROVIDER_ID
+            new SHA256PairwiseSubMapper().getId()
     };
 
     public static void addDefaultPolicies(RealmModel realm) {

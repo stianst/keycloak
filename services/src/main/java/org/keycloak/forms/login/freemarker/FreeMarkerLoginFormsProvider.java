@@ -61,7 +61,6 @@ import org.keycloak.forms.login.freemarker.model.ProfileBean;
 import org.keycloak.forms.login.freemarker.model.RealmBean;
 import org.keycloak.forms.login.freemarker.model.RegisterBean;
 import org.keycloak.forms.login.freemarker.model.RequiredActionUrlFormatterMethod;
-import org.keycloak.forms.login.freemarker.model.SAMLPostFormBean;
 import org.keycloak.forms.login.freemarker.model.TotpBean;
 import org.keycloak.forms.login.freemarker.model.TotpLoginBean;
 import org.keycloak.forms.login.freemarker.model.UrlBean;
@@ -282,9 +281,6 @@ public class FreeMarkerLoginFormsProvider implements LoginFormsProvider {
                 break;
             case X509_CONFIRM:
                 attributes.put("x509", new X509ConfirmBean(formData));
-                break;
-            case SAML_POST_FORM:
-                attributes.put("samlPost", new SAMLPostFormBean(formData));
                 break;
             case UPDATE_USER_PROFILE:
                 attributes.put("profile", new VerifyProfileBean(user, formData, session));
@@ -690,7 +686,7 @@ public class FreeMarkerLoginFormsProvider implements LoginFormsProvider {
 
     @Override
     public Response createSamlPostForm() {
-        return createResponse(LoginFormsPages.SAML_POST_FORM);
+        throw new RuntimeException("Unsupported");
     }
 
     @Override

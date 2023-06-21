@@ -33,12 +33,13 @@ import org.keycloak.models.UserSessionProvider;
 import org.keycloak.protocol.oidc.TokenManager;
 import org.keycloak.representations.AccessToken;
 import org.keycloak.representations.IDToken;
-import org.keycloak.saml.common.util.StringUtil;
 import org.keycloak.services.ErrorResponseException;
 import org.keycloak.services.util.DefaultClientSessionContext;
 import org.keycloak.util.JsonSerialization;
 
 import jakarta.ws.rs.core.Response.Status;
+import org.keycloak.utils.StringUtil;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -103,7 +104,7 @@ public class KeycloakIdentity implements Identity {
                     if(!fieldValue.isObject()) {
                         String value = fieldValue.asText();
 
-                        if (StringUtil.isNullOrEmpty(value)) {
+                        if (org.keycloak.utils.StringUtil.isNullOrEmpty(value)) {
                             continue;
                         }
                         values.add(value);

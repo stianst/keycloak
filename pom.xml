@@ -130,7 +130,6 @@
         <elytron.undertow-server.version>1.9.0.Final</elytron.undertow-server.version>
         <jetty94.version>9.4.40.v20210413</jetty94.version>
         <woodstox.version>6.0.3</woodstox.version>
-        <xmlsec.version>2.2.3</xmlsec.version>
         <wildfly.common.version>1.6.0.Final</wildfly.common.version>
         <nashorn.version>15.4</nashorn.version>
         <ua-parser.version>1.5.4</ua-parser.version>
@@ -286,8 +285,6 @@
         <module>crypto</module>
         <module>server-spi</module>
         <module>server-spi-private</module>
-        <module>saml-core-api</module>
-        <module>saml-core</module>
         <module>services</module>
         <module>model</module>
         <module>rest</module>
@@ -628,17 +625,6 @@
                 <groupId>org.freemarker</groupId>
                 <artifactId>freemarker</artifactId>
                 <version>${freemarker.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.santuario</groupId>
-                <artifactId>xmlsec</artifactId>
-                <version>${xmlsec.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.fasterxml.woodstox</groupId>
-                        <artifactId>woodstox-core</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.wildfly</groupId>
@@ -1241,37 +1227,12 @@
             </dependency>
             <dependency>
                 <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-saml-servlet-filter-adapter</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-saml-jakarta-servlet-filter-adapter</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
                 <artifactId>keycloak-servlet-filter-adapter</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.keycloak</groupId>
                 <artifactId>keycloak-jakarta-servlet-filter-adapter</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-saml-as7-adapter</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-saml-as7-subsystem</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-saml-tomcat-adapter</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -1292,16 +1253,6 @@
             <dependency>
                 <groupId>org.keycloak</groupId>
                 <artifactId>keycloak-wildfly-elytron-oidc-adapter</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-saml-wildfly-elytron-adapter</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-saml-wildfly-elytron-jakarta-adapter</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -1352,56 +1303,6 @@
             <dependency>
                 <groupId>org.keycloak</groupId>
                 <artifactId>launcher</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-saml-core</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-saml-core-public</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-saml-adapter-api-public</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-saml-adapter-core</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-saml-tomcat-adapter-core</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-saml-jetty-adapter-core</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-saml-wildfly-subsystem</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-saml-wildfly-jakarta-subsystem</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-saml-jetty94-adapter</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-saml-undertow-adapter</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -1466,12 +1367,6 @@
 
             <dependency>
                 <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-saml-as7-modules</artifactId>
-                <version>${project.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
                 <artifactId>keycloak-as7-modules</artifactId>
                 <version>${project.version}</version>
                 <type>zip</type>
@@ -1479,18 +1374,6 @@
             <dependency>
                 <groupId>org.keycloak</groupId>
                 <artifactId>keycloak-wildfly-modules</artifactId>
-                <version>${project.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-saml-wildfly-modules</artifactId>
-                <version>${project.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-saml-wildfly-jakarta-modules</artifactId>
                 <version>${project.version}</version>
                 <type>zip</type>
             </dependency>
@@ -1509,12 +1392,6 @@
             <dependency>
                 <groupId>org.keycloak</groupId>
                 <artifactId>keycloak-wildfly-adapter-dist</artifactId>
-                <version>${project.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-saml-wildfly-adapter-dist</artifactId>
                 <version>${project.version}</version>
                 <type>zip</type>
             </dependency>
@@ -1575,24 +1452,6 @@
             <dependency>
                 <groupId>org.keycloak</groupId>
                 <artifactId>keycloak-adapter-feature-pack</artifactId>
-                <version>${project.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-saml-tomcat-adapter-dist</artifactId>
-                <version>${project.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-saml-jetty94-adapter-dist</artifactId>
-                <version>${project.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-saml-as7-adapter-dist</artifactId>
                 <version>${project.version}</version>
                 <type>zip</type>
             </dependency>

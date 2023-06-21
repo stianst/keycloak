@@ -17,20 +17,20 @@
 
 package org.keycloak.models.jpa;
 
+import jakarta.persistence.EntityManager;
 import org.keycloak.Config;
 import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.models.ClientProvider;
 import org.keycloak.models.ClientProviderFactory;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
-import org.keycloak.protocol.saml.SamlConfigAttributes;
 
-import jakarta.persistence.EntityManager;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import static org.keycloak.models.jpa.JpaRealmProviderFactory.PROVIDER_ID;
 import static org.keycloak.models.jpa.JpaRealmProviderFactory.PROVIDER_PRIORITY;
 
@@ -39,8 +39,6 @@ public class JpaClientProviderFactory implements ClientProviderFactory {
     private Set<String> clientSearchableAttributes = null;
 
     private static final List<String> REQUIRED_SEARCHABLE_ATTRIBUTES = Arrays.asList(
-        "saml_idp_initiated_sso_url_name",
-        SamlConfigAttributes.SAML_ARTIFACT_BINDING_IDENTIFIER
     );
 
     @Override

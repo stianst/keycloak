@@ -76,7 +76,6 @@ import org.keycloak.connections.jpa.updater.liquibase.conn.DefaultLiquibaseConne
 import org.keycloak.policy.BlacklistPasswordPolicyProviderFactory;
 import org.keycloak.protocol.ProtocolMapperSpi;
 import org.keycloak.protocol.oidc.mappers.DeployedScriptOIDCProtocolMapper;
-import org.keycloak.protocol.saml.mappers.DeployedScriptSAMLProtocolMapper;
 import org.keycloak.provider.EnvironmentDependentProviderFactory;
 import org.keycloak.provider.Provider;
 import org.keycloak.provider.ProviderFactory;
@@ -186,7 +185,6 @@ class KeycloakProcessor {
         DEPLOYEABLE_SCRIPT_PROVIDERS.put(AUTHENTICATORS, KeycloakProcessor::registerScriptAuthenticator);
         DEPLOYEABLE_SCRIPT_PROVIDERS.put(POLICIES, KeycloakProcessor::registerScriptPolicy);
         DEPLOYEABLE_SCRIPT_PROVIDERS.put(MAPPERS, KeycloakProcessor::registerScriptMapper);
-        DEPLOYEABLE_SCRIPT_PROVIDERS.put(SAML_MAPPERS, KeycloakProcessor::registerSAMLScriptMapper);
     }
 
     private static ProviderFactory registerScriptAuthenticator(ScriptProviderMetadata metadata) {
@@ -199,10 +197,6 @@ class KeycloakProcessor {
 
     private static ProviderFactory registerScriptMapper(ScriptProviderMetadata metadata) {
         return new DeployedScriptOIDCProtocolMapper(metadata);
-    }
-
-    private static ProviderFactory registerSAMLScriptMapper(ScriptProviderMetadata metadata) {
-        return new DeployedScriptSAMLProtocolMapper(metadata);
     }
 
     @BuildStep

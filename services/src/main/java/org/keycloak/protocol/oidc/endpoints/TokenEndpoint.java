@@ -17,9 +17,18 @@
 
 package org.keycloak.protocol.oidc.endpoints;
 
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.OPTIONS;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 import org.jboss.logging.Logger;
-import org.keycloak.http.HttpRequest;
-import org.keycloak.http.HttpResponse;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.OAuthErrorException;
 import org.keycloak.authentication.AuthenticationProcessor;
@@ -36,6 +45,8 @@ import org.keycloak.events.Details;
 import org.keycloak.events.Errors;
 import org.keycloak.events.EventBuilder;
 import org.keycloak.events.EventType;
+import org.keycloak.http.HttpRequest;
+import org.keycloak.http.HttpResponse;
 import org.keycloak.jose.jws.JWSInput;
 import org.keycloak.jose.jws.JWSInputException;
 import org.keycloak.models.AuthenticatedClientSessionModel;
@@ -60,18 +71,10 @@ import org.keycloak.protocol.oidc.utils.AuthorizeClientUtil;
 import org.keycloak.protocol.oidc.utils.OAuth2Code;
 import org.keycloak.protocol.oidc.utils.OAuth2CodeParser;
 import org.keycloak.protocol.oidc.utils.PkceUtils;
-import org.keycloak.protocol.saml.JaxrsSAML2BindingBuilder;
-import org.keycloak.protocol.saml.SamlClient;
-import org.keycloak.protocol.saml.SamlProtocol;
 import org.keycloak.rar.AuthorizationRequestContext;
 import org.keycloak.representations.AccessToken;
 import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.idm.authorization.AuthorizationRequest.Metadata;
-import org.keycloak.saml.common.constants.JBossSAMLConstants;
-import org.keycloak.saml.common.constants.JBossSAMLURIConstants;
-import org.keycloak.saml.common.exceptions.ConfigurationException;
-import org.keycloak.saml.common.exceptions.ProcessingException;
-import org.keycloak.saml.common.util.DocumentUtil;
 import org.keycloak.services.CorsErrorResponseException;
 import org.keycloak.services.ServicesLogger;
 import org.keycloak.services.Urls;
@@ -99,23 +102,7 @@ import org.keycloak.sessions.AuthenticationSessionModel;
 import org.keycloak.sessions.RootAuthenticationSessionModel;
 import org.keycloak.util.TokenUtil;
 import org.keycloak.utils.ProfileHelper;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.InternalServerErrorException;
-import jakarta.ws.rs.OPTIONS;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.core.HttpHeaders;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.MultivaluedHashMap;
-import jakarta.ws.rs.core.MultivaluedMap;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
-import javax.xml.namespace.QName;
-
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -1000,36 +987,4 @@ public class TokenEndpoint {
         return grantType.cibaGrant();
     }
 
-    public static class TokenExchangeSamlProtocol extends SamlProtocol {
-
-        final SamlClient samlClient;
-
-        public TokenExchangeSamlProtocol(SamlClient samlClient) {
-            this.samlClient = samlClient;
-        }
-
-        @Override
-        protected Response buildAuthenticatedResponse(AuthenticatedClientSessionModel clientSession, String redirectUri,
-                                                      Document samlDocument, JaxrsSAML2BindingBuilder bindingBuilder)
-                throws ConfigurationException, ProcessingException, IOException {
-            JaxrsSAML2BindingBuilder.PostBindingBuilder builder = bindingBuilder.postBinding(samlDocument);
-
-            Element assertionElement;
-            if (samlClient.requiresEncryption()) {
-                assertionElement = DocumentUtil.getElement(builder.getDocument(), new QName(JBossSAMLURIConstants.ASSERTION_NSURI.get(), JBossSAMLConstants.ENCRYPTED_ASSERTION.get()));
-            } else {
-                assertionElement = DocumentUtil.getElement(builder.getDocument(), new QName(JBossSAMLURIConstants.ASSERTION_NSURI.get(), JBossSAMLConstants.ASSERTION.get()));
-            }
-            if (assertionElement == null) {
-                return Response.status(Status.BAD_REQUEST).build();
-            }
-            String assertion = DocumentUtil.getNodeAsString(assertionElement);
-            return Response.ok(assertion, MediaType.APPLICATION_XML_TYPE).build();
-        }
-
-        @Override
-        protected Response buildErrorResponse(boolean isPostBinding, String destination, JaxrsSAML2BindingBuilder binding, Document document) throws ConfigurationException, ProcessingException, IOException {
-            return Response.status(Status.BAD_REQUEST).build();
-        }
-    }
 }

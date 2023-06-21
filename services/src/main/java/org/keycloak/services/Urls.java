@@ -21,7 +21,6 @@ import org.keycloak.models.Constants;
 import org.keycloak.protocol.oidc.OIDCLoginProtocol;
 import org.keycloak.protocol.oidc.OIDCLoginProtocolService;
 import org.keycloak.protocol.oidc.endpoints.LogoutEndpoint;
-import org.keycloak.protocol.saml.SamlProtocol;
 import org.keycloak.services.resources.IdentityBrokerService;
 import org.keycloak.services.resources.LoginActionsService;
 import org.keycloak.services.resources.RealmsResource;
@@ -210,7 +209,4 @@ public class Urls {
         return UriBuilder.fromUri(baseUri).path(ThemeResource.class);
     }
 
-    public static URI samlRequestEndpoint(final URI baseUri, final String realmName) {
-        return realmBase(baseUri).path(RealmsResource.class, "getProtocol").build(realmName, SamlProtocol.LOGIN_PROTOCOL);
-    }
 }

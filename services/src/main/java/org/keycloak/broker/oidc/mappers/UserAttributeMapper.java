@@ -27,7 +27,7 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.provider.ProviderConfigProperty;
-import org.keycloak.saml.common.util.StringUtil;
+import org.keycloak.utils.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -107,7 +107,7 @@ public class UserAttributeMapper extends AbstractClaimMapper {
     @Override
     public void preprocessFederatedIdentity(KeycloakSession session, RealmModel realm, IdentityProviderMapperModel mapperModel, BrokeredIdentityContext context) {
         String attribute = mapperModel.getConfig().get(USER_ATTRIBUTE);
-        if(StringUtil.isNullOrEmpty(attribute)){
+        if(org.keycloak.utils.StringUtil.isNullOrEmpty(attribute)){
             return;
         }
         Object value = getClaimValue(mapperModel, context);
