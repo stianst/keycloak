@@ -697,38 +697,6 @@
                 <scope>test</scope>
             </dependency>
 
-            <!-- Apache DS -->
-            <dependency>
-                <groupId>org.apache.directory.server</groupId>
-                <artifactId>apacheds-core</artifactId>
-                <version>${apacheds.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.directory.server</groupId>
-                <artifactId>apacheds-core-api</artifactId>
-                <version>${apacheds.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.directory.server</groupId>
-                <artifactId>apacheds-core-annotations</artifactId>
-                <version>${apacheds.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.directory.server</groupId>
-                <artifactId>apacheds-interceptor-kerberos</artifactId>
-                <version>${apacheds.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.directory.server</groupId>
-                <artifactId>apacheds-server-annotations</artifactId>
-                <version>${apacheds.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.directory.api</groupId>
-                <artifactId>api-ldap-codec-standalone</artifactId>
-                <version>${apacheds.codec.version}</version>
-            </dependency>
-
             <!-- Selenium -->
             <dependency>
                 <groupId>org.seleniumhq.selenium</groupId>
@@ -1573,11 +1541,6 @@
                 <artifactId>keycloak-demo-dist</artifactId>
                 <version>${project.version}</version>
                 <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.keycloak</groupId>
-                <artifactId>keycloak-util-embedded-ldap</artifactId>
-                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.keycloak</groupId>
