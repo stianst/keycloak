@@ -17,18 +17,12 @@
 
 package org.keycloak.models.sessions.infinispan;
 
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
-
-import org.infinispan.client.hotrod.exceptions.HotRodClientException;
-import org.infinispan.commons.api.BasicCache;
 import org.jboss.logging.Logger;
-import org.keycloak.common.util.Time;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.SingleUseObjectProvider;
 import org.keycloak.models.sessions.infinispan.entities.SingleUseObjectValueEntity;
-import org.keycloak.connections.infinispan.InfinispanUtil;
+
+import java.util.Map;
 
 /**
  * TODO: Check if Boolean can be used as single-use cache argument instead of SingleUseObjectValueEntity. With respect to other single-use cache usecases like "Revoke Refresh Token" .
@@ -41,11 +35,11 @@ public class InfinispanSingleUseObjectProvider implements SingleUseObjectProvide
 
     public static final Logger logger = Logger.getLogger(InfinispanSingleUseObjectProvider.class);
 
-    private final Supplier<BasicCache<String, SingleUseObjectValueEntity>> singleUseObjectCache;
+    private final Map<String, SingleUseObjectValueEntity> singleUseObjectCache;
     private final KeycloakSession session;
     private final InfinispanKeycloakTransaction tx;
 
-    public InfinispanSingleUseObjectProvider(KeycloakSession session, Supplier<BasicCache<String, SingleUseObjectValueEntity>> singleUseObjectCache) {
+    public InfinispanSingleUseObjectProvider(KeycloakSession session, Map<String, SingleUseObjectValueEntity> singleUseObjectCache) {
         this.session = session;
         this.singleUseObjectCache = singleUseObjectCache;
         this.tx = new InfinispanKeycloakTransaction();
@@ -56,78 +50,42 @@ public class InfinispanSingleUseObjectProvider implements SingleUseObjectProvide
     @Override
     public void put(String key, long lifespanSeconds, Map<String, String> notes) {
         SingleUseObjectValueEntity tokenValue = new SingleUseObjectValueEntity(notes);
-        try {
-            BasicCache<String, SingleUseObjectValueEntity> cache = singleUseObjectCache.get();
-            tx.put(cache, key, tokenValue, InfinispanUtil.toHotrodTimeMs(cache, Time.toMillis(lifespanSeconds)), TimeUnit.MILLISECONDS);
-        } catch (HotRodClientException re) {
-            // No need to retry. The hotrod (remoteCache) has some retries in itself in case of some random network error happened.
-            if (logger.isDebugEnabled()) {
-                logger.debugf(re, "Failed when adding code %s", key);
-            }
-
-            throw re;
-        }
+        singleUseObjectCache.put(key, tokenValue);
     }
 
     @Override
     public Map<String, String> get(String key) {
         SingleUseObjectValueEntity singleUseObjectValueEntity;
-
-        BasicCache<String, SingleUseObjectValueEntity> cache = singleUseObjectCache.get();
-        singleUseObjectValueEntity = tx.get(cache, key);
+        singleUseObjectValueEntity = singleUseObjectCache.get(key);
         return singleUseObjectValueEntity != null ? singleUseObjectValueEntity.getNotes() : null;
     }
 
     @Override
     public Map<String, String> remove(String key) {
-        try {
-            BasicCache<String, SingleUseObjectValueEntity> cache = singleUseObjectCache.get();
-            SingleUseObjectValueEntity singleUseObjectValueEntity = tx.get(cache, key);
-            if (singleUseObjectValueEntity != null) {
-                tx.remove(cache, key);
-                return singleUseObjectValueEntity.getNotes();
-            }
-            return null;
-        } catch (HotRodClientException re) {
-            // No need to retry. The hotrod (remoteCache) has some retries in itself in case of some random network error happened.
-            // In case of lock conflict, we don't want to retry anyway as there was likely an attempt to remove the code from different place.
-            if (logger.isDebugEnabled()) {
-                logger.debugf(re, "Failed when removing code %s", key);
-            }
-
-            return null;
+        SingleUseObjectValueEntity singleUseObjectValueEntity = singleUseObjectCache.get(key);
+        if (singleUseObjectValueEntity != null) {
+            singleUseObjectCache.remove(key);
+            return singleUseObjectValueEntity.getNotes();
         }
+        return null;
     }
 
     @Override
     public boolean replace(String key, Map<String, String> notes) {
-        BasicCache<String, SingleUseObjectValueEntity> cache = singleUseObjectCache.get();
-        return cache.replace(key, new SingleUseObjectValueEntity(notes)) != null;
+        return singleUseObjectCache.replace(key, new SingleUseObjectValueEntity(notes)) != null;
     }
 
     @Override
     public boolean putIfAbsent(String key, long lifespanInSeconds) {
         SingleUseObjectValueEntity tokenValue = new SingleUseObjectValueEntity(null);
-        BasicCache<String, SingleUseObjectValueEntity> cache = singleUseObjectCache.get();
 
-        try {
-            long lifespanMs = InfinispanUtil.toHotrodTimeMs(cache, Time.toMillis(lifespanInSeconds));
-            SingleUseObjectValueEntity existing = cache.putIfAbsent(key, tokenValue, lifespanMs, TimeUnit.MILLISECONDS);
-            return existing == null;
-        } catch (HotRodClientException re) {
-            // No need to retry. The hotrod (remoteCache) has some retries in itself in case of some random network error happened.
-            // In case of lock conflict, we don't want to retry anyway as there was likely an attempt to use the token from different place.
-            logger.debugf(re, "Failed when adding token %s", key);
-
-            return false;
-        }
-
+        SingleUseObjectValueEntity existing = singleUseObjectCache.putIfAbsent(key, tokenValue);
+        return existing == null;
     }
 
     @Override
     public boolean contains(String key) {
-        BasicCache<String, SingleUseObjectValueEntity> cache = singleUseObjectCache.get();
-        return cache.containsKey(key);
+        return singleUseObjectCache.containsKey(key);
     }
 
     @Override

@@ -21,3 +21,5 @@ bin/kc.sh start --optimized --hostname-strict false --http-enabled true --db-url
 
 
 bin/kc.sh start-dev --hostname-strict false --http-enabled true --db postgres --db-url-host localhost --db-username keycloak --db-password password
+
+kcw dev-build start  --db-url-host localhost --db-username keycloak --db-password password

@@ -33,7 +33,7 @@
         <class>org.keycloak.models.jpa.entities.RoleEntity</class>
         <class>org.keycloak.models.jpa.entities.RoleAttributeEntity</class>
         <class>org.keycloak.models.jpa.entities.FederatedIdentityEntity</class>
-        <class>org.keycloak.models.jpa.entities.MigrationModelEntity</class>
+<!--        <class>org.keycloak.models.jpa.entities.MigrationModelEntity</class>-->
         <class>org.keycloak.models.jpa.entities.UserEntity</class>
         <class>org.keycloak.models.jpa.entities.RealmLocalizationTextsEntity</class>
         <class>org.keycloak.models.jpa.entities.UserRequiredActionEntity</class>
@@ -66,12 +66,12 @@
         <class>org.keycloak.events.jpa.AdminEventEntity</class>
 
         <!-- Authorization -->
-        <class>org.keycloak.authorization.jpa.entities.ResourceServerEntity</class>
-        <class>org.keycloak.authorization.jpa.entities.ResourceEntity</class>
-        <class>org.keycloak.authorization.jpa.entities.ScopeEntity</class>
-        <class>org.keycloak.authorization.jpa.entities.PolicyEntity</class>
-        <class>org.keycloak.authorization.jpa.entities.PermissionTicketEntity</class>
-        <class>org.keycloak.authorization.jpa.entities.ResourceAttributeEntity</class>
+<!--        <class>org.keycloak.authorization.jpa.entities.ResourceServerEntity</class>-->
+<!--        <class>org.keycloak.authorization.jpa.entities.ResourceEntity</class>-->
+<!--        <class>org.keycloak.authorization.jpa.entities.ScopeEntity</class>-->
+<!--        <class>org.keycloak.authorization.jpa.entities.PolicyEntity</class>-->
+<!--        <class>org.keycloak.authorization.jpa.entities.PermissionTicketEntity</class>-->
+<!--        <class>org.keycloak.authorization.jpa.entities.ResourceAttributeEntity</class>-->
 
         <!-- User Federation Storage -->
         <class>org.keycloak.storage.jpa.entity.BrokerLinkEntity</class>

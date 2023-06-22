@@ -15,7 +15,6 @@
 # limitations under the License.
 #
 
-org.keycloak.models.cache.CachePublicKeyProviderSpi
 org.keycloak.storage.client.ClientStorageProviderSpi
 org.keycloak.storage.group.GroupStorageProviderSpi
 org.keycloak.storage.clientscope.ClientScopeStorageProviderSpi

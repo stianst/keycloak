@@ -35,7 +35,6 @@ import jakarta.persistence.Table;
         @NamedQuery(name="deleteResourceAttributesByNameAndResource", query="delete from ResourceAttributeEntity attr where attr.resource.id = :resourceId and attr.name = :name")
 })
 @Table(name="RESOURCE_ATTRIBUTE")
-@Entity
 public class ResourceAttributeEntity {
 
     @Id

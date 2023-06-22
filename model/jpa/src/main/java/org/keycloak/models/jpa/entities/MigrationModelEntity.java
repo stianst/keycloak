@@ -31,7 +31,6 @@ import jakarta.persistence.Table;
  * @version $Revision: 1 $
  */
 @Table(name="MIGRATION_MODEL")
-@Entity
 @NamedQueries({
         @NamedQuery(name = "getLatest", query = "select m from MigrationModelEntity m ORDER BY m.updatedTime DESC")
 })

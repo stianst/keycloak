@@ -49,7 +49,6 @@ import org.hibernate.annotations.FetchMode;
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Igor</a>
  */
-@Entity
 @Table(name = "RESOURCE_SERVER_RESOURCE", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"NAME", "RESOURCE_SERVER_ID", "OWNER"})
 })

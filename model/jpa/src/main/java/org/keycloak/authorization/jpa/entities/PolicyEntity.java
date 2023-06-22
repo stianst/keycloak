@@ -48,7 +48,6 @@ import org.keycloak.representations.idm.authorization.Logic;
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Igor</a>
  */
-@Entity
 @Table(name = "RESOURCE_SERVER_POLICY", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"NAME", "RESOURCE_SERVER_ID"})
 })

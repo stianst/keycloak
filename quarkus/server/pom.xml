@@ -19,6 +19,7 @@
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-quarkus-server</artifactId>
         </dependency>
+
     </dependencies>
 
     <properties>

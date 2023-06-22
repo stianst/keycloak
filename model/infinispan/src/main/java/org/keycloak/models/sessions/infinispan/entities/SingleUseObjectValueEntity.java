@@ -18,15 +18,13 @@ package org.keycloak.models.sessions.infinispan.entities;
 
 import org.keycloak.models.SingleUseObjectValueModel;
 
-import java.io.*;
-import java.util.*;
-import org.infinispan.commons.marshall.Externalizer;
-import org.infinispan.commons.marshall.SerializeWith;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author hmlnarik
  */
-@SerializeWith(SingleUseObjectValueEntity.ExternalizerImpl.class)
 public class SingleUseObjectValueEntity implements SingleUseObjectValueModel {
 
     private final Map<String, String> notes;
@@ -50,32 +48,4 @@ public class SingleUseObjectValueEntity implements SingleUseObjectValueModel {
         return String.format("SingleUseObjectValueEntity [ notes=%s ]", notes.toString());
     }
 
-    public static class ExternalizerImpl implements Externalizer<SingleUseObjectValueEntity> {
-
-        private static final int VERSION_1 = 1;
-
-        @Override
-        public void writeObject(ObjectOutput output, SingleUseObjectValueEntity t) throws IOException {
-            output.writeByte(VERSION_1);
-
-            output.writeBoolean(t.notes.isEmpty());
-            if (! t.notes.isEmpty()) {
-                output.writeObject(t.notes);
-            }
-        }
-
-        @Override
-        public SingleUseObjectValueEntity readObject(ObjectInput input) throws IOException, ClassNotFoundException {
-            byte version = input.readByte();
-            
-            if (version != VERSION_1) {
-                throw new IOException("Invalid version: " + version);
-            }
-            boolean notesEmpty = input.readBoolean();
-
-            Map<String, String> notes = notesEmpty ? Collections.EMPTY_MAP : (Map<String, String>) input.readObject();
-            
-            return new SingleUseObjectValueEntity(notes);
-        }
-    }
 }

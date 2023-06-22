@@ -29,7 +29,6 @@ import jakarta.persistence.Table;
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Igor</a>
  */
-@Entity
 @Table(name = "RESOURCE_SERVER")
 public class ResourceServerEntity {
 
