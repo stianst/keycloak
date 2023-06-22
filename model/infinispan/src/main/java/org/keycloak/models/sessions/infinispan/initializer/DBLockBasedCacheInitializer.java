@@ -19,8 +19,6 @@ package org.keycloak.models.sessions.infinispan.initializer;
 
 import org.jboss.logging.Logger;
 import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.dblock.DBLockManager;
-import org.keycloak.models.dblock.DBLockProvider;
 
 /**
  * Encapsulates preloading of sessions within the DB Lock. This DB-aware lock ensures that "startLoading" is done on single DC and the other DCs need to wait.
@@ -72,19 +70,5 @@ public class DBLockBasedCacheInitializer extends CacheInitializer {
      */
     @Override
     protected void startLoading() {
-        DBLockManager dbLockManager = new DBLockManager(session);
-        dbLockManager.checkForcedUnlock();
-        DBLockProvider dbLock = dbLockManager.getDBLock();
-        dbLock.waitForLock(DBLockProvider.Namespace.OFFLINE_SESSIONS);
-        try {
-
-            if (isFinished()) {
-                log.infof("Task already finished when DBLock retrieved");
-            } else {
-                delegate.startLoading();
-            }
-        } finally {
-            dbLock.releaseLock();
-        }
     }
 }

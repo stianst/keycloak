@@ -33,7 +33,6 @@ import org.keycloak.models.ModelDuplicateException;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.UserProvider;
-import org.keycloak.models.locking.GlobalLockProvider;
 import org.keycloak.models.utils.KeycloakModelUtils;
 import org.keycloak.models.utils.PostMigrationEvent;
 import org.keycloak.models.utils.RepresentationToModel;
@@ -124,33 +123,6 @@ public class KeycloakApplication extends Application {
     protected void startup() {
         KeycloakApplication.sessionFactory = createSessionFactory();
 
-        ExportImportManager[] exportImportManager = new ExportImportManager[1];
-
-        // Release all locks acquired by currently used GlobalLockProvider if keycloak.globalLock.forceUnlock is equal
-        //   to true. This can be used to recover from a state where there are some stale locks that were not correctly
-        //   unlocked
-        if (Boolean.getBoolean("keycloak.globalLock.forceUnlock")) {
-            KeycloakModelUtils.runJobInTransaction(sessionFactory, new KeycloakSessionTask() {
-                @Override
-                public void run(KeycloakSession session) {
-                    GlobalLockProvider locks = session.getProvider(GlobalLockProvider.class);
-                    locks.forceReleaseAllLocks();
-                }
-            });
-        }
-
-        KeycloakModelUtils.runJobInTransaction(sessionFactory, new KeycloakSessionTask() {
-            @Override
-            public void run(KeycloakSession session) {
-                GlobalLockProvider locks = session.getProvider(GlobalLockProvider.class);
-                exportImportManager[0] = locks.withLock(GlobalLockProvider.Constants.KEYCLOAK_BOOT, innerSession -> bootstrap());
-            }
-        });
-
-        if (exportImportManager[0].isRunExport()) {
-            exportImportManager[0].runExport();
-        }
-
         KeycloakModelUtils.runJobInTransaction(sessionFactory, new KeycloakSessionTask() {
 
             @Override
@@ -169,55 +141,6 @@ public class KeycloakApplication extends Application {
             sessionFactory.close();
     }
 
-    // Bootstrap master realm, import realms and create admin user.
-    protected ExportImportManager bootstrap() {
-        ExportImportManager[] exportImportManager = new ExportImportManager[1];
-
-        logger.debug("bootstrap");
-        KeycloakModelUtils.runJobInTransaction(sessionFactory, new KeycloakSessionTask() {
-            @Override
-            public void run(KeycloakSession session) {
-                // TODO what is the purpose of following piece of code? Leaving it as is for now.
-                JtaTransactionManagerLookup lookup = (JtaTransactionManagerLookup) sessionFactory.getProviderFactory(JtaTransactionManagerLookup.class);
-                if (lookup != null) {
-                    if (lookup.getTransactionManager() != null) {
-                        try {
-                            Transaction transaction = lookup.getTransactionManager().getTransaction();
-                            logger.debugv("bootstrap current transaction? {0}", transaction != null);
-                            if (transaction != null) {
-                                logger.debugv("bootstrap current transaction status? {0}", transaction.getStatus());
-                            }
-                        } catch (SystemException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                }
-                // TODO up here ^^
-
-                ApplianceBootstrap applianceBootstrap = new ApplianceBootstrap(session);
-                exportImportManager[0] = new ExportImportManager(session);
-
-                boolean createMasterRealm = applianceBootstrap.isNewInstall();
-                if (exportImportManager[0].isRunImport() && exportImportManager[0].isImportMasterIncluded()) {
-                    createMasterRealm = false;
-                }
-
-                if (createMasterRealm) {
-                    applianceBootstrap.createMasterRealm();
-                }
-            }
-        });
-
-        if (exportImportManager[0].isRunImport()) {
-            exportImportManager[0].runImport();
-        } else {
-            importRealms(exportImportManager[0]);
-        }
-
-        importAddUser();
-
-        return exportImportManager[0];
-    }
 
     protected void loadConfig() {
 

@@ -197,18 +197,6 @@ final class StoragePropertyMappers {
                         .transformer(StoragePropertyMappers::resolveMapStorageProvider)
                         .paramLabel("type")
                         .build(),
-                fromOption(StorageOptions.STORAGE_GLOBAL_LOCK_PROVIDER)
-                        .to("kc.spi-global-lock-provider")
-                        .mapFrom("storage")
-                        .transformer(StoragePropertyMappers::getGlobalLockProvider)
-                        .paramLabel("type")
-                        .build(),
-                fromOption(StorageOptions.STORAGE_GLOBAL_LOCK_PROVIDER)
-                        .to("kc.spi-global-lock-map-storage-provider")
-                        .mapFrom("storage")
-                        .transformer(StoragePropertyMappers::resolveMapStorageProvider)
-                        .paramLabel("type")
-                        .build(),
                 fromOption(StorageOptions.STORAGE_CACHE_REALM_ENABLED)
                         .to("kc.spi-realm-cache-default-enabled")
                         .mapFrom("storage")
@@ -340,26 +328,6 @@ final class StoragePropertyMappers {
         }
 
         return storage;
-    }
-
-    private static Optional<String> getGlobalLockProvider(Optional<String> storage, ConfigSourceInterceptorContext context) {
-        try {
-            if (storage.isPresent()) {
-                StorageType storageType = StorageType.valueOf(storage.get());
-                switch (storageType) {
-                    case hotrod:
-                        return Optional.of(storageType.getProvider());
-                    case jpa:
-                        return Optional.of("map");
-                    default:
-                        return Optional.of("none");
-                }
-            }
-        } catch (IllegalArgumentException iae) {
-            throw new IllegalArgumentException("Invalid storage provider: " + storage.orElse(null), iae);
-        }
-
-        return of("dblock");
     }
 
     private static Optional<String> getUserSessionPersisterStorage(Optional<String> storage, ConfigSourceInterceptorContext context) {

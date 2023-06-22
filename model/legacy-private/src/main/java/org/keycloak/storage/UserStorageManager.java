@@ -17,19 +17,6 @@
 
 package org.keycloak.storage;
 
-import static org.keycloak.models.utils.KeycloakModelUtils.runJobInTransaction;
-import static org.keycloak.utils.StreamsUtil.distinctByKey;
-import static org.keycloak.utils.StreamsUtil.paginatedStream;
-
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.jboss.logging.Logger;
 import org.keycloak.common.constants.ServiceAccountConstants;
 import org.keycloak.common.util.reflections.Types;
@@ -56,7 +43,6 @@ import org.keycloak.models.UserModel;
 import org.keycloak.models.UserProvider;
 import org.keycloak.models.cache.CachedUserModel;
 import org.keycloak.models.cache.OnUserCache;
-import org.keycloak.models.cache.UserCache;
 import org.keycloak.models.utils.ComponentUtil;
 import org.keycloak.models.utils.ReadOnlyUserModelDelegate;
 import org.keycloak.storage.client.ClientStorageProvider;
@@ -70,6 +56,19 @@ import org.keycloak.storage.user.UserLookupProvider;
 import org.keycloak.storage.user.UserQueryMethodsProvider;
 import org.keycloak.storage.user.UserQueryProvider;
 import org.keycloak.storage.user.UserRegistrationProvider;
+
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.keycloak.models.utils.KeycloakModelUtils.runJobInTransaction;
+import static org.keycloak.utils.StreamsUtil.distinctByKey;
+import static org.keycloak.utils.StreamsUtil.paginatedStream;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
@@ -156,10 +155,6 @@ public class UserStorageManager extends AbstractStorageManager<UserStorageProvid
     protected void deleteInvalidUser(final RealmModel realm, final UserModel user) {
         String userId = user.getId();
         String userName = user.getUsername();
-        UserCache userCache = UserStorageUtil.userCache(session);
-        if (userCache != null) {
-            userCache.evict(realm, user);
-        }
 
         // This needs to be running in separate transaction because removing the user may end up with throwing
         // PessimisticLockException which also rollbacks Jpa transaction, hence when it is running in current transaction

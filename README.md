@@ -18,3 +18,6 @@ Stop Keycloak 21.1.1
 
 bin/kc.sh build --db postgres --cache local
 bin/kc.sh start --optimized --hostname-strict false --http-enabled true --db-url-host localhost --db-username keycloak --db-password password
+
+
+bin/kc.sh start-dev --hostname-strict false --http-enabled true --db postgres --db-url-host localhost --db-username keycloak --db-password password

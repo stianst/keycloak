@@ -27,8 +27,6 @@ import org.keycloak.models.SingleUseObjectProvider;
 import org.keycloak.models.UserLoginFailureProvider;
 import org.keycloak.models.UserProvider;
 import org.keycloak.models.UserSessionProvider;
-import org.keycloak.models.cache.CacheRealmProvider;
-import org.keycloak.models.cache.UserCache;
 import org.keycloak.sessions.AuthenticationSessionProvider;
 import org.keycloak.storage.ClientScopeStorageManager;
 import org.keycloak.storage.ClientStorageManager;
@@ -36,7 +34,6 @@ import org.keycloak.storage.DatastoreProvider;
 import org.keycloak.storage.ExportImportManager;
 import org.keycloak.storage.GroupStorageManager;
 import org.keycloak.storage.LegacyStoreManagers;
-import org.keycloak.storage.MigrationManager;
 import org.keycloak.storage.RoleStorageManager;
 import org.keycloak.storage.UserStorageManager;
 import org.keycloak.storage.federated.UserFederatedStorageProvider;
@@ -121,61 +118,28 @@ public class LegacyDatastoreProvider implements DatastoreProvider, LegacyStoreMa
     }
 
     private ClientProvider getClientProvider() {
-        // TODO: Extract ClientProvider from CacheRealmProvider and use that instead
-        ClientProvider cache = session.getProvider(CacheRealmProvider.class);
-        if (cache != null) {
-            return cache;
-        } else {
-            return clientStorageManager();
-        }
+        return clientStorageManager();
     }
 
     private ClientScopeProvider getClientScopeProvider() {
-        // TODO: Extract ClientScopeProvider from CacheRealmProvider and use that instead
-        ClientScopeProvider cache = session.getProvider(CacheRealmProvider.class);
-        if (cache != null) {
-            return cache;
-        } else {
-            return clientScopeStorageManager();
-        }
+        return clientScopeStorageManager();
     }
 
     private GroupProvider getGroupProvider() {
-        // TODO: Extract GroupProvider from CacheRealmProvider and use that instead
-        GroupProvider cache = session.getProvider(CacheRealmProvider.class);
-        if (cache != null) {
-            return cache;
-        } else {
-            return groupStorageManager();
-        }
+        return groupStorageManager();
     }
 
     private RealmProvider getRealmProvider() {
-        CacheRealmProvider cache = session.getProvider(CacheRealmProvider.class);
-        if (cache != null) {
-            return cache;
-        } else {
-            return session.getProvider(RealmProvider.class);
-        }
+        return session.getProvider(RealmProvider.class);
     }
 
     private RoleProvider getRoleProvider() {
-        // TODO: Extract RoleProvider from CacheRealmProvider and use that instead
-        RoleProvider cache = session.getProvider(CacheRealmProvider.class);
-        if (cache != null) {
-            return cache;
-        } else {
+
             return roleStorageManager();
-        }
     }
 
     private UserProvider getUserProvider() {
-        UserCache cache = session.getProvider(UserCache.class);
-        if (cache != null) {
-            return cache;
-        } else {
-            return userStorageManager();
-        }
+         return userStorageManager();
     }
 
     @Override

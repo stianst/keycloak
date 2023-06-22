@@ -34,20 +34,15 @@ import org.infinispan.transaction.TransactionMode;
 import org.infinispan.transaction.lookup.EmbeddedTransactionManagerLookup;
 import org.jboss.logging.Logger;
 import org.keycloak.Config;
-import org.keycloak.cluster.ClusterEvent;
 import org.keycloak.cluster.ClusterProvider;
 import org.keycloak.cluster.ManagedCacheManagerProvider;
 import org.keycloak.cluster.infinispan.KeycloakHotRodMarshallerFactory;
 import org.keycloak.common.Profile;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
-import org.keycloak.models.cache.infinispan.ClearCacheEvent;
-import org.keycloak.models.cache.infinispan.events.RealmRemovedEvent;
-import org.keycloak.models.cache.infinispan.events.RealmUpdatedEvent;
 import org.keycloak.models.utils.KeycloakModelUtils;
 import org.keycloak.models.utils.PostMigrationEvent;
 import org.keycloak.provider.EnvironmentDependentProviderFactory;
-import org.keycloak.provider.InvalidationHandler.ObjectType;
 import org.keycloak.provider.ProviderEvent;
 
 import java.util.Iterator;
@@ -58,8 +53,6 @@ import static org.keycloak.connections.infinispan.InfinispanUtil.configureTransp
 import static org.keycloak.connections.infinispan.InfinispanUtil.createCacheConfigurationBuilder;
 import static org.keycloak.connections.infinispan.InfinispanUtil.getActionTokenCacheConfig;
 import static org.keycloak.connections.infinispan.InfinispanUtil.setTimeServiceToKeycloakTime;
-import static org.keycloak.models.cache.infinispan.InfinispanCacheRealmProviderFactory.REALM_CLEAR_CACHE_EVENTS;
-import static org.keycloak.models.cache.infinispan.InfinispanCacheRealmProviderFactory.REALM_INVALIDATION_EVENTS;
 
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
@@ -484,20 +477,6 @@ public class DefaultInfinispanConnectionProviderFactory implements InfinispanCon
     private void registerSystemWideListeners(KeycloakSession session) {
         KeycloakSessionFactory sessionFactory = session.getKeycloakSessionFactory();
         ClusterProvider cluster = session.getProvider(ClusterProvider.class);
-        cluster.registerListener(REALM_CLEAR_CACHE_EVENTS, (ClusterEvent event) -> {
-            if (event instanceof ClearCacheEvent) {
-                sessionFactory.invalidate(null, ObjectType._ALL_);
-            }
-        });
-        cluster.registerListener(REALM_INVALIDATION_EVENTS, (ClusterEvent event) -> {
-            if (event instanceof RealmUpdatedEvent) {
-                RealmUpdatedEvent rr = (RealmUpdatedEvent) event;
-                sessionFactory.invalidate(null, ObjectType.REALM, rr.getId());
-            } else if (event instanceof RealmRemovedEvent) {
-                RealmRemovedEvent rr = (RealmRemovedEvent) event;
-                sessionFactory.invalidate(null, ObjectType.REALM, rr.getId());
-            }
-        });
     }
 
     @Override

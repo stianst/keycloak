@@ -19,9 +19,8 @@ package org.keycloak.services.legacysessionsupport;
 
 import org.keycloak.credential.UserCredentialStoreManager;
 import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.UserCredentialManager;
 import org.keycloak.models.LegacySessionSupportProvider;
-import org.keycloak.models.cache.UserCache;
+import org.keycloak.models.UserCredentialManager;
 
 /**
  * @author Alexander Schwartz

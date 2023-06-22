@@ -16,6 +16,4 @@
 #
 
 org.keycloak.services.resources.admin.UserStorageProviderRealmAdminProvider
-org.keycloak.services.resources.admin.ClearUserCacheRealmAdminProvider
-org.keycloak.services.resources.admin.ClearRealmCacheRealmAdminProvider
 org.keycloak.services.resources.admin.ClearKeysCacheRealmAdminProvider
