@@ -17,6 +17,7 @@
 
 package org.keycloak.storage.datastore;
 
+import jakarta.ws.rs.core.MediaType;
 import org.jboss.logging.Logger;
 import org.keycloak.common.enums.SslRequired;
 import org.keycloak.common.util.MultivaluedHashMap;
@@ -26,7 +27,6 @@ import org.keycloak.exportimport.ExportOptions;
 import org.keycloak.exportimport.util.ExportUtils;
 import org.keycloak.keys.KeyProvider;
 import org.keycloak.migration.MigrationProvider;
-import org.keycloak.migration.migrators.MigrateTo8_0_0;
 import org.keycloak.migration.migrators.MigrationUtils;
 import org.keycloak.models.AuthenticationExecutionModel;
 import org.keycloak.models.AuthenticationFlowModel;
@@ -100,7 +100,6 @@ import org.keycloak.userprofile.UserProfileProvider;
 import org.keycloak.util.JsonSerialization;
 import org.keycloak.validation.ValidationUtil;
 
-import jakarta.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -1382,10 +1381,7 @@ public class LegacyExportImportManager implements ExportImportManager {
             model.setRequirement(AuthenticationExecutionModel.Requirement.valueOf(rep.getRequirement()));
             model.setParentFlow(parentFlow.getId());
         } catch (IllegalArgumentException iae) {
-            //retro-compatible for previous OPTIONAL being changed to CONDITIONAL
-            if ("OPTIONAL".equals(rep.getRequirement())){
-                MigrateTo8_0_0.migrateOptionalAuthenticationExecution(realm, parentFlow, model, false);
-            }
+
         }
         return model;
     }

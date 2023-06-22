@@ -147,7 +147,6 @@
         <javaparser.version>3.24.2</javaparser.version>
 
         <jetty9.version>${jetty94.version}</jetty9.version>
-        <liquibase.version>4.20.0</liquibase.version>
         <osgi.version>4.2.0</osgi.version>
         <pax.web.version>7.1.0</pax.web.version>
         <servlet.api.30.version>1.0.2.Final</servlet.api.30.version>
@@ -637,21 +636,6 @@
                 <artifactId>jboss-marshalling-river</artifactId>
                 <version>${jboss.marshalling.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.liquibase</groupId>
-                <artifactId>liquibase-core</artifactId>
-                <version>${liquibase.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.yaml</groupId>
-                        <artifactId>snakeyaml</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.commons</groupId>
-                        <artifactId>commons-text</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
 
             <!-- keycloak -->
             <dependency>
@@ -905,11 +889,6 @@
                     <groupId>org.jboss.galleon</groupId>
                     <artifactId>galleon-maven-plugin</artifactId>
                     <version>${org.jboss.galleon.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.liquibase</groupId>
-                    <artifactId>liquibase-maven-plugin</artifactId>
-                    <version>${liquibase.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.wildfly.build</groupId>

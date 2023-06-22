@@ -17,47 +17,32 @@
 
 package org.keycloak.quarkus.runtime.storage.legacy.database;
 
-import static org.keycloak.connections.jpa.util.JpaUtils.configureNamedQuery;
-import static org.keycloak.quarkus.runtime.storage.legacy.liquibase.QuarkusJpaUpdaterProvider.VERIFY_AND_RUN_MASTER_CHANGELOG;
-import static org.keycloak.models.utils.KeycloakModelUtils.runJobInTransaction;
-
-import java.io.File;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
+import io.quarkus.arc.Arc;
 import jakarta.enterprise.inject.Instance;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-
-import io.quarkus.arc.Arc;
-
 import org.jboss.logging.Logger;
-import org.keycloak.Config;
-import org.keycloak.ServerStartupError;
 import org.keycloak.common.Profile;
-import org.keycloak.common.Version;
 import org.keycloak.connections.jpa.DefaultJpaConnectionProvider;
 import org.keycloak.connections.jpa.JpaConnectionProvider;
-import org.keycloak.connections.jpa.updater.JpaUpdaterProvider;
 import org.keycloak.connections.jpa.util.JpaUtils;
-import org.keycloak.migration.MigrationModelManager;
-import org.keycloak.migration.ModelVersion;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
-import org.keycloak.models.dblock.DBLockGlobalLockProvider;
-import org.keycloak.models.locking.GlobalLockProvider;
 import org.keycloak.provider.EnvironmentDependentProviderFactory;
 import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.provider.ProviderConfigurationBuilder;
 import org.keycloak.provider.ServerInfoAwareProviderFactory;
-import org.keycloak.quarkus.runtime.Environment;
 import org.keycloak.quarkus.runtime.storage.database.jpa.AbstractJpaConnectionProviderFactory;
+
+import java.io.File;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.keycloak.connections.jpa.util.JpaUtils.configureNamedQuery;
 
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
@@ -105,37 +90,6 @@ public class LegacyJpaConnectionProviderFactory extends AbstractJpaConnectionPro
     @Override
     public void postInit(KeycloakSessionFactory factory) {
         super.postInit(factory);
-
-        String id = null;
-        String version = null;
-        String schema = getSchema();
-        boolean schemaChanged;
-
-        try (Connection connection = getConnection(); KeycloakSession session = factory.create()) {
-            try {
-                try (Statement statement = connection.createStatement()) {
-                    try (ResultSet rs = statement.executeQuery(String.format(SQL_GET_LATEST_VERSION, getSchema(schema)))) {
-                        if (rs.next()) {
-                            id = rs.getString(1);
-                            version = rs.getString(2);
-                        }
-                    }
-                }
-            } catch (SQLException ignore) {
-                // migration model probably does not exist so we assume the database is empty
-            }
-            createOperationalInfo(connection);
-            addSpecificNamedQueries(session);
-            schemaChanged = createOrUpdateSchema(schema, version, connection, session);
-        } catch (SQLException cause) {
-            throw new RuntimeException("Failed to update database.", cause);
-        }
-
-        if (schemaChanged || Environment.isImportExportMode()) {
-            runJobInTransaction(factory, this::initSchema);
-        } else {
-            Version.RESOURCES_VERSION = id;
-        }
     }
 
     @Override
@@ -183,41 +137,6 @@ public class LegacyJpaConnectionProviderFactory extends AbstractJpaConnectionPro
         return 100;
     }
 
-    private MigrationStrategy getMigrationStrategy() {
-        String migrationStrategy = config.get("migrationStrategy");
-        if (migrationStrategy == null) {
-            // Support 'databaseSchema' for backwards compatibility
-            migrationStrategy = config.get("databaseSchema");
-        }
-
-        if (migrationStrategy != null) {
-            return MigrationStrategy.valueOf(migrationStrategy.toUpperCase());
-        } else {
-            return MigrationStrategy.UPDATE;
-        }
-    }
-
-    private void initSchema(KeycloakSession session) {
-        /*
-         * Migrate model is executed just in case following providers are "jpa".
-         * In Map Storage, there is an assumption that migrateModel is not needed.
-         */
-        if ((Config.getProvider("realm") == null || "jpa".equals(Config.getProvider("realm"))) &&
-            (Config.getProvider("client") == null || "jpa".equals(Config.getProvider("client"))) &&
-            (Config.getProvider("clientScope") == null || "jpa".equals(Config.getProvider("clientScope")))) {
-
-            logger.debug("Calling migrateModel");
-            migrateModel(session);
-        }
-    }
-
-    private void migrateModel(KeycloakSession session) {
-        try {
-            MigrationModelManager.migrate(session);
-        } catch (Exception e) {
-            throw e;
-        }
-    }
 
     private String getSchema(String schema) {
         return schema == null ? "" : schema + ".";
@@ -240,68 +159,6 @@ public class LegacyJpaConnectionProviderFactory extends AbstractJpaConnectionPro
         } catch (SQLException e) {
             logger.warn("Unable to prepare operational info due database exception: " + e.getMessage());
         }
-    }
-
-    private boolean createOrUpdateSchema(String schema, String version, Connection connection, KeycloakSession session) {
-        MigrationStrategy strategy = getMigrationStrategy();
-        boolean initializeEmpty = config.getBoolean("initializeEmpty", true);
-        File databaseUpdateFile = getDatabaseUpdateFile();
-
-        JpaUpdaterProvider updater = session.getProvider(JpaUpdaterProvider.class);
-
-        boolean requiresMigration = version == null || !version.equals(new ModelVersion(Version.VERSION).toString());
-        session.setAttribute(VERIFY_AND_RUN_MASTER_CHANGELOG, requiresMigration);
-
-        JpaUpdaterProvider.Status status = updater.validate(connection, schema);
-
-        if (status == JpaUpdaterProvider.Status.VALID) {
-            logger.debug("Database is up-to-date");
-        } else if (status == JpaUpdaterProvider.Status.EMPTY) {
-            if (initializeEmpty) {
-                update(connection, schema, session, updater);
-            } else {
-                switch (strategy) {
-                    case UPDATE:
-                        update(connection, schema, session, updater);
-                        break;
-                    case MANUAL:
-                        export(connection, schema, databaseUpdateFile, session, updater);
-                        throw new ServerStartupError("Database not initialized, please initialize database with " + databaseUpdateFile.getAbsolutePath(), false);
-                    case VALIDATE:
-                        throw new ServerStartupError("Database not initialized, please enable database initialization", false);
-                }
-            }
-        } else {
-            switch (strategy) {
-                case UPDATE:
-                    update(connection, schema, session, updater);
-                    break;
-                case MANUAL:
-                    export(connection, schema, databaseUpdateFile, session, updater);
-                    throw new ServerStartupError("Database not up-to-date, please migrate database with " + databaseUpdateFile.getAbsolutePath(), false);
-                case VALIDATE:
-                    throw new ServerStartupError("Database not up-to-date, please enable database migration", false);
-            }
-        }
-
-        return requiresMigration;
-    }
-
-    private void update(Connection connection, String schema, KeycloakSession session, JpaUpdaterProvider updater) {
-        GlobalLockProvider globalLock = session.getProvider(GlobalLockProvider.class);
-        globalLock.withLock(DBLockGlobalLockProvider.DATABASE, innerSession -> {
-            updater.update(connection, schema);
-            return null;
-        });
-    }
-
-    private void export(Connection connection, String schema, File databaseUpdateFile, KeycloakSession session,
-            JpaUpdaterProvider updater) {
-        GlobalLockProvider globalLock = session.getProvider(GlobalLockProvider.class);
-        globalLock.withLock(DBLockGlobalLockProvider.DATABASE, innerSession -> {
-            updater.export(connection, schema, databaseUpdateFile);
-            return null;
-        });
     }
 
     @Override

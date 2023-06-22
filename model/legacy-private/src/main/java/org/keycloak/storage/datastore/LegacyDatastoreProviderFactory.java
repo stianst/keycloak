@@ -20,7 +20,6 @@ package org.keycloak.storage.datastore;
 import org.keycloak.Config;
 import org.keycloak.Config.Scope;
 import org.keycloak.common.Profile;
-import org.keycloak.migration.MigrationModelManager;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.utils.PostMigrationEvent;
@@ -93,7 +92,6 @@ public class LegacyDatastoreProviderFactory implements DatastoreProviderFactory,
             UserStorageSyncManager.notifyToRefreshPeriodicSyncAll(ev.getSession(), ev.getRealm(), ev.getRemoved());
         } else if (event instanceof LegacyStoreMigrateRepresentationEvent) {
             LegacyStoreMigrateRepresentationEvent ev = (LegacyStoreMigrateRepresentationEvent) event;
-            MigrationModelManager.migrateImport(ev.getSession(), ev.getRealm(), ev.getRep(), ev.isSkipUserDependent());
         }
     }    
 
