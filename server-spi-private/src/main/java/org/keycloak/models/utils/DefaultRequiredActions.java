@@ -78,10 +78,7 @@ public class DefaultRequiredActions {
         TERMS_AND_CONDITIONS(UserModel.RequiredAction.TERMS_AND_CONDITIONS.name(), DefaultRequiredActions::addTermsAndConditionsAction),
         DELETE_ACCOUNT("delete_account", DefaultRequiredActions::addDeleteAccountAction),
         UPDATE_USER_LOCALE("update_user_locale", DefaultRequiredActions::addUpdateLocaleAction),
-        UPDATE_EMAIL(UserModel.RequiredAction.UPDATE_EMAIL.name(), DefaultRequiredActions::addUpdateEmailAction, () -> isFeatureEnabled(Profile.Feature.UPDATE_EMAIL)),
-        CONFIGURE_RECOVERY_AUTHN_CODES(UserModel.RequiredAction.CONFIGURE_RECOVERY_AUTHN_CODES.name(), DefaultRequiredActions::addRecoveryAuthnCodesAction, () -> isFeatureEnabled(Profile.Feature.RECOVERY_CODES)),
-        WEBAUTHN_REGISTER("webauthn-register", DefaultRequiredActions::addWebAuthnRegisterAction, () -> isFeatureEnabled(Profile.Feature.WEB_AUTHN)),
-        WEBAUTHN_PASSWORDLESS_REGISTER("webauthn-register-passwordless", DefaultRequiredActions::addWebAuthnPasswordlessRegisterAction, () -> isFeatureEnabled(Profile.Feature.WEB_AUTHN));
+        UPDATE_EMAIL(UserModel.RequiredAction.UPDATE_EMAIL.name(), DefaultRequiredActions::addUpdateEmailAction, () -> isFeatureEnabled(Profile.Feature.UPDATE_EMAIL));
 
         private final String alias;
         private final Consumer<RealmModel> addAction;
@@ -226,69 +223,6 @@ public class DefaultRequiredActions {
             updateEmail.setDefaultAction(false);
             updateEmail.setPriority(70);
             realm.addRequiredActionProvider(updateEmail);
-        }
-    }
-
-    public static void addRecoveryAuthnCodesAction(RealmModel realm) {
-        final String PROVIDER_ID = UserModel.RequiredAction.CONFIGURE_RECOVERY_AUTHN_CODES.name();
-
-        final boolean isAvailable = Action.CONFIGURE_RECOVERY_AUTHN_CODES.isAvailable();
-        if (!isAvailable) return;
-
-        final RequiredActionProviderModel provider = realm.getRequiredActionProviderByAlias(PROVIDER_ID);
-        final boolean isRequiredActionActive = provider != null;
-
-        if (!isRequiredActionActive) {
-            RequiredActionProviderModel recoveryCodes = new RequiredActionProviderModel();
-            recoveryCodes.setEnabled(true);
-            recoveryCodes.setAlias(PROVIDER_ID);
-            recoveryCodes.setName("Recovery Authentication Codes");
-            recoveryCodes.setProviderId(PROVIDER_ID);
-            recoveryCodes.setDefaultAction(false);
-            recoveryCodes.setPriority(70);
-            realm.addRequiredActionProvider(recoveryCodes);
-        }
-    }
-
-    public static void addWebAuthnRegisterAction(RealmModel realm) {
-        final String PROVIDER_ID = "webauthn-register";
-
-        final boolean isAvailable = Action.WEBAUTHN_REGISTER.isAvailable();
-        if (!isAvailable) return;
-
-        final RequiredActionProviderModel provider = realm.getRequiredActionProviderByAlias(PROVIDER_ID);
-        final boolean isRequiredActionActive = provider != null;
-
-        if (!isRequiredActionActive) {
-            final RequiredActionProviderModel webauthnRegister = new RequiredActionProviderModel();
-            webauthnRegister.setEnabled(true);
-            webauthnRegister.setAlias(PROVIDER_ID);
-            webauthnRegister.setName("Webauthn Register");
-            webauthnRegister.setProviderId(PROVIDER_ID);
-            webauthnRegister.setDefaultAction(false);
-            webauthnRegister.setPriority(70);
-            realm.addRequiredActionProvider(webauthnRegister);
-        }
-    }
-
-    public static void addWebAuthnPasswordlessRegisterAction(RealmModel realm) {
-        final String PROVIDER_ID = "webauthn-register-passwordless";
-
-        final boolean isAvailable = Action.WEBAUTHN_PASSWORDLESS_REGISTER.isAvailable();
-        if (!isAvailable) return;
-
-        final RequiredActionProviderModel provider = realm.getRequiredActionProviderByAlias(PROVIDER_ID);
-        final boolean isRequiredActionActive = provider != null;
-
-        if (!isRequiredActionActive) {
-            final RequiredActionProviderModel webauthnRegister = new RequiredActionProviderModel();
-            webauthnRegister.setEnabled(true);
-            webauthnRegister.setAlias(PROVIDER_ID);
-            webauthnRegister.setName("Webauthn Register Passwordless");
-            webauthnRegister.setProviderId(PROVIDER_ID);
-            webauthnRegister.setDefaultAction(false);
-            webauthnRegister.setPriority(80);
-            realm.addRequiredActionProvider(webauthnRegister);
         }
     }
 

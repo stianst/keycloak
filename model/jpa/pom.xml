@@ -92,25 +92,6 @@
             <artifactId>jackson-core</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.jboss.logmanager</groupId>
-            <artifactId>jboss-logmanager</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-reload4j</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${jdbc.mvn.groupId}</groupId>
-            <artifactId>${jdbc.mvn.artifactId}</artifactId>
-            <version>${jdbc.mvn.version}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>

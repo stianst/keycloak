@@ -17,7 +17,6 @@
 
 package org.keycloak.authentication;
 
-import com.google.common.collect.Sets;
 import org.jboss.logging.Logger;
 import org.keycloak.models.AuthenticationExecutionModel;
 import org.keycloak.models.Constants;
@@ -25,7 +24,9 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.sessions.AuthenticationSessionModel;
 import org.keycloak.utils.StringUtil;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -85,7 +86,7 @@ public class AuthenticatorUtil {
         final String callbacksFactories = authSession.getAuthNote(CALLBACKS_FACTORY_IDS_NOTE);
 
         if (StringUtil.isNotBlank(callbacksFactories)) {
-            return Sets.newHashSet(callbacksFactories.split(Constants.CFG_DELIMITER));
+            return new HashSet<>(Arrays.asList(callbacksFactories.split(Constants.CFG_DELIMITER)));
         } else {
             return Collections.emptySet();
         }

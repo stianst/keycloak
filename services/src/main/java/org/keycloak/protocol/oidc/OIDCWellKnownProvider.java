@@ -17,7 +17,8 @@
 
 package org.keycloak.protocol.oidc;
 
-import com.google.common.collect.Streams;
+import jakarta.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.core.UriInfo;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.authentication.ClientAuthenticator;
 import org.keycloak.authentication.ClientAuthenticatorFactory;
@@ -51,9 +52,6 @@ import org.keycloak.services.resources.RealmsResource;
 import org.keycloak.urls.UrlType;
 import org.keycloak.util.JsonSerialization;
 import org.keycloak.wellknown.WellKnownProvider;
-
-import jakarta.ws.rs.core.UriBuilder;
-import jakarta.ws.rs.core.UriInfo;
 
 import java.net.URI;
 import java.util.AbstractMap;
@@ -236,9 +234,6 @@ public class OIDCWellKnownProvider implements WellKnownProvider {
         Stream<String> supportedAlgorithms = session.getKeycloakSessionFactory().getProviderFactoriesStream(clazz)
                 .map(ProviderFactory::getId);
 
-        if (includeNone) {
-            supportedAlgorithms = Streams.concat(supportedAlgorithms, Stream.of("none"));
-        }
         return supportedAlgorithms.collect(Collectors.toList());
     }
 

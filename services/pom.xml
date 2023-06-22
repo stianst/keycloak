@@ -40,17 +40,6 @@
             <artifactId>keycloak-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-core</artifactId>
-            <scope>test</scope>
-            <type>test-jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>${keycloak.crypto.artifactId}</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
             <scope>provided</scope>
@@ -115,10 +104,6 @@
             <artifactId>resteasy-multipart-provider</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
-            <artifactId>owasp-java-html-sanitizer</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
         </dependency>
@@ -130,48 +115,19 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
         </dependency>
-        <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>javax.annotation</groupId>-->
+<!--            <artifactId>javax.annotation-api</artifactId>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jdk8</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.fasterxml.woodstox</groupId>
-            <artifactId>woodstox-core</artifactId>
-            <version>${woodstox.version}</version>    <!-- this version has to match that of used in Wildfly -->
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.zxing</groupId>
-            <artifactId>javase</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.icegreen</groupId>
-            <artifactId>greenmail</artifactId>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.webauthn4j</groupId>
-            <artifactId>webauthn4j-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.ua-parser</groupId>
-            <artifactId>uap-java</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>commons-io</groupId>-->
+<!--            <artifactId>commons-io</artifactId>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
     </dependencies>
     <build>
         <plugins>

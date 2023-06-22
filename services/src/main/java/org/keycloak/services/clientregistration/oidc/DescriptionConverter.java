@@ -17,7 +17,6 @@
 
 package org.keycloak.services.clientregistration.oidc;
 
-import com.google.common.collect.Streams;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.authentication.ClientAuthenticator;
 import org.keycloak.authentication.ClientAuthenticatorFactory;
@@ -265,10 +264,6 @@ public class DescriptionConverter {
     private static List<String> getSupportedAlgorithms(KeycloakSession session, Class<? extends Provider> clazz, boolean includeNone) {
         Stream<String> supportedAlgorithms = session.getKeycloakSessionFactory().getProviderFactoriesStream(clazz)
                 .map(ProviderFactory::getId);
-
-        if (includeNone) {
-            supportedAlgorithms = Streams.concat(supportedAlgorithms, Stream.of("none"));
-        }
         return supportedAlgorithms.collect(Collectors.toList());
     }
 

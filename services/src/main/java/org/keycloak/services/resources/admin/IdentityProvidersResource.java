@@ -17,9 +17,17 @@
 
 package org.keycloak.services.resources.admin;
 
-import com.google.common.collect.Streams;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
 import org.jboss.resteasy.annotations.cache.NoCache;
-import org.keycloak.broker.provider.IdentityProvider;
 import org.keycloak.broker.provider.IdentityProviderFactory;
 import org.keycloak.broker.social.SocialIdentityProvider;
 import org.keycloak.connections.httpclient.HttpClientProvider;
@@ -37,17 +45,8 @@ import org.keycloak.provider.ProviderFactory;
 import org.keycloak.representations.idm.IdentityProviderRepresentation;
 import org.keycloak.services.ErrorResponse;
 import org.keycloak.services.resources.admin.permissions.AdminPermissionEvaluator;
+import org.keycloak.utils.ReservedCharValidator;
 
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.MultivaluedMap;
-import jakarta.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
@@ -55,7 +54,6 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 import static jakarta.ws.rs.core.Response.Status.BAD_REQUEST;
-import org.keycloak.utils.ReservedCharValidator;
 
 /**
  * @resource Identity Providers
@@ -97,7 +95,6 @@ public class IdentityProvidersResource {
     /**
      * Import identity provider from uploaded JSON file
      *
-     * @param input
      * @return
      * @throws IOException
      */
@@ -224,7 +221,6 @@ public class IdentityProvidersResource {
     }
 
     private Stream<ProviderFactory> getProviderFactories() {
-        return Streams.concat(session.getKeycloakSessionFactory().getProviderFactoriesStream(IdentityProvider.class),
-                session.getKeycloakSessionFactory().getProviderFactoriesStream(SocialIdentityProvider.class));
+        return session.getKeycloakSessionFactory().getProviderFactoriesStream(SocialIdentityProvider.class);
     }
 }
