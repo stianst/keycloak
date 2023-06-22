@@ -190,15 +190,6 @@ public interface KeycloakSession extends AutoCloseable {
      */
     UserSessionProvider sessions();
 
-    /**
-     * Returns a managed provider instance.  Will start a provider transaction.  This transaction is managed by the KeycloakSession
-     * transaction.
-     *
-     * @return {@link UserLoginFailureProvider}
-     * @throws IllegalStateException if transaction is not active
-     */
-    UserLoginFailureProvider loginFailures();
-
     AuthenticationSessionProvider authenticationSessions();
 
     SingleUseObjectProvider singleUseObjects();

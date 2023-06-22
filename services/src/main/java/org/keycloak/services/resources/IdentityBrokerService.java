@@ -86,7 +86,6 @@ import org.keycloak.services.Urls;
 import org.keycloak.services.managers.AppAuthManager;
 import org.keycloak.services.managers.AuthenticationManager;
 import org.keycloak.services.managers.AuthenticationSessionManager;
-import org.keycloak.services.managers.BruteForceProtector;
 import org.keycloak.services.managers.ClientSessionCode;
 import org.keycloak.services.messages.Messages;
 import org.keycloak.services.resources.account.AccountConsole;
@@ -621,12 +620,6 @@ public class IdentityBrokerService implements IdentityProvider.AuthenticationCal
         if (!user.isEnabled()) {
             event.error(Errors.USER_DISABLED);
             return ErrorPage.error(session, authSession, Response.Status.BAD_REQUEST, Messages.ACCOUNT_DISABLED);
-        }
-        if (realm.isBruteForceProtected()) {
-            if (session.getProvider(BruteForceProtector.class).isTemporarilyDisabled(session, realm, user)) {
-                event.error(Errors.USER_TEMPORARILY_DISABLED);
-                return ErrorPage.error(session, authSession, Response.Status.BAD_REQUEST, Messages.ACCOUNT_DISABLED);
-            }
         }
         return null;
     }

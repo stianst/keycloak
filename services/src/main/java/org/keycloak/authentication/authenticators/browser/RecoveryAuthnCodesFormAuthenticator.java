@@ -1,9 +1,10 @@
 package org.keycloak.authentication.authenticators.browser;
 
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.authentication.Authenticator;
-import org.keycloak.authentication.authenticators.util.AuthenticatorUtils;
 import org.keycloak.common.util.ObjectUtil;
 import org.keycloak.credential.CredentialModel;
 import org.keycloak.events.Details;
@@ -14,13 +15,11 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserCredentialModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.credential.RecoveryAuthnCodesCredentialModel;
-import org.keycloak.models.utils.RecoveryAuthnCodesUtils;
 import org.keycloak.models.utils.FormMessage;
+import org.keycloak.models.utils.RecoveryAuthnCodesUtils;
 import org.keycloak.services.messages.Messages;
 import org.keycloak.sessions.AuthenticationSessionModel;
 
-import jakarta.ws.rs.core.MultivaluedMap;
-import jakarta.ws.rs.core.Response;
 import java.util.Optional;
 
 import static org.keycloak.services.validation.Validation.FIELD_USERNAME;
@@ -100,7 +99,7 @@ public class RecoveryAuthnCodesFormAuthenticator implements Authenticator {
     }
 
     protected String getDisabledByBruteForceEventError(AuthenticationFlowContext authnFlowContext, UserModel authenticatedUser) {
-        return AuthenticatorUtils.getDisabledByBruteForceEventError(authnFlowContext, authenticatedUser);
+        return null;
     }
 
     private Response createLoginForm(AuthenticationFlowContext authnFlowContext, boolean withInvalidUserCredentialsError,

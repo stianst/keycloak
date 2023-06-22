@@ -23,7 +23,6 @@ import org.keycloak.models.GroupProvider;
 import org.keycloak.models.RealmProvider;
 import org.keycloak.models.RoleProvider;
 import org.keycloak.models.SingleUseObjectProvider;
-import org.keycloak.models.UserLoginFailureProvider;
 import org.keycloak.models.UserProvider;
 import org.keycloak.models.UserSessionProvider;
 import org.keycloak.provider.Provider;
@@ -39,7 +38,6 @@ public interface DatastoreProvider extends Provider {
 
     GroupProvider groups();
 
-    UserLoginFailureProvider loginFailures();
 
     RealmProvider realms();
 

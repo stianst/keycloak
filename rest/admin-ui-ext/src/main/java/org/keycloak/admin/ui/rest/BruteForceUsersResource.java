@@ -1,10 +1,5 @@
 package org.keycloak.admin.ui.rest;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Stream;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
@@ -17,17 +12,21 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.jboss.logging.Logger;
 import org.keycloak.admin.ui.rest.model.BruteUser;
-import org.keycloak.common.util.Time;
 import org.keycloak.models.Constants;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
-import org.keycloak.models.UserLoginFailureModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.ModelToRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.keycloak.services.resources.admin.permissions.AdminPermissionEvaluator;
 import org.keycloak.services.resources.admin.permissions.UserPermissionEvaluator;
 import org.keycloak.utils.SearchQueryUtils;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
 
 public class BruteForceUsersResource {
     private static final Logger logger = Logger.getLogger(BruteForceUsersResource.class);
@@ -181,37 +180,9 @@ public class BruteForceUsersResource {
         if (!realm.isBruteForceProtected())
             bruteUser.setBruteForceStatus(data);
 
-        UserLoginFailureModel model = session.loginFailures().getUserLoginFailure(realm, user.getId());
-        if (model == null) {
-            bruteUser.setBruteForceStatus(data);
-            return bruteUser;
-        }
-
-        boolean disabled;
-        disabled = isTemporarilyDisabled(session, realm, user);
-        if (disabled) {
-            data.put("disabled", true);
-        }
-
-        data.put("numFailures", model.getNumFailures());
-        data.put("lastFailure", model.getLastFailure());
-        data.put("lastIPFailure", model.getLastIPFailure());
         bruteUser.setBruteForceStatus(data);
 
         return bruteUser;
     }
 
-    public boolean isTemporarilyDisabled(KeycloakSession session, RealmModel realm, UserRepresentation user) {
-        UserLoginFailureModel failure = session.loginFailures().getUserLoginFailure(realm, user.getId());
-        if (failure != null) {
-            int currTime = (int)(Time.currentTimeMillis() / 1000L);
-            int failedLoginNotBefore = failure.getFailedLoginNotBefore();
-            if (currTime < failedLoginNotBefore) {
-                logger.debugv("Current: {0} notBefore: {1}", currTime, failedLoginNotBefore);
-                return true;
-            }
-        }
-
-        return false;
-    }
 }

@@ -1593,14 +1593,7 @@ public class AuthenticationManager {
     }
 
     public static void logSuccess(KeycloakSession session, AuthenticationSessionModel authSession) {
-        RealmModel realm = session.getContext().getRealm();
-        if (realm.isBruteForceProtected()) {
-            UserModel user = lookupUserForBruteForceLog(session, realm, authSession);
-            if (user != null) {
-                BruteForceProtector bruteForceProtector = session.getProvider(BruteForceProtector.class);
-                bruteForceProtector.successfulLogin(realm, user, session.getContext().getConnection());
-            }
-        }
+
     }
 
     public static UserModel lookupUserForBruteForceLog(KeycloakSession session, RealmModel realm, AuthenticationSessionModel authenticationSession) {

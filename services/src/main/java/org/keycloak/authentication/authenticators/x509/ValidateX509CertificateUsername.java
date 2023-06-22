@@ -18,10 +18,7 @@
 
 package org.keycloak.authentication.authenticators.x509;
 
-import java.security.cert.X509Certificate;
-
 import jakarta.ws.rs.core.Response;
-
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.authentication.authenticators.browser.AbstractUsernameFormAuthenticator;
@@ -31,7 +28,7 @@ import org.keycloak.models.ModelDuplicateException;
 import org.keycloak.models.UserModel;
 import org.keycloak.services.ServicesLogger;
 
-import static org.keycloak.authentication.authenticators.util.AuthenticatorUtils.getDisabledByBruteForceEventError;
+import java.security.cert.X509Certificate;
 
 /**
  * @author <a href="mailto:pnalyvayko@agi.com">Peter Nalyvayko</a>
@@ -124,14 +121,6 @@ public class ValidateX509CertificateUsername extends AbstractX509ClientCertifica
             return;
         }
 
-        String bruteForceError = getDisabledByBruteForceEventError(context, user);
-        if (bruteForceError != null) {
-            context.getEvent().user(user);
-            context.getEvent().error(bruteForceError);
-            Response challengeResponse = errorResponse(Response.Status.BAD_REQUEST.getStatusCode(), "invalid_grant", "Invalid user credentials");
-            context.failure(AuthenticationFlowError.INVALID_USER, challengeResponse);
-            return;
-        }
 
         if (!user.isEnabled()) {
             context.getEvent().user(user);

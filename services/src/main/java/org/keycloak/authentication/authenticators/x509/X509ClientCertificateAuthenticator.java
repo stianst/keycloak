@@ -18,15 +18,9 @@
 
 package org.keycloak.authentication.authenticators.x509;
 
-import java.security.cert.X509Certificate;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import jakarta.ws.rs.core.MultivaluedHashMap;
-
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
-
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.authenticators.browser.AbstractUsernameFormAuthenticator;
 import org.keycloak.events.Details;
@@ -36,7 +30,10 @@ import org.keycloak.models.ModelDuplicateException;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.FormMessage;
 
-import static org.keycloak.authentication.authenticators.util.AuthenticatorUtils.getDisabledByBruteForceEventError;
+import java.security.cert.X509Certificate;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:pnalyvayko@agi.com">Peter Nalyvayko</a>
@@ -139,18 +136,6 @@ public class X509ClientCertificateAuthenticator extends AbstractX509ClientCertif
                 return;
             }
 
-            String bruteForceError = getDisabledByBruteForceEventError(context, user);
-            if (bruteForceError != null) {
-                context.getEvent().user(user);
-                context.getEvent().error(bruteForceError);
-                // TODO use specific locale to load error messages
-                String errorMessage = "X509 certificate authentication's failed.";
-                // TODO is calling form().setErrors enough to show errors on login screen?
-                context.challenge(createErrorResponse(context, certs[0].getSubjectDN().getName(),
-                        errorMessage, "Invalid user"));
-                context.attempted();
-                return;
-            }
 
             if (!userEnabled(context, user)) {
                 // TODO use specific locale to load error messages

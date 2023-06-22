@@ -25,7 +25,6 @@ import org.keycloak.models.AuthenticatorConfigModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.utils.FormMessage;
-import org.keycloak.services.managers.BruteForceProtector;
 
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
@@ -86,7 +85,6 @@ public interface AbstractAuthenticationFlowContext {
     KeycloakSession getSession();
 
     HttpRequest getHttpRequest();
-    BruteForceProtector getProtector();
 
 
     /**

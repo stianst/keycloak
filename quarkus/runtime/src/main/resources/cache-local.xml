@@ -54,9 +54,6 @@
         <local-cache name="offlineClientSessions">
             <expiration lifespan="-1"/>
         </local-cache>
-        <local-cache name="loginFailures">
-            <expiration lifespan="-1"/>
-        </local-cache>
         <local-cache name="authorization">
             <encoding>
                 <key media-type="application/x-java-object"/>

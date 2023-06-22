@@ -18,14 +18,14 @@
 
 package org.keycloak.models.sessions.infinispan.util;
 
-import java.util.concurrent.TimeUnit;
 import org.keycloak.common.util.Time;
 import org.keycloak.models.ClientModel;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.sessions.infinispan.entities.AuthenticatedClientSessionEntity;
-import org.keycloak.models.sessions.infinispan.entities.LoginFailureEntity;
 import org.keycloak.models.sessions.infinispan.entities.UserSessionEntity;
 import org.keycloak.models.utils.SessionExpirationUtils;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
@@ -207,28 +207,4 @@ public class SessionTimeouts {
     }
 
 
-    /**
-     * Not using lifespan for detached login failure  (backwards compatibility with the background cleaner threads, which were used for cleanup of detached login failures)
-     *
-     * @param realm
-     * @param client
-     * @param loginFailureEntity
-     * @return
-     */
-    public static long getLoginFailuresLifespanMs(RealmModel realm, ClientModel client, LoginFailureEntity loginFailureEntity) {
-        return -1l;
-    }
-
-
-    /**
-     * Not using maxIdle for detached login failure  (backwards compatibility with the background cleaner threads, which were used for cleanup of detached login failures)
-     *
-     * @param realm
-     * @param client
-     * @param loginFailureEntity
-     * @return
-     */
-    public static long getLoginFailuresMaxIdleMs(RealmModel realm, ClientModel client, LoginFailureEntity loginFailureEntity) {
-        return -1l;
-    }
 }

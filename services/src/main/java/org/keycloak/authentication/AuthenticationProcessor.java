@@ -17,8 +17,11 @@
 
 package org.keycloak.authentication;
 
+import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.core.UriInfo;
 import org.jboss.logging.Logger;
-import org.keycloak.http.HttpRequest;
 import org.keycloak.authentication.authenticators.browser.AbstractUsernameFormAuthenticator;
 import org.keycloak.authentication.authenticators.client.ClientAuthUtil;
 import org.keycloak.common.ClientConnection;
@@ -27,6 +30,7 @@ import org.keycloak.events.Details;
 import org.keycloak.events.Errors;
 import org.keycloak.events.EventBuilder;
 import org.keycloak.forms.login.LoginFormsProvider;
+import org.keycloak.http.HttpRequest;
 import org.keycloak.models.AuthenticationExecutionModel;
 import org.keycloak.models.AuthenticationFlowModel;
 import org.keycloak.models.AuthenticatorConfigModel;
@@ -47,21 +51,15 @@ import org.keycloak.services.ErrorPage;
 import org.keycloak.services.ErrorPageException;
 import org.keycloak.services.ServicesLogger;
 import org.keycloak.services.managers.AuthenticationManager;
-import org.keycloak.services.managers.BruteForceProtector;
 import org.keycloak.services.managers.ClientSessionCode;
 import org.keycloak.services.managers.UserSessionManager;
 import org.keycloak.services.messages.Messages;
 import org.keycloak.services.resources.LoginActionsService;
-import org.keycloak.services.util.CacheControlUtil;
 import org.keycloak.services.util.AuthenticationFlowURLHelper;
+import org.keycloak.services.util.CacheControlUtil;
 import org.keycloak.sessions.AuthenticationSessionModel;
 import org.keycloak.sessions.CommonClientSessionModel;
 import org.keycloak.util.JsonSerialization;
-
-import jakarta.ws.rs.core.MultivaluedHashMap;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriBuilder;
-import jakarta.ws.rs.core.UriInfo;
 
 import java.io.IOException;
 import java.net.URI;
@@ -97,7 +95,6 @@ public class AuthenticationProcessor {
     protected String flowId;
     protected String flowPath;
     protected boolean browserFlow;
-    protected BruteForceProtector protector;
     protected Runnable afterResetListener;
     /**
      * This could be an error message forwarded from another authenticator
@@ -128,13 +125,6 @@ public class AuthenticationProcessor {
     public AuthenticationProcessor setBrowserFlow(boolean browserFlow) {
         this.browserFlow = browserFlow;
         return this;
-    }
-
-    public BruteForceProtector getBruteForceProtector() {
-        if (protector == null) {
-            protector = session.getProvider(BruteForceProtector.class);
-        }
-        return protector;
     }
 
     public RealmModel getRealm() {
@@ -505,11 +495,6 @@ public class AuthenticationProcessor {
         }
 
         @Override
-        public BruteForceProtector getProtector() {
-            return AuthenticationProcessor.this.getBruteForceProtector();
-        }
-
-        @Override
         public EventBuilder getEvent() {
             return AuthenticationProcessor.this.event;
         }
@@ -685,12 +670,7 @@ public class AuthenticationProcessor {
     }
 
     public void logFailure() {
-        if (realm.isBruteForceProtected()) {
-            UserModel user = AuthenticationManager.lookupUserForBruteForceLog(session, realm, authenticationSession);
-            if (user != null) {
-                getBruteForceProtector().failedLogin(realm, user, connection);
-            }
-        }
+
     }
 
     public boolean isSuccessful(AuthenticationExecutionModel model) {

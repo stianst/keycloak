@@ -24,7 +24,6 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmProvider;
 import org.keycloak.models.RoleProvider;
 import org.keycloak.models.SingleUseObjectProvider;
-import org.keycloak.models.UserLoginFailureProvider;
 import org.keycloak.models.UserProvider;
 import org.keycloak.models.UserSessionProvider;
 import org.keycloak.sessions.AuthenticationSessionProvider;
@@ -46,7 +45,6 @@ public class LegacyDatastoreProvider implements DatastoreProvider, LegacyStoreMa
     private ClientProvider clientProvider;
     private ClientScopeProvider clientScopeProvider;
     private GroupProvider groupProvider;
-    private UserLoginFailureProvider userLoginFailureProvider;
     private RealmProvider realmProvider;
     private RoleProvider roleProvider;
     private SingleUseObjectProvider singleUseObjectProvider;
@@ -172,14 +170,6 @@ public class LegacyDatastoreProvider implements DatastoreProvider, LegacyStoreMa
             groupProvider = getGroupProvider();
         }
         return groupProvider;
-    }
-
-    @Override
-    public UserLoginFailureProvider loginFailures() {
-        if (userLoginFailureProvider == null) {
-            userLoginFailureProvider = session.getProvider(UserLoginFailureProvider.class);
-        }
-        return userLoginFailureProvider;
     }
 
     @Override

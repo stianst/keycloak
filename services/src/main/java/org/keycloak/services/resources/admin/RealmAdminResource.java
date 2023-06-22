@@ -16,21 +16,7 @@
  */
 package org.keycloak.services.resources.admin;
 
-import static org.keycloak.utils.LockObjectsForModification.lockUserSessionsForModification;
-import static org.keycloak.util.JsonSerialization.readValue;
-
-import java.io.InputStream;
-import java.security.cert.X509Certificate;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -48,12 +34,8 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.StreamingOutput;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.annotations.cache.NoCache;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.keycloak.Config;
 import org.keycloak.KeyPairVerifier;
 import org.keycloak.authentication.CredentialRegistrator;
@@ -116,6 +98,21 @@ import org.keycloak.storage.LegacyStoreSyncEvent;
 import org.keycloak.utils.ProfileHelper;
 import org.keycloak.utils.ReservedCharValidator;
 
+import java.io.InputStream;
+import java.security.cert.X509Certificate;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.keycloak.util.JsonSerialization.readValue;
+import static org.keycloak.utils.LockObjectsForModification.lockUserSessionsForModification;
+
 /**
  * Base resource class for the admin REST api of one realm
  *
@@ -166,16 +163,6 @@ public class RealmAdminResource {
                 .map(factory -> factory.create(session).convertToInternal(description))
                 .findFirst()
                 .orElseThrow(() -> new BadRequestException("Unsupported format"));
-    }
-
-    /**
-     * Base path for managing attack detection.
-     *
-     * @return
-     */
-    @Path("attack-detection")
-    public AttackDetectionResource getAttackDetection() {
-        return new AttackDetectionResource(session, auth, adminEvent);
     }
 
     /**

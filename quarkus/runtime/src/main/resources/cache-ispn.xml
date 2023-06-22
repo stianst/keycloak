@@ -52,9 +52,7 @@
         <distributed-cache name="offlineClientSessions" owners="2">
             <expiration lifespan="-1"/>
         </distributed-cache>
-        <distributed-cache name="loginFailures" owners="2">
-            <expiration lifespan="-1"/>
-        </distributed-cache>
+
         <local-cache name="authorization" simple-cache="true">
             <encoding>
                 <key media-type="application/x-java-object"/>
