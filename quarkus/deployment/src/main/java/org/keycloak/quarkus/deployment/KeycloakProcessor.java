@@ -71,7 +71,6 @@ import org.keycloak.config.StorageOptions;
 import org.keycloak.connections.jpa.DefaultJpaConnectionProviderFactory;
 import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.connections.jpa.JpaConnectionSpi;
-import org.keycloak.policy.BlacklistPasswordPolicyProviderFactory;
 import org.keycloak.protocol.ProtocolMapperSpi;
 import org.keycloak.protocol.oidc.mappers.DeployedScriptOIDCProtocolMapper;
 import org.keycloak.provider.EnvironmentDependentProviderFactory;
@@ -165,7 +164,6 @@ class KeycloakProcessor {
             DefaultHostnameProviderFactory.class,
             FixedHostnameProviderFactory.class,
             RequestHostnameProviderFactory.class,
-            BlacklistPasswordPolicyProviderFactory.class,
             ClasspathThemeResourceProviderFactory.class,
             JarThemeProviderFactory.class);
     public static final String QUARKUS_HEALTH_ROOT_PROPERTY = "quarkus.smallrye-health.root-path";

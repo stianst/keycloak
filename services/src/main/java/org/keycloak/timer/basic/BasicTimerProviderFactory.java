@@ -23,32 +23,19 @@ import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.timer.TimerProvider;
 import org.keycloak.timer.TimerProviderFactory;
 
-import java.util.Timer;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
  */
 public class BasicTimerProviderFactory implements TimerProviderFactory {
 
-    private Timer timer;
-
-    private int transactionTimeout;
-
-    public static final String TRANSACTION_TIMEOUT = "transactionTimeout";
-
-    private ConcurrentMap<String, TimerTaskContextImpl> scheduledTasks = new ConcurrentHashMap<>();
 
     @Override
     public TimerProvider create(KeycloakSession session) {
-        return new BasicTimerProvider(session, timer, transactionTimeout, this);
+        return new BasicTimerProvider();
     }
 
     @Override
     public void init(Config.Scope config) {
-        transactionTimeout = config.getInt(TRANSACTION_TIMEOUT, 0);
-        timer = new Timer();
     }
 
     @Override
@@ -58,21 +45,11 @@ public class BasicTimerProviderFactory implements TimerProviderFactory {
 
     @Override
     public void close() {
-        timer.cancel();
-        timer = null;
     }
 
     @Override
     public String getId() {
         return "basic";
-    }
-
-    protected TimerTaskContextImpl putTask(String taskName, TimerTaskContextImpl task) {
-        return scheduledTasks.put(taskName, task);
-    }
-
-    protected TimerTaskContextImpl removeTask(String taskName) {
-        return scheduledTasks.remove(taskName);
     }
 
 }

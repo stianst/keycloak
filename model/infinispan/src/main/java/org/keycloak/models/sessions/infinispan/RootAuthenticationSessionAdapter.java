@@ -17,13 +17,6 @@
 
 package org.keycloak.models.sessions.infinispan;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
-
-import org.infinispan.Cache;
 import org.jboss.logging.Logger;
 import org.keycloak.common.util.Time;
 import org.keycloak.models.ClientModel;
@@ -35,6 +28,11 @@ import org.keycloak.models.utils.SessionExpiration;
 import org.keycloak.sessions.AuthenticationSessionModel;
 import org.keycloak.sessions.RootAuthenticationSessionModel;
 
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
@@ -44,7 +42,7 @@ public class RootAuthenticationSessionAdapter implements RootAuthenticationSessi
 
     private KeycloakSession session;
     private InfinispanAuthenticationSessionProvider provider;
-    private Cache<String, RootAuthenticationSessionEntity> cache;
+    private Map<String, RootAuthenticationSessionEntity> cache;
     private RealmModel realm;
     private RootAuthenticationSessionEntity entity;
     private final int authSessionsLimit;
@@ -52,7 +50,7 @@ public class RootAuthenticationSessionAdapter implements RootAuthenticationSessi
             Comparator.comparingInt(e -> e.getValue().getTimestamp());
 
     public RootAuthenticationSessionAdapter(KeycloakSession session, InfinispanAuthenticationSessionProvider provider,
-                                            Cache<String, RootAuthenticationSessionEntity> cache, RealmModel realm,
+                                            Map<String, RootAuthenticationSessionEntity> cache, RealmModel realm,
                                             RootAuthenticationSessionEntity entity, int authSessionsLimt) {
         this.session = session;
         this.provider = provider;
@@ -64,7 +62,7 @@ public class RootAuthenticationSessionAdapter implements RootAuthenticationSessi
 
     void update() {
         int expirationSeconds = SessionExpiration.getAuthSessionLifespan(realm);
-        provider.tx.replace(cache, entity.getId(), entity, expirationSeconds, TimeUnit.SECONDS);
+//        provider.tx.replace(cache, entity.getId(), entity, expirationSeconds, TimeUnit.SECONDS);
     }
 
 
@@ -153,15 +151,7 @@ public class RootAuthenticationSessionAdapter implements RootAuthenticationSessi
 
     @Override
     public void removeAuthenticationSessionByTabId(String tabId) {
-        if (entity.getAuthenticationSessions().remove(tabId) != null) {
-            if (entity.getAuthenticationSessions().isEmpty()) {
-                provider.tx.remove(cache, entity.getId());
-            } else {
-                entity.setTimestamp(Time.currentTime());
 
-                update();
-            }
-        }
     }
 
     @Override

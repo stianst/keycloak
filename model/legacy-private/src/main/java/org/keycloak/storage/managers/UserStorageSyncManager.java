@@ -17,10 +17,6 @@
 package org.keycloak.storage.managers;
 
 import org.jboss.logging.Logger;
-import org.keycloak.cluster.ClusterEvent;
-import org.keycloak.cluster.ClusterListener;
-import org.keycloak.cluster.ClusterProvider;
-import org.keycloak.cluster.ExecutionResult;
 import org.keycloak.common.util.Time;
 import org.keycloak.component.ComponentModel;
 import org.keycloak.models.KeycloakSession;
@@ -37,8 +33,6 @@ import org.keycloak.storage.user.SynchronizationResult;
 import org.keycloak.timer.TimerProvider;
 
 import java.util.Objects;
-import java.util.concurrent.Callable;
-import java.util.stream.Stream;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
@@ -56,120 +50,16 @@ public class UserStorageSyncManager {
      * @param timer
      */
     public static void bootstrapPeriodic(final KeycloakSessionFactory sessionFactory, final TimerProvider timer) {
-        KeycloakModelUtils.runJobInTransaction(sessionFactory, new KeycloakSessionTask() {
 
-            @Override
-            public void run(KeycloakSession session) {
-                Stream<RealmModel> realms = session.realms().getRealmsWithProviderTypeStream(UserStorageProvider.class);
-                realms.forEach(realm -> {
-                    Stream<UserStorageProviderModel> providers = ((LegacyRealmModel) realm).getUserStorageProvidersStream();
-                    providers.forEachOrdered(provider -> {
-                        UserStorageProviderFactory factory = (UserStorageProviderFactory) session.getKeycloakSessionFactory().getProviderFactory(UserStorageProvider.class, provider.getProviderId());
-                        if (factory instanceof ImportSynchronization && provider.isImportEnabled()) {
-                            refreshPeriodicSyncForProvider(sessionFactory, timer, provider, realm.getId());
-                        }
-                    });
-                });
-
-                ClusterProvider clusterProvider = session.getProvider(ClusterProvider.class);
-                clusterProvider.registerListener(USER_STORAGE_TASK_KEY, new UserStorageClusterListener(sessionFactory));
-            }
-        });
     }
 
-    private static class Holder {
-        ExecutionResult<SynchronizationResult> result;
-    }
 
     public static SynchronizationResult syncAllUsers(final KeycloakSessionFactory sessionFactory, final String realmId, final UserStorageProviderModel provider) {
-        UserStorageProviderFactory factory = (UserStorageProviderFactory) sessionFactory.getProviderFactory(UserStorageProvider.class, provider.getProviderId());
-        if (!(factory instanceof ImportSynchronization) || !provider.isImportEnabled() || !provider.isEnabled()) {
-            return SynchronizationResult.ignored();
-
-        }
-
-        final Holder holder = new Holder();
-
-        // Ensure not executed concurrently on this or any other cluster node
-        KeycloakModelUtils.runJobInTransaction(sessionFactory, new KeycloakSessionTask() {
-
-            @Override
-            public void run(KeycloakSession session) {
-                ClusterProvider clusterProvider = session.getProvider(ClusterProvider.class);
-                // shared key for "full" and "changed" . Improve if needed
-                String taskKey = provider.getId() + "::sync";
-
-                // 30 seconds minimal timeout for now
-                int timeout = Math.max(30, provider.getFullSyncPeriod());
-                holder.result = clusterProvider.executeIfNotExecuted(taskKey, timeout, new Callable<SynchronizationResult>() {
-
-                    @Override
-                    public SynchronizationResult call() throws Exception {
-                        int lastSync = Time.currentTime();
-                        SynchronizationResult result = ((ImportSynchronization)factory).sync(sessionFactory, realmId, provider);
-                        if (!result.isIgnored()) {
-                            updateLastSyncInterval(sessionFactory, provider, realmId, lastSync);
-                        }
-                        return result;
-                    }
-
-                });
-            }
-
-        });
-
-        if (holder.result == null || !holder.result.isExecuted()) {
-            logger.debugf("syncAllUsers for federation provider %s was ignored as it's already in progress", provider.getName());
-            return SynchronizationResult.ignored();
-        } else {
-            return holder.result.getResult();
-        }
+        return null;
     }
 
     public static SynchronizationResult syncChangedUsers(final KeycloakSessionFactory sessionFactory, final String realmId, final UserStorageProviderModel provider) {
-        UserStorageProviderFactory factory = (UserStorageProviderFactory) sessionFactory.getProviderFactory(UserStorageProvider.class, provider.getProviderId());
-        if (!(factory instanceof ImportSynchronization) || !provider.isImportEnabled() || !provider.isEnabled()) {
-            return SynchronizationResult.ignored();
-
-        }
-        final Holder holder = new Holder();
-
-        // Ensure not executed concurrently on this or any other cluster node
-        KeycloakModelUtils.runJobInTransaction(sessionFactory, new KeycloakSessionTask() {
-
-            @Override
-            public void run(KeycloakSession session) {
-                ClusterProvider clusterProvider = session.getProvider(ClusterProvider.class);
-                // shared key for "full" and "changed" . Improve if needed
-                String taskKey = provider.getId() + "::sync";
-
-                // 30 seconds minimal timeout for now
-                int timeout = Math.max(30, provider.getChangedSyncPeriod());
-                holder.result = clusterProvider.executeIfNotExecuted(taskKey, timeout, new Callable<SynchronizationResult>() {
-
-                    @Override
-                    public SynchronizationResult call() throws Exception {
-                        // See when we did last sync.
-                        int oldLastSync = provider.getLastSync();
-                        int lastSync = Time.currentTime();
-                        SynchronizationResult result = ((ImportSynchronization)factory).syncSince(Time.toDate(oldLastSync), sessionFactory, realmId, provider);
-                        if (!result.isIgnored()) {
-                            updateLastSyncInterval(sessionFactory, provider, realmId, lastSync);
-                        }
-                        return result;
-                    }
-
-                });
-            }
-
-        });
-
-        if (holder.result == null || !holder.result.isExecuted()) {
-            logger.debugf("syncChangedUsers for federation provider %s was ignored as it's already in progress", provider.getName());
-            return SynchronizationResult.ignored();
-        } else {
-            return holder.result.getResult();
-        }
+        return null;
     }
 
 
@@ -188,11 +78,6 @@ public class UserStorageSyncManager {
         if (!(factory instanceof ImportSynchronization) || !provider.isImportEnabled()) {
             return;
 
-        }
-        final ClusterProvider cp = session.getProvider(ClusterProvider.class);
-        if (cp != null) {
-            UserStorageProviderClusterEvent event = UserStorageProviderClusterEvent.createEvent(removed, realm.getId(), provider);
-            cp.notify(USER_STORAGE_TASK_KEY, event, false, ClusterProvider.DCNotify.ALL_DCS);
         }
     }
 
@@ -291,85 +176,5 @@ public class UserStorageSyncManager {
     }
 
 
-    private static class UserStorageClusterListener implements ClusterListener {
-
-        private final KeycloakSessionFactory sessionFactory;
-
-        public UserStorageClusterListener(KeycloakSessionFactory sessionFactory) {
-            this.sessionFactory = sessionFactory;
-        }
-
-        @Override
-        public void eventReceived(ClusterEvent event) {
-            final UserStorageProviderClusterEvent fedEvent = (UserStorageProviderClusterEvent) event;
-            KeycloakModelUtils.runJobInTransaction(sessionFactory, new KeycloakSessionTask() {
-
-                @Override
-                public void run(KeycloakSession session) {
-                    TimerProvider timer = session.getProvider(TimerProvider.class);
-                    if (fedEvent.isRemoved()) {
-                        removePeriodicSyncForProvider(timer, fedEvent.getStorageProvider());
-                    } else {
-                        refreshPeriodicSyncForProvider(sessionFactory, timer, fedEvent.getStorageProvider(), fedEvent.getRealmId());
-                    }
-                }
-
-            });
-        }
-    }
-
-
-    // Send to cluster during each update or remove of federationProvider, so all nodes can update sync periods
-    public static class UserStorageProviderClusterEvent implements ClusterEvent {
-
-        private boolean removed;
-        private String realmId;
-        private UserStorageProviderModel storageProvider;
-
-        public boolean isRemoved() {
-            return removed;
-        }
-
-        public void setRemoved(boolean removed) {
-            this.removed = removed;
-        }
-
-        public String getRealmId() {
-            return realmId;
-        }
-
-        public void setRealmId(String realmId) {
-            this.realmId = realmId;
-        }
-
-        public UserStorageProviderModel getStorageProvider() {
-            return storageProvider;
-        }
-
-        public void setStorageProvider(UserStorageProviderModel federationProvider) {
-            this.storageProvider = federationProvider;
-        }
-
-        public static UserStorageProviderClusterEvent createEvent(boolean removed, String realmId, UserStorageProviderModel provider) {
-            UserStorageProviderClusterEvent notification = new UserStorageProviderClusterEvent();
-            notification.setRemoved(removed);
-            notification.setRealmId(realmId);
-            notification.setStorageProvider(provider);
-            return notification;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            UserStorageProviderClusterEvent that = (UserStorageProviderClusterEvent) o;
-            return removed == that.removed && Objects.equals(realmId, that.realmId) && Objects.equals(storageProvider.getId(), that.storageProvider.getId());
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(removed, realmId, storageProvider.getId());
-        }
-    }
 
 }

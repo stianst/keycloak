@@ -22,12 +22,10 @@ import io.quarkus.agroal.DataSource;
 import io.quarkus.arc.Arc;
 import io.quarkus.arc.InstanceHandle;
 import io.quarkus.hibernate.orm.runtime.integration.HibernateOrmIntegrationRuntimeInitListener;
-import io.quarkus.runtime.RuntimeValue;
 import io.quarkus.runtime.ShutdownContext;
 import io.quarkus.runtime.annotations.Recorder;
 import io.vertx.ext.web.RoutingContext;
 import org.hibernate.cfg.AvailableSettings;
-import org.infinispan.manager.DefaultCacheManager;
 import org.keycloak.Config;
 import org.keycloak.common.Profile;
 import org.keycloak.common.crypto.CryptoIntegration;
@@ -40,7 +38,6 @@ import org.keycloak.quarkus.runtime.configuration.Configuration;
 import org.keycloak.quarkus.runtime.configuration.MicroProfileConfigProvider;
 import org.keycloak.quarkus.runtime.integration.QuarkusKeycloakSessionFactory;
 import org.keycloak.quarkus.runtime.integration.web.QuarkusRequestFilter;
-import org.keycloak.quarkus.runtime.storage.legacy.infinispan.CacheManagerFactory;
 import org.keycloak.theme.ClasspathThemeProviderFactory;
 
 import java.lang.annotation.Annotation;
@@ -72,26 +69,6 @@ public class KeycloakRecorder {
         QuarkusKeycloakSessionFactory.setInstance(new QuarkusKeycloakSessionFactory(factories, defaultProviders, preConfiguredProviders, themes, reaugmented));
     }
 
-    public RuntimeValue<CacheManagerFactory> createCacheInitializer(String config, boolean metricsEnabled, ShutdownContext shutdownContext) {
-        try {
-            CacheManagerFactory cacheManagerFactory = new CacheManagerFactory(config, metricsEnabled);
-
-            shutdownContext.addShutdownTask(new Runnable() {
-                @Override
-                public void run() {
-                    DefaultCacheManager cacheManager = cacheManagerFactory.getOrCreate();
-
-                    if (cacheManager != null) {
-                        cacheManager.stop();
-                    }
-                }
-            });
-
-            return new RuntimeValue<>(cacheManagerFactory);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     public void registerShutdownHook(ShutdownContext shutdownContext) {
         shutdownContext.addShutdownTask(new Runnable() {

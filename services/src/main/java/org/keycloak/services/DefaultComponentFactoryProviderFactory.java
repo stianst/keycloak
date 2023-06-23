@@ -16,9 +16,9 @@
  */
 package org.keycloak.services;
 
+import org.jboss.logging.Logger;
 import org.keycloak.Config;
 import org.keycloak.Config.Scope;
-import org.keycloak.cluster.ClusterProvider;
 import org.keycloak.common.util.StackUtil;
 import org.keycloak.component.ComponentFactoryProviderFactory;
 import org.keycloak.component.ComponentModel;
@@ -27,10 +27,9 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.utils.KeycloakModelUtils;
 import org.keycloak.provider.InvalidationHandler;
-import org.keycloak.provider.InvalidationHandler.InvalidableObjectType;
-import org.keycloak.provider.InvalidationHandler.ObjectType;
 import org.keycloak.provider.Provider;
 import org.keycloak.provider.ProviderFactory;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
@@ -40,7 +39,6 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Stream;
-import org.jboss.logging.Logger;
 
 /**
  * @author hmlnarik
@@ -71,7 +69,7 @@ public class DefaultComponentFactoryProviderFactory implements ComponentFactoryP
     @Override
     public void postInit(KeycloakSessionFactory factory) {
         this.factory = factory;
-        this.componentCachingAvailable = this.componentCachingEnabled && this.factory.getProviderFactory(ClusterProvider.class) != null;
+        this.componentCachingAvailable = false;
         if (! componentCachingEnabled) {
             LOG.warn("Caching of components disabled by the configuration which may have performance impact.");
         } else if (! componentCachingAvailable) {

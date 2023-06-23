@@ -17,26 +17,17 @@
 
 package org.keycloak.models.sessions.infinispan;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.keycloak.models.AuthenticatedClientSessionModel;
 import org.keycloak.models.ClientModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserSessionModel;
 import org.keycloak.models.session.UserSessionPersisterProvider;
-import org.keycloak.models.sessions.infinispan.changes.InfinispanChangelogBasedTransaction;
-import org.keycloak.models.sessions.infinispan.changes.SessionEntityWrapper;
-import org.keycloak.models.sessions.infinispan.changes.ClientSessionUpdateTask;
-import org.keycloak.models.sessions.infinispan.changes.SessionUpdateTask;
-import org.keycloak.models.sessions.infinispan.changes.Tasks;
-import org.keycloak.models.sessions.infinispan.changes.UserSessionUpdateTask;
-import org.keycloak.models.sessions.infinispan.changes.sessions.CrossDCLastSessionRefreshChecker;
 import org.keycloak.models.sessions.infinispan.entities.AuthenticatedClientSessionEntity;
-import org.keycloak.models.sessions.infinispan.entities.UserSessionEntity;
-import java.util.UUID;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
@@ -47,13 +38,12 @@ public class AuthenticatedClientSessionAdapter implements AuthenticatedClientSes
     private final InfinispanUserSessionProvider provider;
     private AuthenticatedClientSessionEntity entity;
     private final ClientModel client;
-    private final InfinispanChangelogBasedTransaction<UUID, AuthenticatedClientSessionEntity> clientSessionUpdateTx;
     private UserSessionModel userSession;
     private boolean offline;
 
     public AuthenticatedClientSessionAdapter(KeycloakSession kcSession, InfinispanUserSessionProvider provider,
                                              AuthenticatedClientSessionEntity entity, ClientModel client, UserSessionModel userSession,
-                                             InfinispanChangelogBasedTransaction<UUID, AuthenticatedClientSessionEntity> clientSessionUpdateTx, boolean offline) {
+                                             boolean offline) {
         if (userSession == null) {
             throw new NullPointerException("userSession must not be null");
         }
@@ -63,12 +53,7 @@ public class AuthenticatedClientSessionAdapter implements AuthenticatedClientSes
         this.entity = entity;
         this.userSession = userSession;
         this.client = client;
-        this.clientSessionUpdateTx = clientSessionUpdateTx;
         this.offline = offline;
-    }
-
-    private void update(ClientSessionUpdateTask task) {
-        clientSessionUpdateTx.addTask(entity.getId(), task);
     }
 
     /**
@@ -85,10 +70,6 @@ public class AuthenticatedClientSessionAdapter implements AuthenticatedClientSes
         // Intentionally do not remove the clientUUID from the user session, invalid session is handled
         // as nonexistent in org.keycloak.models.sessions.infinispan.UserSessionAdapter.getAuthenticatedClientSessions()
         this.userSession = null;
-
-        SessionUpdateTask<AuthenticatedClientSessionEntity> removeTask = Tasks.removeSync();
-
-        clientSessionUpdateTx.addTask(entity.getId(), removeTask);
     }
 
     @Override
@@ -103,16 +84,7 @@ public class AuthenticatedClientSessionAdapter implements AuthenticatedClientSes
 
     @Override
     public void setRedirectUri(String uri) {
-        ClientSessionUpdateTask task = new ClientSessionUpdateTask() {
 
-            @Override
-            public void runUpdate(AuthenticatedClientSessionEntity entity) {
-                entity.setRedirectUri(uri);
-            }
-
-        };
-
-        update(task);
     }
 
     @Override
@@ -137,27 +109,7 @@ public class AuthenticatedClientSessionAdapter implements AuthenticatedClientSes
 
     @Override
     public void setTimestamp(int timestamp) {
-        ClientSessionUpdateTask task = new ClientSessionUpdateTask() {
-
-            @Override
-            public void runUpdate(AuthenticatedClientSessionEntity entity) {
-                entity.setTimestamp(timestamp);
-            }
-
-            @Override
-            public CrossDCMessageStatus getCrossDCMessageStatus(SessionEntityWrapper<AuthenticatedClientSessionEntity> sessionWrapper) {
-                return new CrossDCLastSessionRefreshChecker(provider.getLastSessionRefreshStore(), provider.getOfflineLastSessionRefreshStore())
-                        .shouldSaveClientSessionToRemoteCache(kcSession, client.getRealm(), sessionWrapper, userSession, offline, timestamp);
-            }
-
-            @Override
-            public String toString() {
-                return "setTimestamp(" + timestamp + ')';
-            }
-
-        };
-
-        update(task);
+       entity.setTimestamp(timestamp);
     }
 
     @Override
@@ -167,15 +119,7 @@ public class AuthenticatedClientSessionAdapter implements AuthenticatedClientSes
 
     @Override
     public void setCurrentRefreshTokenUseCount(int currentRefreshTokenUseCount) {
-        ClientSessionUpdateTask task = new ClientSessionUpdateTask() {
-
-            @Override
-            public void runUpdate(AuthenticatedClientSessionEntity entity) {
-                entity.setCurrentRefreshTokenUseCount(currentRefreshTokenUseCount);
-            }
-        };
-
-        update(task);
+        entity.setCurrentRefreshTokenUseCount(currentRefreshTokenUseCount);
     }
 
     @Override
@@ -185,15 +129,7 @@ public class AuthenticatedClientSessionAdapter implements AuthenticatedClientSes
 
     @Override
     public void setCurrentRefreshToken(String currentRefreshToken) {
-        ClientSessionUpdateTask task = new ClientSessionUpdateTask() {
-
-            @Override
-            public void runUpdate(AuthenticatedClientSessionEntity entity) {
-                entity.setCurrentRefreshToken(currentRefreshToken);
-            }
-        };
-
-        update(task);
+        entity.setCurrentRefreshToken(currentRefreshToken);
     }
 
     @Override
@@ -203,16 +139,7 @@ public class AuthenticatedClientSessionAdapter implements AuthenticatedClientSes
 
     @Override
     public void setAction(String action) {
-        ClientSessionUpdateTask task = new ClientSessionUpdateTask() {
-
-            @Override
-            public void runUpdate(AuthenticatedClientSessionEntity entity) {
-                entity.setAction(action);
-            }
-
-        };
-
-        update(task);
+        entity.setAction(action);
     }
 
     @Override
@@ -222,16 +149,7 @@ public class AuthenticatedClientSessionAdapter implements AuthenticatedClientSes
 
     @Override
     public void setProtocol(String method) {
-        ClientSessionUpdateTask task = new ClientSessionUpdateTask() {
-
-            @Override
-            public void runUpdate(AuthenticatedClientSessionEntity entity) {
-                entity.setAuthMethod(method);
-            }
-
-        };
-
-        update(task);
+        entity.setAuthMethod(method);
     }
 
     @Override
@@ -241,30 +159,12 @@ public class AuthenticatedClientSessionAdapter implements AuthenticatedClientSes
 
     @Override
     public void setNote(String name, String value) {
-        ClientSessionUpdateTask task = new ClientSessionUpdateTask() {
-
-            @Override
-            public void runUpdate(AuthenticatedClientSessionEntity entity) {
-                entity.getNotes().put(name, value);
-            }
-
-        };
-
-        update(task);
+        entity.getNotes().put(name, value);
     }
 
     @Override
     public void removeNote(String name) {
-        ClientSessionUpdateTask task = new ClientSessionUpdateTask() {
-
-            @Override
-            public void runUpdate(AuthenticatedClientSessionEntity entity) {
-                entity.getNotes().remove(name);
-            }
-
-        };
-
-        update(task);
+        entity.getNotes().remove(name);
     }
 
     @Override

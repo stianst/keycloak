@@ -30,7 +30,6 @@ import org.keycloak.services.scheduled.ClearExpiredAdminEvents;
 import org.keycloak.services.scheduled.ClearExpiredClientInitialAccessTokens;
 import org.keycloak.services.scheduled.ClearExpiredEvents;
 import org.keycloak.services.scheduled.ClearExpiredUserSessions;
-import org.keycloak.services.scheduled.ClusterAwareScheduledTaskRunner;
 import org.keycloak.services.scheduled.ScheduledTaskRunner;
 import org.keycloak.storage.DatastoreProvider;
 import org.keycloak.storage.DatastoreProviderFactory;
@@ -96,18 +95,18 @@ public class LegacyDatastoreProviderFactory implements DatastoreProviderFactory,
     }    
 
     public static void setupScheduledTasks(final KeycloakSessionFactory sessionFactory) {
-        long interval = Config.scope("scheduled").getLong("interval", 900L) * 1000;
-
-        try (KeycloakSession session = sessionFactory.create()) {
-            TimerProvider timer = session.getProvider(TimerProvider.class);
-            if (timer != null) {
-                timer.schedule(new ClusterAwareScheduledTaskRunner(sessionFactory, new ClearExpiredEvents(), interval), interval, "ClearExpiredEvents");
-                timer.schedule(new ClusterAwareScheduledTaskRunner(sessionFactory, new ClearExpiredAdminEvents(), interval), interval, "ClearExpiredAdminEvents");
-                timer.schedule(new ClusterAwareScheduledTaskRunner(sessionFactory, new ClearExpiredClientInitialAccessTokens(), interval), interval, "ClearExpiredClientInitialAccessTokens");
-                timer.schedule(new ScheduledTaskRunner(sessionFactory, new ClearExpiredUserSessions()), interval, ClearExpiredUserSessions.TASK_NAME);
-                UserStorageSyncManager.bootstrapPeriodic(sessionFactory, timer);
-            }
-        }
+//        long interval = Config.scope("scheduled").getLong("interval", 900L) * 1000;
+//
+//        try (KeycloakSession session = sessionFactory.create()) {
+//            TimerProvider timer = session.getProvider(TimerProvider.class);
+//            if (timer != null) {
+////                timer.schedule(new ScheduledTaskRunner(sessionFactory, new ClearExpiredEvents(), interval, "ClearExpiredEvents");
+////                timer.schedule(new ScheduledTaskRunner(sessionFactory, new ClearExpiredAdminEvents(), interval), interval, "ClearExpiredAdminEvents");
+////                timer.schedule(new ScheduledTaskRunner(sessionFactory, new ClearExpiredClientInitialAccessTokens(), interval), interval, "ClearExpiredClientInitialAccessTokens");
+////                timer.schedule(new ScheduledTaskRunner(sessionFactory, new ClearExpiredUserSessions()), interval, ClearExpiredUserSessions.TASK_NAME);
+//                UserStorageSyncManager.bootstrapPeriodic(sessionFactory, timer);
+//            }
+//        }
     }
 
     @Override

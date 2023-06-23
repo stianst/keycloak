@@ -17,33 +17,19 @@
 
 package org.keycloak.models.sessions.infinispan;
 
-import org.infinispan.Cache;
+import org.jboss.logging.Logger;
 import org.keycloak.Config;
-import org.keycloak.cluster.ClusterEvent;
-import org.keycloak.cluster.ClusterProvider;
-import org.keycloak.connections.infinispan.InfinispanConnectionProvider;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
-import org.keycloak.models.cache.infinispan.events.AuthenticationSessionAuthNoteUpdateEvent;
-import org.keycloak.models.sessions.infinispan.entities.AuthenticationSessionEntity;
 import org.keycloak.models.sessions.infinispan.entities.RootAuthenticationSessionEntity;
-import org.keycloak.models.sessions.infinispan.events.AbstractAuthSessionClusterListener;
-import org.keycloak.models.sessions.infinispan.events.ClientRemovedSessionEvent;
-import org.keycloak.models.sessions.infinispan.events.RealmRemovedSessionEvent;
-import org.keycloak.models.sessions.infinispan.util.InfinispanKeyGenerator;
-import org.keycloak.models.utils.KeycloakModelUtils;
-import org.keycloak.models.utils.PostMigrationEvent;
 import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.provider.ProviderConfigurationBuilder;
-import org.keycloak.provider.ProviderEvent;
-import org.keycloak.provider.ProviderEventListener;
 import org.keycloak.sessions.AuthenticationSessionProvider;
 import org.keycloak.sessions.AuthenticationSessionProviderFactory;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
-import org.jboss.logging.Logger;
 
 /**
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
@@ -53,9 +39,7 @@ public class InfinispanAuthenticationSessionProviderFactory implements Authentic
     private static final Logger log = Logger.getLogger(InfinispanAuthenticationSessionProviderFactory.class);
     public static final int PROVIDER_PRIORITY = 1;
 
-    private InfinispanKeyGenerator keyGenerator;
-
-    private volatile Cache<String, RootAuthenticationSessionEntity> authSessionsCache;
+    private volatile Map<String, RootAuthenticationSessionEntity> authSessionsCache = new HashMap<>();
 
     private int authSessionsLimit;
 
@@ -82,20 +66,6 @@ public class InfinispanAuthenticationSessionProviderFactory implements Authentic
 
     @Override
     public void postInit(KeycloakSessionFactory factory) {
-        factory.register(new ProviderEventListener() {
-
-            @Override
-            public void onEvent(ProviderEvent event) {
-                if (event instanceof PostMigrationEvent) {
-
-                    KeycloakModelUtils.runJobInTransaction(factory, (KeycloakSession session) -> {
-
-                        registerClusterListeners(session);
-
-                    });
-                }
-            }
-        });
     }
 
     @Override
@@ -110,87 +80,14 @@ public class InfinispanAuthenticationSessionProviderFactory implements Authentic
                 .build();
     }
 
-    protected void registerClusterListeners(KeycloakSession session) {
-        KeycloakSessionFactory sessionFactory = session.getKeycloakSessionFactory();
-        ClusterProvider cluster = session.getProvider(ClusterProvider.class);
-
-        cluster.registerListener(REALM_REMOVED_AUTHSESSION_EVENT, new AbstractAuthSessionClusterListener<RealmRemovedSessionEvent>(sessionFactory) {
-
-            @Override
-            protected void eventReceived(KeycloakSession session, InfinispanAuthenticationSessionProvider provider, RealmRemovedSessionEvent sessionEvent) {
-                provider.onRealmRemovedEvent(sessionEvent.getRealmId());
-            }
-
-        });
-
-        cluster.registerListener(CLIENT_REMOVED_AUTHSESSION_EVENT, new AbstractAuthSessionClusterListener<ClientRemovedSessionEvent>(sessionFactory) {
-
-            @Override
-            protected void eventReceived(KeycloakSession session, InfinispanAuthenticationSessionProvider provider, ClientRemovedSessionEvent sessionEvent) {
-                provider.onClientRemovedEvent(sessionEvent.getRealmId(), sessionEvent.getClientUuid());
-            }
-        });
-
-        log.debug("Registered cluster listeners");
-    }
-
 
     @Override
     public AuthenticationSessionProvider create(KeycloakSession session) {
         lazyInit(session);
-        return new InfinispanAuthenticationSessionProvider(session, keyGenerator, authSessionsCache, authSessionsLimit);
-    }
-
-    private void updateAuthNotes(ClusterEvent clEvent) {
-        if (! (clEvent instanceof AuthenticationSessionAuthNoteUpdateEvent)) {
-            return;
-        }
-
-        AuthenticationSessionAuthNoteUpdateEvent event = (AuthenticationSessionAuthNoteUpdateEvent) clEvent;
-        RootAuthenticationSessionEntity authSession = this.authSessionsCache.get(event.getAuthSessionId());
-        updateAuthSession(authSession, event.getTabId(), event.getAuthNotesFragment());
-    }
-
-
-    private static void updateAuthSession(RootAuthenticationSessionEntity rootAuthSession, String tabId, Map<String, String> authNotesFragment) {
-        if (rootAuthSession == null) {
-            return;
-        }
-
-        AuthenticationSessionEntity authSession = rootAuthSession.getAuthenticationSessions().get(tabId);
-
-        if (authSession != null) {
-            if (authSession.getAuthNotes() == null) {
-                authSession.setAuthNotes(new ConcurrentHashMap<>());
-            }
-
-            for (Entry<String, String> me : authNotesFragment.entrySet()) {
-                String value = me.getValue();
-                if (value == null) {
-                    authSession.getAuthNotes().remove(me.getKey());
-                } else {
-                    authSession.getAuthNotes().put(me.getKey(), value);
-                }
-            }
-        }
+        return new InfinispanAuthenticationSessionProvider(session, authSessionsCache, authSessionsLimit);
     }
 
     private void lazyInit(KeycloakSession session) {
-        if (authSessionsCache == null) {
-            synchronized (this) {
-                if (authSessionsCache == null) {
-                    InfinispanConnectionProvider connections = session.getProvider(InfinispanConnectionProvider.class);
-                    authSessionsCache = connections.getCache(InfinispanConnectionProvider.AUTHENTICATION_SESSIONS_CACHE_NAME);
-
-                    keyGenerator = new InfinispanKeyGenerator();
-
-                    ClusterProvider cluster = session.getProvider(ClusterProvider.class);
-                    cluster.registerListener(AUTHENTICATION_SESSION_EVENTS, this::updateAuthNotes);
-
-                    log.debugf("[%s] Registered cluster listeners", authSessionsCache.getCacheManager().getAddress());
-                }
-            }
-        }
     }
 
     @Override

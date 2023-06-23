@@ -17,26 +17,17 @@
 
 package org.keycloak.models.sessions.infinispan.entities;
 
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.infinispan.commons.marshall.Externalizer;
-import org.infinispan.commons.marshall.MarshallUtil;
-import org.infinispan.commons.marshall.SerializeWith;
 import org.jboss.logging.Logger;
 import org.keycloak.models.AuthenticatedClientSessionModel;
-import org.keycloak.models.sessions.infinispan.changes.SessionEntityWrapper;
-import org.keycloak.models.sessions.infinispan.util.KeycloakMarshallUtil;
+
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
-@SerializeWith(AuthenticatedClientSessionEntity.ExternalizerImpl.class)
 public class AuthenticatedClientSessionEntity extends SessionEntity {
 
     public static final Logger logger = Logger.getLogger(AuthenticatedClientSessionEntity.class);
@@ -165,71 +156,5 @@ public class AuthenticatedClientSessionEntity extends SessionEntity {
         return id != null ? id.hashCode() : 0;
     }
 
-    @Override
-    public SessionEntityWrapper mergeRemoteEntityWithLocalEntity(SessionEntityWrapper localEntityWrapper) {
-        int timestampRemote = getTimestamp();
-
-        SessionEntityWrapper entityWrapper;
-        if (localEntityWrapper == null) {
-            entityWrapper = new SessionEntityWrapper<>(this);
-        } else {
-            AuthenticatedClientSessionEntity localClientSession = (AuthenticatedClientSessionEntity) localEntityWrapper.getEntity();
-
-            // local timestamp should always contain the bigger
-            if (timestampRemote < localClientSession.getTimestamp()) {
-                setTimestamp(localClientSession.getTimestamp());
-            }
-
-            entityWrapper = new SessionEntityWrapper<>(localEntityWrapper.getLocalMetadata(), this);
-        }
-
-        entityWrapper.putLocalMetadataNoteInt(LAST_TIMESTAMP_REMOTE, timestampRemote);
-
-        logger.debugf("Updating client session entity %s. timestamp=%d, timestampRemote=%d", getId(), getTimestamp(), timestampRemote);
-
-        return entityWrapper;
-    }
-
-    public static class ExternalizerImpl implements Externalizer<AuthenticatedClientSessionEntity> {
-
-        @Override
-        public void writeObject(ObjectOutput output, AuthenticatedClientSessionEntity session) throws IOException {
-            MarshallUtil.marshallUUID(session.id, output, false);
-            MarshallUtil.marshallString(session.getRealmId(), output);
-            MarshallUtil.marshallString(session.getAuthMethod(), output);
-            MarshallUtil.marshallString(session.getRedirectUri(), output);
-            KeycloakMarshallUtil.marshall(session.getTimestamp(), output);
-            MarshallUtil.marshallString(session.getAction(), output);
-
-            Map<String, String> notes = session.getNotes();
-            KeycloakMarshallUtil.writeMap(notes, KeycloakMarshallUtil.STRING_EXT, KeycloakMarshallUtil.STRING_EXT, output);
-
-            MarshallUtil.marshallString(session.getCurrentRefreshToken(), output);
-            KeycloakMarshallUtil.marshall(session.getCurrentRefreshTokenUseCount(), output);
-        }
-
-
-        @Override
-        public AuthenticatedClientSessionEntity readObject(ObjectInput input) throws IOException, ClassNotFoundException {
-            AuthenticatedClientSessionEntity sessionEntity = new AuthenticatedClientSessionEntity(MarshallUtil.unmarshallUUID(input, false));
-
-            sessionEntity.setRealmId(MarshallUtil.unmarshallString(input));
-
-            sessionEntity.setAuthMethod(MarshallUtil.unmarshallString(input));
-            sessionEntity.setRedirectUri(MarshallUtil.unmarshallString(input));
-            sessionEntity.setTimestamp(KeycloakMarshallUtil.unmarshallInteger(input));
-            sessionEntity.setAction(MarshallUtil.unmarshallString(input));
-
-            Map<String, String> notes = KeycloakMarshallUtil.readMap(input, KeycloakMarshallUtil.STRING_EXT, KeycloakMarshallUtil.STRING_EXT,
-                    new KeycloakMarshallUtil.ConcurrentHashMapBuilder<>());
-            sessionEntity.setNotes(notes);
-
-            sessionEntity.setCurrentRefreshToken(MarshallUtil.unmarshallString(input));
-            sessionEntity.setCurrentRefreshTokenUseCount(KeycloakMarshallUtil.unmarshallInteger(input));
-
-            return sessionEntity;
-        }
-
-    }
 
 }

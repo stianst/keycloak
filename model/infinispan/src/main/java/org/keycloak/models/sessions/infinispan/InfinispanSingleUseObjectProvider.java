@@ -37,14 +37,10 @@ public class InfinispanSingleUseObjectProvider implements SingleUseObjectProvide
 
     private final Map<String, SingleUseObjectValueEntity> singleUseObjectCache;
     private final KeycloakSession session;
-    private final InfinispanKeycloakTransaction tx;
 
     public InfinispanSingleUseObjectProvider(KeycloakSession session, Map<String, SingleUseObjectValueEntity> singleUseObjectCache) {
         this.session = session;
         this.singleUseObjectCache = singleUseObjectCache;
-        this.tx = new InfinispanKeycloakTransaction();
-
-        session.getTransactionManager().enlistAfterCompletion(tx);
     }
 
     @Override

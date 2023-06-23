@@ -17,8 +17,8 @@
 
 package org.keycloak.services.managers;
 
+import jakarta.ws.rs.core.UriInfo;
 import org.jboss.logging.Logger;
-import org.keycloak.common.ClientConnection;
 import org.keycloak.common.util.ServerCookie.SameSiteAttributeValue;
 import org.keycloak.models.ClientModel;
 import org.keycloak.models.KeycloakSession;
@@ -28,9 +28,7 @@ import org.keycloak.protocol.RestartLoginCookie;
 import org.keycloak.services.util.CookieHelper;
 import org.keycloak.sessions.AuthenticationSessionModel;
 import org.keycloak.sessions.RootAuthenticationSessionModel;
-import org.keycloak.sessions.StickySessionEncoderProvider;
 
-import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -147,8 +145,7 @@ public class AuthenticationSessionManager {
 
         boolean sslRequired = realm.getSslRequired().isRequired(session.getContext().getConnection());
 
-        StickySessionEncoderProvider encoder = session.getProvider(StickySessionEncoderProvider.class);
-        String encodedAuthSessionId = encoder.encodeSessionId(authSessionId);
+        String encodedAuthSessionId = authSessionId;
 
         CookieHelper.addCookie(AUTH_SESSION_ID, encodedAuthSessionId, cookiePath, null, null, -1, sslRequired, true, SameSiteAttributeValue.NONE, session);
 
@@ -163,9 +160,8 @@ public class AuthenticationSessionManager {
      */
     AuthSessionId decodeAuthSessionId(String encodedAuthSessionId) {
         log.debugf("Found AUTH_SESSION_ID cookie with value %s", encodedAuthSessionId);
-        StickySessionEncoderProvider encoder = session.getProvider(StickySessionEncoderProvider.class);
-        String decodedAuthSessionId = encoder.decodeSessionId(encodedAuthSessionId);
-        String reencoded = encoder.encodeSessionId(decodedAuthSessionId);
+        String decodedAuthSessionId = encodedAuthSessionId;
+        String reencoded = decodedAuthSessionId;
 
         return new AuthSessionId(decodedAuthSessionId, reencoded);
     }
@@ -200,13 +196,8 @@ public class AuthenticationSessionManager {
         return authSessionIds.stream().filter(new Predicate<String>() {
             @Override
             public boolean test(String id) {
-                StickySessionEncoderProvider encoder = session.getProvider(StickySessionEncoderProvider.class);
-                // in case the id is encoded with a route when running in a cluster
-                String decodedId = encoder.decodeSessionId(id);
-                // we can't blindly trust the cookie and assume it is valid and referencing a valid root auth session
-                // but make sure the root authentication session actually exists
-                // without this check there is a risk of resolving user sessions from invalid root authentication sessions as they share the same id
-                return session.authenticationSessions().getRootAuthenticationSession(realm, decodedId) != null;
+
+                return session.authenticationSessions().getRootAuthenticationSession(realm, id) != null;
             }
         }).collect(Collectors.toList());
     }

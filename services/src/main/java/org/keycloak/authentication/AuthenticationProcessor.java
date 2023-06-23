@@ -1042,7 +1042,7 @@ public class AuthenticationProcessor {
 
         if (userSession == null) { // if no authenticator attached a usersession
 
-            userSession = lockUserSessionsForModification(session, () -> session.sessions().getUserSession(realm, authSession.getParentSession().getId()));
+//            userSession = lockUserSessionsForModification(session, () -> session.sessions().getUserSession(realm, authSession.getParentSession().getId()));
             if (userSession == null) {
                 UserSessionModel.SessionPersistenceState persistenceState = UserSessionModel.SessionPersistenceState.fromString(authSession.getClientNote(AuthenticationManager.USER_SESSION_PERSISTENT_STATE));
 
