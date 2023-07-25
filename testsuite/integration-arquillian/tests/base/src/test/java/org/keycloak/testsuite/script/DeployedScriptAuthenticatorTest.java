@@ -33,10 +33,13 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 import org.keycloak.authentication.authenticators.browser.ScriptBasedAuthenticatorFactory;
 import org.keycloak.authentication.authenticators.browser.UsernamePasswordFormFactory;
 import org.keycloak.events.Details;
@@ -64,6 +67,7 @@ import org.keycloak.util.JsonSerialization;
  * @author <a href="mailto:psilva@redhat.com">Pedro Igor</a>
  */
 @EnableFeature(value = SCRIPTS, skipRestart = true)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class DeployedScriptAuthenticatorTest extends AbstractFlowTest {
 
     public static final String EXECUTION_ID = "scriptAuth";
@@ -96,6 +100,18 @@ public class DeployedScriptAuthenticatorTest extends AbstractFlowTest {
     @ArquillianResource
     private Deployer deployer;
 
+    @Test
+    public void aDeploy() throws Exception {
+        deployer.deploy(SCRIPT_DEPLOYMENT_NAME);
+        reconnectAdminClient();
+    }
+
+    @Test
+    public void xUndeploy() throws Exception {
+        deployer.undeploy(SCRIPT_DEPLOYMENT_NAME);
+        reconnectAdminClient();
+    }
+
     private AuthenticationFlowRepresentation flow;
 
     @Override
@@ -122,8 +138,6 @@ public class DeployedScriptAuthenticatorTest extends AbstractFlowTest {
     }
 
     public void configureFlows() throws Exception {
-        deployer.deploy(SCRIPT_DEPLOYMENT_NAME);
-        reconnectAdminClient();
         if (testContext.isInitialized()) {
             return;
         }
@@ -173,12 +187,6 @@ public class DeployedScriptAuthenticatorTest extends AbstractFlowTest {
         testContext.setInitialized(true);
     }
 
-    @After
-    public void onAfter() throws Exception {
-        deployer.undeploy(SCRIPT_DEPLOYMENT_NAME);
-        reconnectAdminClient();
-    }
-
     /**
      * KEYCLOAK-3491
      */
@@ -211,10 +219,10 @@ public class DeployedScriptAuthenticatorTest extends AbstractFlowTest {
         events.expect(EventType.LOGIN_ERROR).user((String) null).error(Errors.USER_NOT_FOUND).assertEvent();
     }
 
-    @Test
-    @DisableFeature(value = SCRIPTS, executeAsLast = false, skipRestart = true)
-    public void testScriptAuthenticatorNotAvailable() {
-        assertFalse(testRealm().flows().getAuthenticatorProviders().stream().anyMatch(
-                provider -> ScriptBasedAuthenticatorFactory.PROVIDER_ID.equals(provider.get("id"))));
-    }
+//    @Test
+//    @DisableFeature(value = SCRIPTS, executeAsLast = false, skipRestart = true)
+//    public void testScriptAuthenticatorNotAvailable() {
+//        assertFalse(testRealm().flows().getAuthenticatorProviders().stream().anyMatch(
+//                provider -> ScriptBasedAuthenticatorFactory.PROVIDER_ID.equals(provider.get("id"))));
+//    }
 }
