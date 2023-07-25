@@ -133,7 +133,6 @@ jobs:
         name: Unit test setup
         uses: ./.github/actions/unit-test-setup
 
-      # Not sure why, but needs to re-build otherwise there's some failures starting up
       - name: Run Quarkus integration Tests
         run: |
           declare -A PARAMS
@@ -142,7 +141,6 @@ jobs:
           PARAMS["container"]="-Dkc.quarkus.tests.dist=docker"
           PARAMS["storage"]="-Ptest-database -Dtest=PostgreSQLDistTest,MariaDBDistTest#testSuccessful,MySQLDistTest#testSuccessful,DatabaseOptionsDistTest,JPAStoreDistTest,HotRodStoreDistTest,MixedStoreDistTest,TransactionConfigurationDistTest"
 
-          ./mvnw install -nsu -B -pl quarkus/tests/integration -am -DskipTests
           ./mvnw test -nsu -B -pl quarkus/tests/integration ${PARAMS["${{ matrix.server }}"]} | misc/log/trimmer.sh
 
       - name: Upload JVM Heapdumps
