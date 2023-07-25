@@ -171,29 +171,29 @@ jobs:
           jdk-dist: ${{ matrix.dist }}
           jdk-version: ${{ matrix.version }}
 
-      - name: Prepare Quarkus distribution with current JDK
-        run: ./mvnw install -nsu -B -e -pl testsuite/integration-arquillian/servers/auth-server/quarkus
+#      - name: Prepare Quarkus distribution with current JDK
+#        run: ./mvnw install -nsu -B -e -pl testsuite/integration-arquillian/servers/auth-server/quarkus
 
       - name: Run base tests
         run: |
           TESTS=`testsuite/integration-arquillian/tests/base/testsuites/suite.sh jdk`
           echo "Tests: $TESTS"
-          ./mvnw test -Dsurefire.rerunFailingTestsCount=${{ env.SUREFIRE_RERUN_FAILING_COUNT }} -nsu -B -Pauth-server-quarkus -Dtest=$TESTS -pl testsuite/integration-arquillian/tests/base | misc/log/trimmer.sh
+          ./mvnw test -nsu -B -Pauth-server-quarkus -Dtest=$TESTS -pl testsuite/integration-arquillian/tests/base | misc/log/trimmer.sh
 
-      - name: Build with JDK
-        run:
-          ./mvnw install -nsu -B -e -DskipTests -DskipExamples
+#      - name: Build with JDK
+#        run:
+#          ./mvnw install -nsu -B -e -DskipTests -DskipExamples
 
-      - name: Upload JVM Heapdumps
-        if: always()
-        uses: ./.github/actions/upload-heapdumps
-
-      - uses: ./.github/actions/upload-flaky-tests
-        name: Upload flaky tests
-        env:
-          GH_TOKEN: ${{ github.token }}
-        with:
-          job-name: Java Distribution IT
+#      - name: Upload JVM Heapdumps
+#        if: always()
+#        uses: ./.github/actions/upload-heapdumps
+#
+#      - uses: ./.github/actions/upload-flaky-tests
+#        name: Upload flaky tests
+#        env:
+#          GH_TOKEN: ${{ github.token }}
+#        with:
+#          job-name: Java Distribution IT
 
 #  databases-new-store:
 #    name: Databases New Store
