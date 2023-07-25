@@ -16,30 +16,12 @@
  */
 package org.keycloak.testsuite.script;
 
-import static org.junit.Assert.assertFalse;
-import static org.keycloak.common.Profile.Feature.SCRIPTS;
-import static org.keycloak.testsuite.arquillian.DeploymentTargetModifier.AUTH_SERVER_CURRENT;
-
-import java.io.IOException;
-
 import jakarta.ws.rs.core.Response;
-
-import org.jboss.arquillian.container.test.api.Deployer;
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.container.test.api.TargetsContainer;
 import org.jboss.arquillian.graphene.page.Page;
-import org.jboss.arquillian.test.api.ArquillianResource;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.StringAsset;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.MethodSorters;
 import org.keycloak.authentication.authenticators.browser.ScriptBasedAuthenticatorFactory;
 import org.keycloak.authentication.authenticators.browser.UsernamePasswordFormFactory;
 import org.keycloak.events.Details;
@@ -50,7 +32,6 @@ import org.keycloak.representations.idm.AuthenticationExecutionRepresentation;
 import org.keycloak.representations.idm.AuthenticationFlowRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
-import org.keycloak.representations.provider.ScriptProviderDescriptor;
 import org.keycloak.testsuite.AssertEvents;
 import org.keycloak.testsuite.arquillian.annotation.DisableFeature;
 import org.keycloak.testsuite.arquillian.annotation.EnableFeature;
@@ -61,30 +42,18 @@ import org.keycloak.testsuite.util.ExecutionBuilder;
 import org.keycloak.testsuite.util.FlowBuilder;
 import org.keycloak.testsuite.util.RealmBuilder;
 import org.keycloak.testsuite.util.UserBuilder;
-import org.keycloak.util.JsonSerialization;
+
+import static org.junit.Assert.assertFalse;
+import static org.keycloak.common.Profile.Feature.SCRIPTS;
 
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Igor</a>
  */
-@EnableFeature(value = SCRIPTS, skipRestart = true)
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@EnableFeature(value = SCRIPTS, skipRestart = false)
 public class DeployedScriptAuthenticatorTest extends AbstractFlowTest {
 
     public static final String EXECUTION_ID = "scriptAuth";
     private static final String SCRIPT_DEPLOYMENT_NAME = "scripts.jar";
-
-    @Deployment(name = SCRIPT_DEPLOYMENT_NAME, managed = false, testable = false)
-    @TargetsContainer(AUTH_SERVER_CURRENT)
-    public static JavaArchive deploy() throws IOException {
-        ScriptProviderDescriptor representation = new ScriptProviderDescriptor();
-
-        representation.addAuthenticator("My Authenticator", "authenticator-a.js");
-
-        return ShrinkWrap.create(JavaArchive.class, SCRIPT_DEPLOYMENT_NAME)
-                .addAsManifestResource(new StringAsset(JsonSerialization.writeValueAsPrettyString(representation)),
-                        "keycloak-scripts.json")
-                .addAsResource("scripts/authenticator-example.js", "authenticator-a.js");
-    }
 
     @BeforeClass
     public static void verifyEnvironment() {
@@ -96,21 +65,6 @@ public class DeployedScriptAuthenticatorTest extends AbstractFlowTest {
 
     @Page
     protected LoginPage loginPage;
-
-    @ArquillianResource
-    private Deployer deployer;
-
-    @Test
-    public void aDeploy() throws Exception {
-        deployer.deploy(SCRIPT_DEPLOYMENT_NAME);
-        reconnectAdminClient();
-    }
-
-    @Test
-    public void xUndeploy() throws Exception {
-        deployer.undeploy(SCRIPT_DEPLOYMENT_NAME);
-        reconnectAdminClient();
-    }
 
     private AuthenticationFlowRepresentation flow;
 
@@ -138,6 +92,8 @@ public class DeployedScriptAuthenticatorTest extends AbstractFlowTest {
     }
 
     public void configureFlows() throws Exception {
+//        deployer.deploy(SCRIPT_DEPLOYMENT_NAME);
+        reconnectAdminClient();
         if (testContext.isInitialized()) {
             return;
         }
@@ -173,7 +129,7 @@ public class DeployedScriptAuthenticatorTest extends AbstractFlowTest {
                 .id(EXECUTION_ID)
                 .parentFlow(this.flow.getId())
                 .requirement(AuthenticationExecutionModel.Requirement.REQUIRED.name())
-                .authenticator("script-authenticator-a.js")
+                .authenticator("script-scripts/auth-example.js")
                 .build();
 
         Response addExecutionResponse = testRealm().flows().addExecution(usernamePasswordFormExecution);
@@ -219,10 +175,10 @@ public class DeployedScriptAuthenticatorTest extends AbstractFlowTest {
         events.expect(EventType.LOGIN_ERROR).user((String) null).error(Errors.USER_NOT_FOUND).assertEvent();
     }
 
-//    @Test
-//    @DisableFeature(value = SCRIPTS, executeAsLast = false, skipRestart = true)
-//    public void testScriptAuthenticatorNotAvailable() {
-//        assertFalse(testRealm().flows().getAuthenticatorProviders().stream().anyMatch(
-//                provider -> ScriptBasedAuthenticatorFactory.PROVIDER_ID.equals(provider.get("id"))));
-//    }
+    @Test
+    @DisableFeature(value = SCRIPTS, executeAsLast = false, skipRestart = true)
+    public void testScriptAuthenticatorNotAvailable() {
+        assertFalse(testRealm().flows().getAuthenticatorProviders().stream().anyMatch(
+                provider -> ScriptBasedAuthenticatorFactory.PROVIDER_ID.equals(provider.get("id"))));
+    }
 }
