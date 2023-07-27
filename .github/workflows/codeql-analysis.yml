@@ -49,7 +49,7 @@ jobs:
     name: CodeQL Themes
     needs: conditional
     runs-on: ubuntu-latest
-    if: needs.conditional.outputs.themes == 'true'
+    if: needs.conditional.outputs.java == 'true'
     outputs:
       conclusion: ${{ steps.check.outputs.conclusion }}
 
