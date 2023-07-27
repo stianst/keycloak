@@ -70,9 +70,3 @@ jobs:
         with:
           required: ${{ needs.conditional.outputs.java }}
           conclusion: ${{ needs.java.result }}
-
-      - name: themes
-        uses: ./.github/actions/checks-job-pass
-        with:
-          required: ${{ needs.conditional.outputs.themes }}
-          conclusion: ${{ needs.themes.result }}
