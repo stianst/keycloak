@@ -2,9 +2,6 @@ name: CodeQL
 
 on:
   push:
-    branches-ignore:
-      - main
-      - dependabot/**
   pull_request:
      branches: [main]
   workflow_dispatch:
