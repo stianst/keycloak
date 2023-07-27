@@ -76,4 +76,4 @@ jobs:
         with:
           required: ${{ needs.conditional.outputs.themes }}
           conclusion: ${{ needs.themes.result }}
-          needs: ${{ toJSON(needs) }}
+          jobs: ${{ toJSON(needs) }}
