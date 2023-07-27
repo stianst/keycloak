@@ -9,6 +9,9 @@ inputs:
   conclusion:
     description: Job conclusion (success if passed, most likely empty otherwise)
     required: true
+  needs:
+    description: Needs
+    required: true
 
 outputs:
   status:
@@ -32,3 +35,4 @@ runs:
             exit 1
           fi        
         fi
+        echo ${{ inputs.needs }}

@@ -45,9 +45,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - id: check
-        uses: ./.github/actions/checks-success
-
   themes:
     name: CodeQL Themes
     needs: conditional
@@ -56,33 +53,27 @@ jobs:
     outputs:
       conclusion: ${{ steps.check.outputs.conclusion }}
 
-    steps:
-      - uses: actions/checkout@v3
-
-      - id: check
-        uses: ./.github/actions/checks-success
-
   check:
     name: Status Check - CodeQL
     if: always()
-    needs: [conditional, java, themes]
+    needs:
+      - conditional
+      - java
+      - themes
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
 
-      - name: Test
-        run: |
-          echo ${{ needs.java.result }}
-
-      - name: CodeQL Java
+      - name: java
         uses: ./.github/actions/checks-job-pass
         with:
           required: ${{ needs.conditional.outputs.java }}
           conclusion: ${{ needs.java.result }}
 
-      - name: CodeQL Themes
+      - name: themes
         uses: ./.github/actions/checks-job-pass
         with:
           required: ${{ needs.conditional.outputs.themes }}
           conclusion: ${{ needs.themes.result }}
+          needs: ${{ toJSON(needs) }}
