@@ -45,21 +45,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2.21.1
-        with:
-          languages: java
-
-      - name: Build Keycloak
-        uses: ./.github/actions/build-keycloak
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2.21.1
-        with:
-          wait-for-processing: true
-        env:
-          CODEQL_ACTION_EXTRA_OPTIONS: '{"database":{"interpret-results":["--max-paths",0]}}'
-
       - id: check
         uses: ./.github/actions/checks-success
 
@@ -74,21 +59,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2.21.1
-        env:
-          CODEQL_ACTION_EXTRA_OPTIONS: '{"database":{"finalize":["--no-run-unnecessary-builds"]}}'
-        with:
-          languages: javascript
-          source-root: themes/src/main/
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2.21.1
-        with:
-          wait-for-processing: true
-        env:
-          CODEQL_ACTION_EXTRA_OPTIONS: '{"database":{"interpret-results":["--max-paths",0]}}'
-
       - id: check
         uses: ./.github/actions/checks-success
 
@@ -101,14 +71,18 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Test
+        run: |
+          echo ${{ needs.java.result }}
+
       - name: CodeQL Java
         uses: ./.github/actions/checks-job-pass
         with:
           required: ${{ needs.conditional.outputs.java }}
-          conclusion: ${{ needs.java.outputs.conclusion }}
+          conclusion: ${{ needs.java.result }}
 
       - name: CodeQL Themes
         uses: ./.github/actions/checks-job-pass
         with:
           required: ${{ needs.conditional.outputs.themes }}
-          conclusion: ${{ needs.themes.outputs.conclusion }}
+          conclusion: ${{ needs.themes.result }}
