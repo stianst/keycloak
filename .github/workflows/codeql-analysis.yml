@@ -53,6 +53,9 @@ jobs:
     outputs:
       conclusion: ${{ steps.check.outputs.conclusion }}
 
+    steps:
+      - uses: actions/checkout@v3
+
   check:
     name: Status Check - CodeQL
     if: always()
@@ -70,3 +73,4 @@ jobs:
         with:
           required: ${{ needs.conditional.outputs.java }}
           conclusion: ${{ needs.java.result }}
+          jobs: ${{ toJSON(needs) }}
