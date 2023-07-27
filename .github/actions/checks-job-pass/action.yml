@@ -35,4 +35,4 @@ runs:
             exit 1
           fi        
         fi
-        echo ${{ inputs.jobs }}
+        echo '${{ inputs.jobs }}'
