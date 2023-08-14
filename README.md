@@ -20,8 +20,6 @@ bin/kc.sh start-dev --db postgres --db-url-host localhost --db-username keycloak
 
 Stop Keycloak 21.1.1
 
-
-
 bin/kc.sh build --db postgres --cache local
 bin/kc.sh start --optimized --hostname-strict false --http-enabled true --db-url-host localhost --db-username keycloak --db-password password
 
@@ -29,3 +27,9 @@ bin/kc.sh start --optimized --hostname-strict false --http-enabled true --db-url
 bin/kc.sh start-dev --hostname-strict false --http-enabled true --db postgres --db-url-host localhost --db-username keycloak --db-password password
 
 kcw dev-build start  --db-url-host localhost --db-username keycloak --db-password password
+
+## Start Keycloak in native mode
+
+```
+quarkus/server/target/lib/keycloak-runner start-dev
+```
