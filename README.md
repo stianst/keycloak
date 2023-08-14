@@ -3,19 +3,19 @@
 ## Build
 
 ```
-./mvnw clean install -Dquarkus.package.type=native -DskipTests
+./mvnw clean install -Dquarkus.package.type=native -DskipTests -Dquarkus.native.additional-build-args="--enable-url-protocols=jar"
 ```
 
 ## Initialise the database
 
 ```
-podman run -d --name postgres --net host -e POSTGRES_DB=keycloak -e POSTGRES_USER=keycloak -e POSTGRES_PASSWORD=password postgres
+podman run -d --name postgres --net host -e POSTGRES_DB=keycloak -e POSTGRES_USER=$USER -e POSTGRES_PASSWORD=password postgres
 ```
 
 Download Keycloak 21.1.1 and run the following:
 
 ```
-bin/kc.sh start-dev --db postgres --db-url-host localhost --db-username keycloak --db-password password
+bin/kc.sh start-dev --db postgres --db-url-host localhost --db-username $USER --db-password password
 ```
 
 Stop Keycloak 21.1.1
