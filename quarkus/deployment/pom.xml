@@ -14,7 +14,10 @@
     <artifactId>keycloak-quarkus-server-deployment</artifactId>
 
     <dependencies>
-
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-picocli-deployment</artifactId>
+        </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-apache-httpclient-deployment</artifactId>

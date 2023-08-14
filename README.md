@@ -1,5 +1,11 @@
 # Mini(Key)cloak
 
+## Build
+
+```
+./mvnw clean install -Dquarkus.package.type=native -DskipTests
+```
+
 ## Initialise the database
 
 ```
