@@ -58,6 +58,7 @@ import org.keycloak.services.resources.admin.permissions.AdminPermissions;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
@@ -304,7 +305,7 @@ public class IdentityProviderResource {
     @Path("mappers")
     @Produces(MediaType.APPLICATION_JSON)
     @NoCache
-    public Stream<IdentityProviderMapperRepresentation> getMappers() {
+    public List<IdentityProviderMapperRepresentation> getMappers() {
         this.auth.realm().requireViewIdentityProviders();
 
         if (identityProviderModel == null) {
@@ -312,7 +313,7 @@ public class IdentityProviderResource {
         }
 
         return realm.getIdentityProviderMappersByAliasStream(identityProviderModel.getAlias())
-                .map(ModelToRepresentation::toRepresentation);
+                .map(ModelToRepresentation::toRepresentation).collect(Collectors.toList());
     }
 
     /**

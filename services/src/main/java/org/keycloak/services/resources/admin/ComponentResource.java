@@ -61,6 +61,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -95,7 +96,7 @@ public class ComponentResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @NoCache
-    public Stream<ComponentRepresentation> getComponents(@QueryParam("parent") String parent,
+    public List<ComponentRepresentation> getComponents(@QueryParam("parent") String parent,
                                                        @QueryParam("type") String type,
                                                        @QueryParam("name") String name) {
         auth.realm().requireViewRealm();
@@ -120,7 +121,7 @@ public class ComponentResource {
                         logger.error("Failed to get component list for component model" + component.getName() + "of realm " + realm.getName());
                         return ModelToRepresentation.toRepresentationWithoutConfig(component);
                     }
-                });
+                }).collect(Collectors.toList());
     }
 
     @POST
@@ -228,7 +229,7 @@ public class ComponentResource {
     @Path("{id}/sub-component-types")
     @Produces(MediaType.APPLICATION_JSON)
     @NoCache
-    public Stream<ComponentTypeRepresentation> getSubcomponentConfig(@PathParam("id") String parentId, @QueryParam("type") String subtype) {
+    public List<ComponentTypeRepresentation> getSubcomponentConfig(@PathParam("id") String parentId, @QueryParam("type") String subtype) {
         auth.realm().requireViewRealm();
         ComponentModel parent = realm.getComponent(parentId);
         if (parent == null) {
@@ -246,7 +247,7 @@ public class ComponentResource {
 
         return session.getKeycloakSessionFactory().getProviderFactoriesStream(providerClass)
             .filter(ComponentFactory.class::isInstance)
-            .map(factory -> toComponentTypeRepresentation(factory, parent));
+            .map(factory -> toComponentTypeRepresentation(factory, parent)).collect(Collectors.toList());
     }
 
     private ComponentTypeRepresentation toComponentTypeRepresentation(ProviderFactory factory, ComponentModel parent) {

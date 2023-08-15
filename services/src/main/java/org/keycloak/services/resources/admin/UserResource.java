@@ -360,9 +360,9 @@ public class UserResource {
     @GET
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<UserSessionRepresentation> getSessions() {
+    public List<UserSessionRepresentation> getSessions() {
         auth.users().requireView(user);
-        return session.sessions().getUserSessionsStream(realm, user).map(ModelToRepresentation::toRepresentation);
+        return session.sessions().getUserSessionsStream(realm, user).map(ModelToRepresentation::toRepresentation).collect(Collectors.toList());
     }
 
     /**
@@ -374,7 +374,7 @@ public class UserResource {
     @GET
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<UserSessionRepresentation> getOfflineSessions(final @PathParam("clientUuid") String clientUuid) {
+    public List<UserSessionRepresentation> getOfflineSessions(final @PathParam("clientUuid") String clientUuid) {
         auth.users().requireView(user);
         ClientModel client = realm.getClientById(clientUuid);
         if (client == null) {
@@ -382,7 +382,7 @@ public class UserResource {
         }
         return new UserSessionManager(session).findOfflineSessionsStream(realm, user)
                 .map(session -> toUserSessionRepresentation(session, clientUuid))
-                .filter(Objects::nonNull);
+                .filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     /**
@@ -394,9 +394,9 @@ public class UserResource {
     @GET
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<FederatedIdentityRepresentation> getFederatedIdentity() {
+    public List<FederatedIdentityRepresentation> getFederatedIdentity() {
         auth.users().requireView(user);
-        return getFederatedIdentities(user);
+        return getFederatedIdentities(user).collect(Collectors.toList());
     }
 
     private Stream<FederatedIdentityRepresentation> getFederatedIdentities(UserModel user) {
@@ -453,7 +453,7 @@ public class UserResource {
     @GET
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<Map<String, Object>> getConsents() {
+    public List<Map<String, Object>> getConsents() {
         auth.users().requireView(user);
 
         Set<ClientModel> offlineClients = new UserSessionManager(session).findClientsWithOfflineToken(realm, user);
@@ -470,7 +470,7 @@ public class UserResource {
                         // filter out clients with explicit user consents to avoid rendering them twice
                         .filter(c -> !clientsWithUserConsents.contains(c))
                         .map(this::toConsent)
-        );
+        ).collect(Collectors.toList());
     }
 
     private Map<String, Object> toConsent(ClientModel client) {
@@ -641,11 +641,11 @@ public class UserResource {
     @Path("credentials")
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<CredentialRepresentation> credentials(){
+    public List<CredentialRepresentation> credentials(){
         auth.users().requireView(user);
         return user.credentialManager().getStoredCredentialsStream()
                 .map(ModelToRepresentation::toRepresentation)
-                .peek(credentialRepresentation -> credentialRepresentation.setSecretData(null));
+                .peek(credentialRepresentation -> credentialRepresentation.setSecretData(null)).collect(Collectors.toList());
     }
 
 
@@ -659,11 +659,11 @@ public class UserResource {
     @Path("configured-user-storage-credential-types")
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<String> getConfiguredUserStorageCredentialTypes() {
+    public List<String> getConfiguredUserStorageCredentialTypes() {
         // This has "requireManage" due the compatibility with "credentials()" endpoint. Strictly said, it is reading endpoint, not writing,
         // so may be revisited if to rather use "requireView" here in the future.
         auth.users().requireManage(user);
-        return user.credentialManager().getConfiguredUserStorageCredentialTypesStream();
+        return user.credentialManager().getConfiguredUserStorageCredentialTypesStream().collect(Collectors.toList());
     }
 
 
@@ -869,16 +869,16 @@ public class UserResource {
     @Path("groups")
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<GroupRepresentation> groupMembership(@QueryParam("search") String search,
+    public List<GroupRepresentation> groupMembership(@QueryParam("search") String search,
                                                        @QueryParam("first") Integer firstResult,
                                                        @QueryParam("max") Integer maxResults,
                                                        @QueryParam("briefRepresentation") @DefaultValue("true") boolean briefRepresentation) {
         auth.users().requireView(user);
 
         if (Objects.nonNull(search)) {
-            return ModelToRepresentation.searchForGroupByName(user, !briefRepresentation, search.trim(), firstResult, maxResults);
+            return ModelToRepresentation.searchForGroupByName(user, !briefRepresentation, search.trim(), firstResult, maxResults).collect(Collectors.toList());
         } else {
-            return ModelToRepresentation.toGroupHierarchy(user, !briefRepresentation, firstResult, maxResults);
+            return ModelToRepresentation.toGroupHierarchy(user, !briefRepresentation, firstResult, maxResults).collect(Collectors.toList());
         }
     }
 

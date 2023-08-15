@@ -49,8 +49,10 @@ import org.keycloak.utils.ReservedCharValidator;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static jakarta.ws.rs.core.Response.Status.BAD_REQUEST;
@@ -159,11 +161,11 @@ public class IdentityProvidersResource {
     @Path("instances")
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<IdentityProviderRepresentation> getIdentityProviders() {
+    public List<IdentityProviderRepresentation> getIdentityProviders() {
         this.auth.realm().requireViewIdentityProviders();
 
         return realm.getIdentityProvidersStream()
-                .map(provider -> StripSecretsUtils.strip(ModelToRepresentation.toRepresentation(realm, provider)));
+                .map(provider -> StripSecretsUtils.strip(ModelToRepresentation.toRepresentation(realm, provider))).collect(Collectors.toList());
     }
 
     /**

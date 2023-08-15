@@ -252,7 +252,7 @@ public class UsersResource {
     @GET
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<UserRepresentation> getUsers(@QueryParam("search") String search,
+    public List<UserRepresentation> getUsers(@QueryParam("search") String search,
                                                @QueryParam("lastName") String last,
                                                @QueryParam("firstName") String first,
                                                @QueryParam("email") String email,
@@ -292,7 +292,7 @@ public class UsersResource {
                     attributes.put(UserModel.ENABLED, enabled.toString());
                 }
                 return searchForUser(attributes, realm, userPermissionEvaluator, briefRepresentation, firstResult,
-                        maxResults, false);
+                        maxResults, false).collect(Collectors.toList());
             }
         } else if (last != null || first != null || email != null || username != null || emailVerified != null
                 || idpAlias != null || idpUserId != null || enabled != null || exact != null || !searchAttributes.isEmpty()) {
@@ -328,13 +328,13 @@ public class UsersResource {
                     attributes.putAll(searchAttributes);
 
                     return searchForUser(attributes, realm, userPermissionEvaluator, briefRepresentation, firstResult,
-                            maxResults, true);
+                            maxResults, true).collect(Collectors.toList());
                 } else {
                     return searchForUser(new HashMap<>(), realm, userPermissionEvaluator, briefRepresentation,
-                            firstResult, maxResults, false);
+                            firstResult, maxResults, false).collect(Collectors.toList());
                 }
 
-        return toRepresentation(realm, userPermissionEvaluator, briefRepresentation, userModels);
+        return toRepresentation(realm, userPermissionEvaluator, briefRepresentation, userModels).collect(Collectors.toList());
     }
 
     /**

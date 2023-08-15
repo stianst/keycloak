@@ -213,8 +213,8 @@ public class RealmAdminResource {
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
     @Path("default-default-client-scopes")
-    public Stream<ClientScopeRepresentation> getDefaultDefaultClientScopes() {
-        return getDefaultClientScopes(true);
+    public List<ClientScopeRepresentation> getDefaultDefaultClientScopes() {
+        return getDefaultClientScopes(true).collect(Collectors.toList());
     }
 
     private Stream<ClientScopeRepresentation> getDefaultClientScopes(boolean defaultScope) {
@@ -275,8 +275,8 @@ public class RealmAdminResource {
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
     @Path("default-optional-client-scopes")
-    public Stream<ClientScopeRepresentation> getDefaultOptionalClientScopes() {
-        return getDefaultClientScopes(false);
+    public List<ClientScopeRepresentation> getDefaultOptionalClientScopes() {
+        return getDefaultClientScopes(false).collect(Collectors.toList());
     }
 
     @PUT
@@ -594,7 +594,7 @@ public class RealmAdminResource {
     @GET
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<Map<String, String>> getClientSessionStats() {
+    public List<Map<String, String>> getClientSessionStats() {
         auth.realm().requireViewRealm();
 
         Map<String, Map<String, String>> data = new HashMap<>();
@@ -630,7 +630,7 @@ public class RealmAdminResource {
             }
         }
 
-        return data.values().stream();
+        return data.values().stream().collect(Collectors.toList());
     }
 
     /**
@@ -699,7 +699,7 @@ public class RealmAdminResource {
     @GET
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<EventRepresentation> getEvents(@QueryParam("type") List<String> types, @QueryParam("client") String client,
+    public List<EventRepresentation> getEvents(@QueryParam("type") List<String> types, @QueryParam("client") String client,
                                                @QueryParam("user") String user, @QueryParam("dateFrom") String dateFrom, @QueryParam("dateTo") String dateTo,
                                                @QueryParam("ipAddress") String ipAddress, @QueryParam("first") Integer firstResult,
                                                @QueryParam("max") Integer maxResults) {
@@ -758,7 +758,7 @@ public class RealmAdminResource {
             query.maxResults(Constants.DEFAULT_MAX_RESULTS);
         }
 
-        return query.getResultStream().map(ModelToRepresentation::toRepresentation);
+        return query.getResultStream().map(ModelToRepresentation::toRepresentation).collect(Collectors.toList());
     }
 
     /**
@@ -782,7 +782,7 @@ public class RealmAdminResource {
     @GET
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<AdminEventRepresentation> getEvents(@QueryParam("operationTypes") List<String> operationTypes, @QueryParam("authRealm") String authRealm, @QueryParam("authClient") String authClient,
+    public List<AdminEventRepresentation> getEvents(@QueryParam("operationTypes") List<String> operationTypes, @QueryParam("authRealm") String authRealm, @QueryParam("authClient") String authClient,
                                                     @QueryParam("authUser") String authUser, @QueryParam("authIpAddress") String authIpAddress,
                                                     @QueryParam("resourcePath") String resourcePath, @QueryParam("dateFrom") String dateFrom,
                                                     @QueryParam("dateTo") String dateTo, @QueryParam("first") Integer firstResult,
@@ -862,7 +862,7 @@ public class RealmAdminResource {
             query.maxResults(Constants.DEFAULT_MAX_RESULTS);
         }
 
-        return query.getResultStream().map(ModelToRepresentation::toRepresentation);
+        return query.getResultStream().map(ModelToRepresentation::toRepresentation).collect(Collectors.toList());
     }
 
     /**
@@ -946,10 +946,10 @@ public class RealmAdminResource {
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
     @Path("default-groups")
-    public Stream<GroupRepresentation> getDefaultGroups() {
+    public List<GroupRepresentation> getDefaultGroups() {
         auth.realm().requireViewRealm();
 
-        return realm.getDefaultGroupsStream().map(ModelToRepresentation::groupToBriefRepresentation);
+        return realm.getDefaultGroupsStream().map(ModelToRepresentation::groupToBriefRepresentation).collect(Collectors.toList());
     }
     @PUT
     @NoCache
@@ -1111,12 +1111,12 @@ public class RealmAdminResource {
     @Path("credential-registrators")
     @NoCache
     @Produces(jakarta.ws.rs.core.MediaType.APPLICATION_JSON)
-    public Stream<String> getCredentialRegistrators(){
+    public List<String> getCredentialRegistrators(){
         auth.realm().requireViewRealm();
         return session.getContext().getRealm().getRequiredActionProvidersStream()
                 .filter(RequiredActionProviderModel::isEnabled)
                 .map(RequiredActionProviderModel::getProviderId)
-                .filter(providerId ->  session.getProvider(RequiredActionProvider.class, providerId) instanceof CredentialRegistrator);
+                .filter(providerId ->  session.getProvider(RequiredActionProvider.class, providerId) instanceof CredentialRegistrator).collect(Collectors.toList());
     }
 
     @Path("client-policies/policies")

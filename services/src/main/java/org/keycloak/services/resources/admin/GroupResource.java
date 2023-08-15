@@ -52,6 +52,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -265,7 +266,7 @@ public class GroupResource {
     @NoCache
     @Path("members")
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<UserRepresentation> getMembers(@QueryParam("first") Integer firstResult,
+    public List<UserRepresentation> getMembers(@QueryParam("first") Integer firstResult,
                                                @QueryParam("max") Integer maxResults,
                                                @QueryParam("briefRepresentation") Boolean briefRepresentation) {
         this.auth.groups().requireViewMembers(group);
@@ -277,7 +278,7 @@ public class GroupResource {
         return session.users().getGroupMembersStream(realm, group, firstResult, maxResults)
                 .map(user -> briefRepresentationB
                         ? ModelToRepresentation.toBriefRepresentation(user)
-                        : ModelToRepresentation.toRepresentation(session, realm, user));
+                        : ModelToRepresentation.toRepresentation(session, realm, user)).collect(Collectors.toList());
     }
 
     /**

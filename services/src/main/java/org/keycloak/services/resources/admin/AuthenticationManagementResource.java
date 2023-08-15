@@ -111,10 +111,10 @@ public class AuthenticationManagementResource {
     @GET
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<Map<String, Object>> getFormProviders() {
+    public List<Map<String, Object>> getFormProviders() {
         auth.realm().requireViewRealm();
 
-        return buildProviderMetadata(session.getKeycloakSessionFactory().getProviderFactoriesStream(FormAuthenticator.class));
+        return buildProviderMetadata(session.getKeycloakSessionFactory().getProviderFactoriesStream(FormAuthenticator.class)).collect(Collectors.toList());
     }
 
     /**
@@ -126,10 +126,10 @@ public class AuthenticationManagementResource {
     @GET
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<Map<String, Object>> getAuthenticatorProviders() {
+    public List<Map<String, Object>> getAuthenticatorProviders() {
         auth.realm().requireViewRealm();
 
-        return buildProviderMetadata(session.getKeycloakSessionFactory().getProviderFactoriesStream(Authenticator.class));
+        return buildProviderMetadata(session.getKeycloakSessionFactory().getProviderFactoriesStream(Authenticator.class)).collect(Collectors.toList());
     }
 
     /**
@@ -141,10 +141,10 @@ public class AuthenticationManagementResource {
     @GET
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<Map<String, Object>> getClientAuthenticatorProviders() {
+    public List<Map<String, Object>> getClientAuthenticatorProviders() {
         auth.realm().requireViewClientAuthenticatorProviders();
 
-        return buildProviderMetadata(session.getKeycloakSessionFactory().getProviderFactoriesStream(ClientAuthenticator.class));
+        return buildProviderMetadata(session.getKeycloakSessionFactory().getProviderFactoriesStream(ClientAuthenticator.class)).collect(Collectors.toList());
     }
 
     public Stream<Map<String, Object>> buildProviderMetadata(Stream<ProviderFactory> factories) {
@@ -167,10 +167,10 @@ public class AuthenticationManagementResource {
     @GET
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<Map<String, Object>> getFormActionProviders() {
+    public List<Map<String, Object>> getFormActionProviders() {
         auth.realm().requireViewRealm();
 
-        return buildProviderMetadata(session.getKeycloakSessionFactory().getProviderFactoriesStream(FormAction.class));
+        return buildProviderMetadata(session.getKeycloakSessionFactory().getProviderFactoriesStream(FormAction.class)).collect(Collectors.toList());
     }
 
 
@@ -183,12 +183,12 @@ public class AuthenticationManagementResource {
     @GET
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<AuthenticationFlowRepresentation> getFlows() {
+    public List<AuthenticationFlowRepresentation> getFlows() {
         auth.realm().requireViewAuthenticationFlows();
 
         return realm.getAuthenticationFlowsStream()
                 .filter(flow -> flow.isTopLevel() && !Objects.equals(flow.getAlias(), DefaultAuthenticationFlows.SAML_ECP_FLOW))
-                .map(flow -> ModelToRepresentation.toRepresentation(realm, flow));
+                .map(flow -> ModelToRepresentation.toRepresentation(realm, flow)).collect(Collectors.toList());
     }
 
     /**
@@ -944,7 +944,7 @@ public class AuthenticationManagementResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @NoCache
-    public Stream<Map<String, String>> getUnregisteredRequiredActions() {
+    public List<Map<String, String>> getUnregisteredRequiredActions() {
         auth.realm().requireViewRealm();
 
         Set<String> providerIds = realm.getRequiredActionProvidersStream()
@@ -958,7 +958,7 @@ public class AuthenticationManagementResource {
                     m.put("name", r.getDisplayText());
                     m.put("providerId", r.getId());
                     return m;
-                });
+                }).collect(Collectors.toList());
     }
 
     /**
@@ -1003,10 +1003,10 @@ public class AuthenticationManagementResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @NoCache
-    public Stream<RequiredActionProviderRepresentation> getRequiredActions() {
+    public List<RequiredActionProviderRepresentation> getRequiredActions() {
         auth.realm().requireViewRequiredActions();
 
-        return realm.getRequiredActionProvidersStream().map(AuthenticationManagementResource::toRepresentation);
+        return realm.getRequiredActionProvidersStream().map(AuthenticationManagementResource::toRepresentation).collect(Collectors.toList());
     }
 
     public static RequiredActionProviderRepresentation toRepresentation(RequiredActionProviderModel model) {

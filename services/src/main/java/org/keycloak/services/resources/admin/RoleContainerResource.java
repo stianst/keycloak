@@ -98,7 +98,7 @@ public class RoleContainerResource extends RoleResource {
     @GET
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<RoleRepresentation> getRoles(@QueryParam("search") @DefaultValue("") String search,
+    public List<RoleRepresentation> getRoles(@QueryParam("search") @DefaultValue("") String search,
                                                @QueryParam("first") Integer firstResult,
                                                @QueryParam("max") Integer maxResults,
                                                @QueryParam("briefRepresentation") @DefaultValue("true") boolean briefRepresentation) {
@@ -117,7 +117,7 @@ public class RoleContainerResource extends RoleResource {
         Function<RoleModel, RoleRepresentation> toRoleRepresentation = briefRepresentation ?
                 ModelToRepresentation::toBriefRepresentation :
                 ModelToRepresentation::toRepresentation;
-        return roleModels.map(toRoleRepresentation);
+        return roleModels.map(toRoleRepresentation).collect(Collectors.toList());
     }
 
     /**
@@ -313,13 +313,13 @@ public class RoleContainerResource extends RoleResource {
     @GET
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<RoleRepresentation> getRoleComposites(final @PathParam("role-name") String roleName) {
+    public List<RoleRepresentation> getRoleComposites(final @PathParam("role-name") String roleName) {
         auth.roles().requireView(roleContainer);
         RoleModel role = roleContainer.getRole(roleName);
         if (role == null) {
             throw new NotFoundException("Could not find role");
         }
-        return role.getCompositesStream().map(ModelToRepresentation::toBriefRepresentation);
+        return role.getCompositesStream().map(ModelToRepresentation::toBriefRepresentation).collect(Collectors.toList());
     }
 
     /**
@@ -332,13 +332,13 @@ public class RoleContainerResource extends RoleResource {
     @GET
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<RoleRepresentation> getRealmRoleComposites(final @PathParam("role-name") String roleName) {
+    public List<RoleRepresentation> getRealmRoleComposites(final @PathParam("role-name") String roleName) {
         auth.roles().requireView(roleContainer);
         RoleModel role = roleContainer.getRole(roleName);
         if (role == null) {
             throw new NotFoundException("Could not find role");
         }
-        return getRealmRoleComposites(role);
+        return getRealmRoleComposites(role).collect(Collectors.toList());
     }
 
     /**
@@ -352,7 +352,7 @@ public class RoleContainerResource extends RoleResource {
     @GET
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<RoleRepresentation> getClientRoleComposites(final @PathParam("role-name") String roleName,
+    public List<RoleRepresentation> getClientRoleComposites(final @PathParam("role-name") String roleName,
                                                                 final @PathParam("clientUuid") String clientUuid) {
         auth.roles().requireView(roleContainer);
         RoleModel role = roleContainer.getRole(roleName);
@@ -364,7 +364,7 @@ public class RoleContainerResource extends RoleResource {
             throw new NotFoundException("Could not find client");
 
         }
-        return getClientRoleComposites(clientModel, role);
+        return getClientRoleComposites(clientModel, role).collect(Collectors.toList());
     }
 
 
@@ -455,7 +455,7 @@ public class RoleContainerResource extends RoleResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @NoCache
-    public Stream<UserRepresentation> getUsersInRole(final @PathParam("role-name") String roleName,
+    public List<UserRepresentation> getUsersInRole(final @PathParam("role-name") String roleName,
                                                     @QueryParam("first") Integer firstResult,
                                                     @QueryParam("max") Integer maxResults) {
         
@@ -469,7 +469,7 @@ public class RoleContainerResource extends RoleResource {
         }
 
         return session.users().getRoleMembersStream(realm, role, firstResult, maxResults)
-                .map(user -> ModelToRepresentation.toRepresentation(session, realm, user));
+                .map(user -> ModelToRepresentation.toRepresentation(session, realm, user)).collect(Collectors.toList());
     }
     
     /**
@@ -486,7 +486,7 @@ public class RoleContainerResource extends RoleResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @NoCache
-    public Stream<GroupRepresentation> getGroupsInRole(final @PathParam("role-name") String roleName,
+    public List<GroupRepresentation> getGroupsInRole(final @PathParam("role-name") String roleName,
                                                     @QueryParam("first") Integer firstResult,
                                                     @QueryParam("max") Integer maxResults,
                                                     @QueryParam("briefRepresentation") @DefaultValue("true") boolean briefRepresentation) {
@@ -501,6 +501,6 @@ public class RoleContainerResource extends RoleResource {
         }
         
         return session.groups().getGroupsByRoleStream(realm, role, firstResult, maxResults)
-                .map(g -> ModelToRepresentation.toRepresentation(g, !briefRepresentation));
+                .map(g -> ModelToRepresentation.toRepresentation(g, !briefRepresentation)).collect(Collectors.toList());
     }   
 }

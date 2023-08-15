@@ -127,7 +127,7 @@ public class ScopeMappedResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @NoCache
-    public Stream<RoleRepresentation> getRealmScopeMappings() {
+    public List<RoleRepresentation> getRealmScopeMappings() {
         viewPermission.require();
 
         if (scopeContainer == null) {
@@ -135,7 +135,7 @@ public class ScopeMappedResource {
         }
 
         return scopeContainer.getRealmScopeMappingsStream()
-                .map(ModelToRepresentation::toBriefRepresentation);
+                .map(ModelToRepresentation::toBriefRepresentation).collect(Collectors.toList());
     }
 
     /**
@@ -147,7 +147,7 @@ public class ScopeMappedResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @NoCache
-    public Stream<RoleRepresentation> getAvailableRealmScopeMappings() {
+    public List<RoleRepresentation> getAvailableRealmScopeMappings() {
         viewPermission.require();
 
         if (scopeContainer == null) {
@@ -157,7 +157,7 @@ public class ScopeMappedResource {
         return realm.getRolesStream()
                 .filter(((Predicate<RoleModel>) scopeContainer::hasDirectScope).negate())
                 .filter(auth.roles()::canMapClientScope)
-                .map(ModelToRepresentation::toBriefRepresentation);
+                .map(ModelToRepresentation::toBriefRepresentation).collect(Collectors.toList());
     }
 
     /**
@@ -175,7 +175,7 @@ public class ScopeMappedResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @NoCache
-    public Stream<RoleRepresentation> getCompositeRealmScopeMappings(@QueryParam("briefRepresentation") @DefaultValue("true") boolean briefRepresentation) {
+    public List<RoleRepresentation> getCompositeRealmScopeMappings(@QueryParam("briefRepresentation") @DefaultValue("true") boolean briefRepresentation) {
         viewPermission.require();
 
         if (scopeContainer == null) {
@@ -186,7 +186,7 @@ public class ScopeMappedResource {
                 ModelToRepresentation::toBriefRepresentation : ModelToRepresentation::toRepresentation;
         return realm.getRolesStream()
                 .filter(scopeContainer::hasScope)
-                .map(toBriefRepresentation);
+                .map(toBriefRepresentation).collect(Collectors.toList());
     }
 
     /**

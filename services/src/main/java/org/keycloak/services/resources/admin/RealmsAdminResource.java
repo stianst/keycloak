@@ -54,7 +54,9 @@ import jakarta.ws.rs.core.Response;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.keycloak.utils.StreamsUtil.throwIfEmpty;
@@ -98,11 +100,11 @@ public class RealmsAdminResource {
     @GET
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<RealmRepresentation> getRealms(@DefaultValue("false") @QueryParam("briefRepresentation") boolean briefRepresentation) {
+    public List<RealmRepresentation> getRealms(@DefaultValue("false") @QueryParam("briefRepresentation") boolean briefRepresentation) {
         Stream<RealmRepresentation> realms = session.realms().getRealmsStream()
                 .map(realm -> toRealmRep(realm, briefRepresentation))
                 .filter(Objects::nonNull);
-        return throwIfEmpty(realms, new ForbiddenException());
+        return throwIfEmpty(realms, new ForbiddenException()).collect(Collectors.toList());
     }
 
     protected RealmRepresentation toRealmRep(RealmModel realm, boolean briefRep) {

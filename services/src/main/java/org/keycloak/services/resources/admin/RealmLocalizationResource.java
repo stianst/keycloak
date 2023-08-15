@@ -27,8 +27,10 @@ import org.keycloak.services.resources.admin.permissions.AdminPermissionEvaluato
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import jakarta.ws.rs.BadRequestException;
@@ -127,10 +129,10 @@ public class RealmLocalizationResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<String> getRealmLocalizationLocales() {
+    public List<String> getRealmLocalizationLocales() {
         auth.requireAnyAdminRole();
 
-        return realm.getRealmLocalizationTexts().keySet().stream().sorted();
+        return realm.getRealmLocalizationTexts().keySet().stream().sorted().collect(Collectors.toList());
     }
 
     @Path("{locale}")

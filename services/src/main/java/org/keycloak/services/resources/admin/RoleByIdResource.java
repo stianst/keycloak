@@ -46,6 +46,7 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -175,7 +176,7 @@ public class RoleByIdResource extends RoleResource {
     @GET
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<RoleRepresentation> getRoleComposites(final @PathParam("role-id") String id,
+    public List<RoleRepresentation> getRoleComposites(final @PathParam("role-id") String id,
                                                         final @QueryParam("search") String search,
                                                         final @QueryParam("first") Integer first,
                                                         final @QueryParam("max") Integer max
@@ -186,10 +187,10 @@ public class RoleByIdResource extends RoleResource {
         auth.roles().requireView(role);
 
         if (search == null && first == null && max == null) {
-            return role.getCompositesStream().map(ModelToRepresentation::toBriefRepresentation);
+            return role.getCompositesStream().map(ModelToRepresentation::toBriefRepresentation).collect(Collectors.toList());
         }
 
-        return role.getCompositesStream(search, first, max).map(ModelToRepresentation::toBriefRepresentation);
+        return role.getCompositesStream(search, first, max).map(ModelToRepresentation::toBriefRepresentation).collect(Collectors.toList());
     }
 
     /**
@@ -202,10 +203,10 @@ public class RoleByIdResource extends RoleResource {
     @GET
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<RoleRepresentation> getRealmRoleComposites(final @PathParam("role-id") String id) {
+    public List<RoleRepresentation> getRealmRoleComposites(final @PathParam("role-id") String id) {
         RoleModel role = getRoleModel(id);
         auth.roles().requireView(role);
-        return getRealmRoleComposites(role);
+        return getRealmRoleComposites(role).collect(Collectors.toList());
     }
 
     /**
@@ -219,7 +220,7 @@ public class RoleByIdResource extends RoleResource {
     @GET
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<RoleRepresentation> getClientRoleComposites(final @PathParam("role-id") String id,
+    public List<RoleRepresentation> getClientRoleComposites(final @PathParam("role-id") String id,
                                                                 final @PathParam("clientUuid") String clientUuid) {
 
         RoleModel role = getRoleModel(id);
@@ -228,7 +229,7 @@ public class RoleByIdResource extends RoleResource {
         if (clientModel == null) {
             throw new NotFoundException("Could not find client");
         }
-        return getClientRoleComposites(clientModel, role);
+        return getClientRoleComposites(clientModel, role).collect(Collectors.toList());
     }
 
     /**

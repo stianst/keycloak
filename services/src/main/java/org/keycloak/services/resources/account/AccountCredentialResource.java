@@ -159,7 +159,7 @@ public class AccountCredentialResource {
     @GET
     @NoCache
     @Produces(jakarta.ws.rs.core.MediaType.APPLICATION_JSON)
-    public Stream<CredentialContainer> credentialTypes(@QueryParam(TYPE) String type,
+    public List<CredentialContainer> credentialTypes(@QueryParam(TYPE) String type,
                                                      @QueryParam(USER_CREDENTIALS) Boolean userCredentials) {
         auth.requireOneOf(AccountRoles.MANAGE_ACCOUNT, AccountRoles.VIEW_PROFILE);
 
@@ -224,7 +224,7 @@ public class AccountCredentialResource {
                 .filter(p -> enabledCredentialTypes.contains(p.getType()))
                 .map(toCredentialContainer)
                 .filter(Objects::nonNull)
-                .sorted(Comparator.comparing(CredentialContainer::getMetadata));
+                .sorted(Comparator.comparing(CredentialContainer::getMetadata)).collect(Collectors.toList());
     }
 
     // Going through all authentication flows and their authentication executions to see if there is any authenticator of the corresponding

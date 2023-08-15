@@ -43,8 +43,10 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -74,24 +76,24 @@ public class GroupsResource {
     @GET
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<GroupRepresentation> getGroups(@QueryParam("search") String search,
-                                                 @QueryParam("q") String searchQuery,
-                                                 @QueryParam("exact") @DefaultValue("false") Boolean exact,
-                                                 @QueryParam("first") Integer firstResult,
-                                                 @QueryParam("max") Integer maxResults,
-                                                 @QueryParam("briefRepresentation") @DefaultValue("true") boolean briefRepresentation,
-                                                 @QueryParam("populateHierarchy") @DefaultValue("true") boolean populateHierarchy) {
+    public List<GroupRepresentation> getGroups(@QueryParam("search") String search,
+                                               @QueryParam("q") String searchQuery,
+                                               @QueryParam("exact") @DefaultValue("false") Boolean exact,
+                                               @QueryParam("first") Integer firstResult,
+                                               @QueryParam("max") Integer maxResults,
+                                               @QueryParam("briefRepresentation") @DefaultValue("true") boolean briefRepresentation,
+                                               @QueryParam("populateHierarchy") @DefaultValue("true") boolean populateHierarchy) {
         auth.groups().requireList();
 
         if (Objects.nonNull(searchQuery)) {
             Map<String, String> attributes = SearchQueryUtils.getFields(searchQuery);
-            return ModelToRepresentation.searchGroupsByAttributes(session, realm, !briefRepresentation, populateHierarchy, attributes, firstResult, maxResults);
+            return ModelToRepresentation.searchGroupsByAttributes(session, realm, !briefRepresentation, populateHierarchy, attributes, firstResult, maxResults).collect(Collectors.toList());
         } else if (Objects.nonNull(search)) {
-            return ModelToRepresentation.searchForGroupByName(session, realm, !briefRepresentation, search.trim(), exact, firstResult, maxResults);
+            return ModelToRepresentation.searchForGroupByName(session, realm, !briefRepresentation, search.trim(), exact, firstResult, maxResults).collect(Collectors.toList());
         } else if(Objects.nonNull(firstResult) && Objects.nonNull(maxResults)) {
-            return ModelToRepresentation.toGroupHierarchy(realm, !briefRepresentation, firstResult, maxResults);
+            return ModelToRepresentation.toGroupHierarchy(realm, !briefRepresentation, firstResult, maxResults).collect(Collectors.toList());
         } else {
-            return ModelToRepresentation.toGroupHierarchy(realm, !briefRepresentation);
+            return ModelToRepresentation.toGroupHierarchy(realm, !briefRepresentation).collect(Collectors.toList());
         }
     }
 

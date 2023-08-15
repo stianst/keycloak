@@ -27,6 +27,7 @@ import jakarta.ws.rs.core.Response;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -73,8 +74,8 @@ public class SessionResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @NoCache
-    public Stream<SessionRepresentation> toRepresentation() {
-        return session.sessions().getUserSessionsStream(realm, user).map(this::toRepresentation);
+    public List<SessionRepresentation> toRepresentation() {
+        return session.sessions().getUserSessionsStream(realm, user).map(this::toRepresentation).collect(Collectors.toList());
     }
 
     /**

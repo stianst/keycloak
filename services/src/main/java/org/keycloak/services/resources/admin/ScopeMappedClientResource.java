@@ -84,11 +84,11 @@ public class ScopeMappedClientResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @NoCache
-    public Stream<RoleRepresentation> getClientScopeMappings() {
+    public List<RoleRepresentation> getClientScopeMappings() {
         viewPermission.require();
 
         return KeycloakModelUtils.getClientScopeMappingsStream(scopedClient, scopeContainer)
-                .map(ModelToRepresentation::toBriefRepresentation);
+                .map(ModelToRepresentation::toBriefRepresentation).collect(Collectors.toList());
     }
 
     /**
@@ -102,13 +102,13 @@ public class ScopeMappedClientResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @NoCache
-    public Stream<RoleRepresentation> getAvailableClientScopeMappings() {
+    public List<RoleRepresentation> getAvailableClientScopeMappings() {
         viewPermission.require();
 
         return scopedClient.getRolesStream()
                 .filter(((Predicate<RoleModel>) scopeContainer::hasDirectScope).negate())
                 .filter(auth.roles()::canMapClientScope)
-                .map(ModelToRepresentation::toBriefRepresentation);
+                .map(ModelToRepresentation::toBriefRepresentation).collect(Collectors.toList());
     }
 
     /**
@@ -124,14 +124,14 @@ public class ScopeMappedClientResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @NoCache
-    public Stream<RoleRepresentation> getCompositeClientScopeMappings(@QueryParam("briefRepresentation") @DefaultValue("true") boolean briefRepresentation) {
+    public List<RoleRepresentation> getCompositeClientScopeMappings(@QueryParam("briefRepresentation") @DefaultValue("true") boolean briefRepresentation) {
         viewPermission.require();
 
         Function<RoleModel, RoleRepresentation> toBriefRepresentation = briefRepresentation ?
                 ModelToRepresentation::toBriefRepresentation : ModelToRepresentation::toRepresentation;
         return scopedClient.getRolesStream()
                 .filter(scopeContainer::hasScope)
-                .map(toBriefRepresentation);
+                .map(toBriefRepresentation).collect(Collectors.toList());
     }
 
     /**

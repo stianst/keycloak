@@ -54,7 +54,10 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.Boolean.TRUE;
@@ -99,7 +102,7 @@ public class ClientsResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @NoCache
-    public Stream<ClientRepresentation> getClients(@QueryParam("clientId") String clientId,
+    public List<ClientRepresentation> getClients(@QueryParam("clientId") String clientId,
                                                  @QueryParam("viewableOnly") @DefaultValue("false") boolean viewableOnly,
                                                  @QueryParam("search") @DefaultValue("false") boolean search,
                                                  @QueryParam("q") String searchQuery,
@@ -150,7 +153,7 @@ public class ClientsResource {
             s = paginatedStream(s, firstResult, maxResults);
         }
 
-        return s;
+        return s.collect(Collectors.toList());
     }
 
     private AuthorizationService getAuthorizationService(ClientModel clientModel) {

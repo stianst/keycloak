@@ -51,6 +51,7 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -99,12 +100,12 @@ public class ProtocolMappersResource {
     @NoCache
     @Path("protocol/{protocol}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<ProtocolMapperRepresentation> getMappersPerProtocol(@PathParam("protocol") String protocol) {
+    public List<ProtocolMapperRepresentation> getMappersPerProtocol(@PathParam("protocol") String protocol) {
         viewPermission.require();
 
         return client.getProtocolMappersStream()
                 .filter(mapper -> isEnabled(session, mapper) && Objects.equals(mapper.getProtocol(), protocol))
-                .map(ModelToRepresentation::toRepresentation);
+                .map(ModelToRepresentation::toRepresentation).collect(Collectors.toList());
     }
 
     /**
@@ -161,12 +162,12 @@ public class ProtocolMappersResource {
     @NoCache
     @Path("models")
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<ProtocolMapperRepresentation> getMappers() {
+    public List<ProtocolMapperRepresentation> getMappers() {
         viewPermission.require();
 
         return client.getProtocolMappersStream()
                 .filter(mapper -> isEnabled(session, mapper))
-                .map(ModelToRepresentation::toRepresentation);
+                .map(ModelToRepresentation::toRepresentation).collect(Collectors.toList());
     }
 
     /**

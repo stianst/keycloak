@@ -156,10 +156,10 @@ public class RoleMapperResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @NoCache
-    public Stream<RoleRepresentation> getRealmRoleMappings() {
+    public List<RoleRepresentation> getRealmRoleMappings() {
         viewPermission.require();
 
-        return roleMapper.getRealmRoleMappingsStream().map(ModelToRepresentation::toBriefRepresentation);
+        return roleMapper.getRealmRoleMappingsStream().map(ModelToRepresentation::toBriefRepresentation).collect(Collectors.toList());
     }
 
     /**
@@ -175,14 +175,14 @@ public class RoleMapperResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @NoCache
-    public Stream<RoleRepresentation> getCompositeRealmRoleMappings(@QueryParam("briefRepresentation") @DefaultValue("true") boolean briefRepresentation) {
+    public List<RoleRepresentation> getCompositeRealmRoleMappings(@QueryParam("briefRepresentation") @DefaultValue("true") boolean briefRepresentation) {
         viewPermission.require();
 
         Function<RoleModel, RoleRepresentation> toBriefRepresentation = briefRepresentation ?
                 ModelToRepresentation::toBriefRepresentation : ModelToRepresentation::toRepresentation;
         return realm.getRolesStream()
                 .filter(roleMapper::hasRole)
-                .map(toBriefRepresentation);
+                .map(toBriefRepresentation).collect(Collectors.toList());
     }
 
     /**
@@ -194,13 +194,13 @@ public class RoleMapperResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @NoCache
-    public Stream<RoleRepresentation> getAvailableRealmRoleMappings() {
+    public List<RoleRepresentation> getAvailableRealmRoleMappings() {
         viewPermission.require();
 
         return realm.getRolesStream()
                 .filter(this::canMapRole)
                 .filter(((Predicate<RoleModel>) roleMapper::hasDirectRole).negate())
-                .map(ModelToRepresentation::toBriefRepresentation);
+                .map(ModelToRepresentation::toBriefRepresentation).collect(Collectors.toList());
     }
 
     /**

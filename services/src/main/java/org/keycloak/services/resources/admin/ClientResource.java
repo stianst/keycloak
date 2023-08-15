@@ -85,8 +85,10 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.Boolean.TRUE;
@@ -350,8 +352,8 @@ public class ClientResource {
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
     @Path("default-client-scopes")
-    public Stream<ClientScopeRepresentation> getDefaultClientScopes() {
-        return getDefaultClientScopes(true);
+    public List<ClientScopeRepresentation> getDefaultClientScopes() {
+        return getDefaultClientScopes(true).collect(Collectors.toList());
     }
 
     private Stream<ClientScopeRepresentation> getDefaultClientScopes(boolean defaultScope) {

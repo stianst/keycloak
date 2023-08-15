@@ -34,6 +34,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -66,7 +67,7 @@ public class ClientRegistrationPolicyResource {
     @GET
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<ComponentTypeRepresentation> getProviders() {
+    public List<ComponentTypeRepresentation> getProviders() {
         return session.getKeycloakSessionFactory().getProviderFactoriesStream(ClientRegistrationPolicy.class)
                 .map((ProviderFactory factory) -> {
                     ClientRegistrationPolicyFactory clientRegFactory = (ClientRegistrationPolicyFactory) factory;
@@ -77,6 +78,6 @@ public class ClientRegistrationPolicyResource {
                     rep.setHelpText(clientRegFactory.getHelpText());
                     rep.setProperties(ModelToRepresentation.toRepresentation(configProps));
                     return rep;
-                });
+                }).collect(Collectors.toList());
     }
 }

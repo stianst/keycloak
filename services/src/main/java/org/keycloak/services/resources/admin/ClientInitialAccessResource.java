@@ -38,6 +38,9 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -94,10 +97,10 @@ public class ClientInitialAccessResource {
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<ClientInitialAccessPresentation> list() {
+    public List<ClientInitialAccessPresentation> list() {
         auth.clients().requireView();
 
-        return session.realms().listClientInitialAccessStream(realm).map(this::wrap);
+        return session.realms().listClientInitialAccessStream(realm).map(this::wrap).collect(Collectors.toList());
     }
 
     @DELETE

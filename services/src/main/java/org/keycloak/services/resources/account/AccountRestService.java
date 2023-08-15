@@ -484,16 +484,16 @@ public class AccountRestService {
     @GET
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<GroupRepresentation> groupMemberships(@QueryParam("briefRepresentation") @DefaultValue("true") boolean briefRepresentation) {
+    public List<GroupRepresentation> groupMemberships(@QueryParam("briefRepresentation") @DefaultValue("true") boolean briefRepresentation) {
         auth.require(AccountRoles.VIEW_GROUPS);
-        return ModelToRepresentation.toGroupHierarchy(user, !briefRepresentation);
+        return ModelToRepresentation.toGroupHierarchy(user, !briefRepresentation).collect(Collectors.toList());
     }
 
     @Path("/applications")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @NoCache
-    public Stream<ClientRepresentation> applications(@QueryParam("name") String name) {
+    public List<ClientRepresentation> applications(@QueryParam("name") String name) {
         checkAccountApiEnabled();
         auth.requireOneOf(AccountRoles.MANAGE_ACCOUNT, AccountRoles.VIEW_APPLICATIONS);
 
@@ -522,7 +522,7 @@ public class AccountRestService {
 
         return clients.stream().filter(client -> !client.isBearerOnly() && !client.getClientId().isEmpty())
                 .filter(client -> matches(client, name))
-                .map(client -> modelToRepresentation(client, inUseClients, offlineClients, consentModels));
+                .map(client -> modelToRepresentation(client, inUseClients, offlineClients, consentModels)).collect(Collectors.toList());
     }
 
     private boolean matches(ClientModel client, String name) {
