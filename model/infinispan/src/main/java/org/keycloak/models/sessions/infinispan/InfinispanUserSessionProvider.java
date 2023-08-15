@@ -81,6 +81,8 @@ public class InfinispanUserSessionProvider implements UserSessionProvider {
         AuthenticatedClientSessionAdapter adapter = new AuthenticatedClientSessionAdapter(session, this, entity, client, userSession, false);
         clientSessionCache.put(clientSessionId, entity);
 
+        sessionCache.get(userSession.getId()).getAuthenticatedClientSessions().put(client.getId(), clientSessionId);
+
         return adapter;
     }
 
@@ -141,13 +143,20 @@ public class InfinispanUserSessionProvider implements UserSessionProvider {
     private UserSessionEntity getUserSessionEntity(RealmModel realm, String id, boolean offline) {
         System.out.println("Getting session " + id);
         UserSessionEntity entity = sessionCache.get(id);
-        if (!entity.getRealmId().equals(realm.getId())) return null;
+        if (entity == null) {
+            System.out.println("Session not found");
+            for (String k : sessionCache.keySet()) {
+                System.out.println("exists: " + k);
+            }
+        }
+        if (entity == null || !entity.getRealmId().equals(realm.getId())) return null;
         return entity;
     }
 
     @Override
     public AuthenticatedClientSessionAdapter getClientSession(UserSessionModel userSession, ClientModel client, String clientSessionId, boolean offline) {
-        return null;
+        AuthenticatedClientSessionEntity entity = clientSessionCache.get(UUID.fromString(clientSessionId));
+        return entity != null ? wrap(userSession, client, entity, false) : null;
     }
 
     @Override

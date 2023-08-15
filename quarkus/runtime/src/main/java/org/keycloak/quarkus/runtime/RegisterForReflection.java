@@ -118,6 +118,7 @@ import org.keycloak.services.resources.admin.ScopeMappedClientResource;
 import org.keycloak.services.resources.admin.ScopeMappedResource;
 import org.keycloak.services.resources.admin.UserResource;
 import org.keycloak.services.resources.admin.UsersResource;
+import org.keycloak.services.resources.admin.info.ServerInfoAdminResource;
 
 @io.quarkus.runtime.annotations.RegisterForReflection(targets = {
         AccessToken.class,
@@ -237,6 +238,7 @@ import org.keycloak.services.resources.admin.UsersResource;
         UserResource.class,
         UsersResource.class,
         WelcomeResource.class,
+        ServerInfoAdminResource.class,
         
         org.keycloak.email.freemarker.beans.AdminEventBean.class,
         org.keycloak.email.freemarker.beans.EventBean.class,

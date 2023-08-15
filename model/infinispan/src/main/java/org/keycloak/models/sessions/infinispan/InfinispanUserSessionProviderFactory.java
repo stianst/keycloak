@@ -30,6 +30,7 @@ import org.keycloak.provider.EnvironmentDependentProviderFactory;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.keycloak.models.sessions.infinispan.InfinispanAuthenticationSessionProviderFactory.PROVIDER_PRIORITY;
 
@@ -39,10 +40,10 @@ public class InfinispanUserSessionProviderFactory implements UserSessionProvider
 
     public static final String PROVIDER_ID = "infinispan";
 
-    protected final Map<String, UserSessionEntity> sessionCache = new HashMap<>();
-    protected final Map<String, UserSessionEntity> offlineSessionCache = new HashMap<>();
-    protected final Map<UUID, AuthenticatedClientSessionEntity> clientSessionCache = new HashMap<>();
-    protected final Map<UUID, AuthenticatedClientSessionEntity> offlineClientSessionCache = new HashMap<>();
+    protected final Map<String, UserSessionEntity> sessionCache = new ConcurrentHashMap<>();
+    protected final Map<String, UserSessionEntity> offlineSessionCache = new ConcurrentHashMap<>();
+    protected final Map<UUID, AuthenticatedClientSessionEntity> clientSessionCache = new ConcurrentHashMap<>();
+    protected final Map<UUID, AuthenticatedClientSessionEntity> offlineClientSessionCache = new ConcurrentHashMap<>();
 
 
     @Override
