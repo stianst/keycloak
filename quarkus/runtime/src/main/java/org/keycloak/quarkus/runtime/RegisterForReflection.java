@@ -19,6 +19,8 @@ import org.keycloak.jose.jwk.JSONWebKeySet;
 import org.keycloak.jose.jwk.JWK;
 import org.keycloak.jose.jwk.RSAPublicJWK;
 import org.keycloak.jose.jws.JWSHeader;
+import org.keycloak.models.credential.dto.PasswordCredentialData;
+import org.keycloak.models.credential.dto.PasswordSecretData;
 import org.keycloak.protocol.oidc.OIDCLoginProtocolService;
 import org.keycloak.protocol.oidc.endpoints.AuthorizationEndpoint;
 import org.keycloak.protocol.oidc.endpoints.LoginStatusIframeEndpoint;
@@ -157,6 +159,7 @@ import org.keycloak.services.resources.admin.UsersResource;
         TokenMetadataRepresentation.class,
         UserInfo.class,
         VersionRepresentation.class,
+        
         AbstractSecuredLocalService.class,
         AccountConsole.class,
         AccountCredentialResource.class,
@@ -233,7 +236,46 @@ import org.keycloak.services.resources.admin.UsersResource;
         UserManagedPermissionService.class,
         UserResource.class,
         UsersResource.class,
-        WelcomeResource.class
+        WelcomeResource.class,
+        
+        org.keycloak.email.freemarker.beans.AdminEventBean.class,
+        org.keycloak.email.freemarker.beans.EventBean.class,
+        org.keycloak.email.freemarker.beans.ProfileBean.class,
+        org.keycloak.forms.login.freemarker.model.ClientBean.class,
+        org.keycloak.forms.login.freemarker.model.CodeBean.class,
+        org.keycloak.forms.login.freemarker.model.FrontChannelLogoutBean.class,
+        org.keycloak.forms.login.freemarker.model.LogoutConfirmBean.class,
+        org.keycloak.forms.login.freemarker.model.OAuthGrantBean.class,
+        org.keycloak.forms.login.freemarker.model.RealmBean.class,
+        org.keycloak.forms.login.freemarker.model.RecoveryAuthnCodeInputLoginBean.class,
+        org.keycloak.forms.login.freemarker.model.RecoveryAuthnCodesBean.class,
+        org.keycloak.forms.login.freemarker.model.TotpLoginBean.class,
+        org.keycloak.forms.login.freemarker.model.IdentityProviderBean.class,
+        org.keycloak.forms.login.freemarker.model.AbstractUserProfileBean.class,
+        org.keycloak.forms.login.freemarker.model.EmailBean.class,
+        org.keycloak.forms.login.freemarker.model.IdpReviewProfileBean.class,
+        org.keycloak.forms.login.freemarker.model.LoginBean.class,
+        org.keycloak.forms.login.freemarker.model.ProfileBean.class,
+        org.keycloak.forms.login.freemarker.model.RegisterBean.class,
+        org.keycloak.forms.login.freemarker.model.TotpBean.class,
+        org.keycloak.forms.login.freemarker.model.VerifyProfileBean.class,
+        org.keycloak.forms.login.freemarker.model.X509ConfirmBean.class,
+        org.keycloak.forms.login.freemarker.model.AuthenticationContextBean.class,
+        org.keycloak.forms.login.freemarker.model.UrlBean.class,
+        org.keycloak.theme.beans.LocaleBean.class,
+        org.keycloak.theme.beans.MessageBean.class,
+        org.keycloak.theme.beans.MessagesPerFieldBean.class,
+
+        org.keycloak.models.credential.dto.OTPSecretData.class,
+        org.keycloak.models.credential.dto.PasswordCredentialData.class,
+        org.keycloak.models.credential.dto.PasswordSecretData.class,
+        org.keycloak.models.credential.dto.RecoveryAuthnCodesCredentialData.class,
+        org.keycloak.models.credential.dto.RecoveryAuthnCodesSecretData.class,
+        org.keycloak.models.credential.dto.OTPCredentialData.class,
+        org.keycloak.models.credential.dto.RecoveryAuthnCodeRepresentation.class,
+
+        org.keycloak.protocol.oidc.rar.model.IntermediaryScopeRepresentation.class,
+        org.keycloak.authorization.protection.resource.UmaResourceRepresentation.class
 })
 public class RegisterForReflection {
 }
