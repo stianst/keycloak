@@ -1,5 +1,9 @@
 package org.keycloak.quarkus.runtime;
 
+import org.keycloak.admin.ui.rest.AdminExtResource;
+import org.keycloak.admin.ui.rest.BruteForceUsersResource;
+import org.keycloak.admin.ui.rest.EffectiveRoleMappingResource;
+import org.keycloak.admin.ui.rest.RoleMappingResource;
 import org.keycloak.authorization.AuthorizationService;
 import org.keycloak.authorization.admin.PolicyResourceService;
 import org.keycloak.authorization.admin.PolicyService;
@@ -239,6 +243,15 @@ import org.keycloak.services.resources.admin.info.ServerInfoAdminResource;
         UsersResource.class,
         WelcomeResource.class,
         ServerInfoAdminResource.class,
+        AdminConsole.WhoAmI.class,
+
+        AdminExtResource.class,
+        AuthenticationManagementResource.class,
+        BruteForceUsersResource.class,
+        EffectiveRoleMappingResource.class,
+        org.keycloak.admin.ui.rest.GroupsResource.class,
+        RoleMappingResource.class,
+        SessionResource.class,
         
         org.keycloak.email.freemarker.beans.AdminEventBean.class,
         org.keycloak.email.freemarker.beans.EventBean.class,

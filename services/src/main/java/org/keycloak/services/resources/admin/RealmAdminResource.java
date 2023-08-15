@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.FormParam;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
@@ -701,8 +702,8 @@ public class RealmAdminResource {
     @Produces(MediaType.APPLICATION_JSON)
     public List<EventRepresentation> getEvents(@QueryParam("type") List<String> types, @QueryParam("client") String client,
                                                @QueryParam("user") String user, @QueryParam("dateFrom") String dateFrom, @QueryParam("dateTo") String dateTo,
-                                               @QueryParam("ipAddress") String ipAddress, @QueryParam("first") Integer firstResult,
-                                               @QueryParam("max") Integer maxResults) {
+                                               @QueryParam("ipAddress") String ipAddress, @DefaultValue("-1") @QueryParam("first") int firstResult,
+                                               @DefaultValue("-1") @QueryParam("max") int maxResults) {
         auth.realm().requireViewEvents();
 
         EventStoreProvider eventStore = session.getProvider(EventStoreProvider.class);
@@ -749,10 +750,10 @@ public class RealmAdminResource {
         if (ipAddress != null) {
             query.ipAddress(ipAddress);
         }
-        if (firstResult != null) {
+        if (firstResult != -1) {
             query.firstResult(firstResult);
         }
-        if (maxResults != null) {
+        if (maxResults != -1) {
             query.maxResults(maxResults);
         } else {
             query.maxResults(Constants.DEFAULT_MAX_RESULTS);
@@ -785,8 +786,8 @@ public class RealmAdminResource {
     public List<AdminEventRepresentation> getEvents(@QueryParam("operationTypes") List<String> operationTypes, @QueryParam("authRealm") String authRealm, @QueryParam("authClient") String authClient,
                                                     @QueryParam("authUser") String authUser, @QueryParam("authIpAddress") String authIpAddress,
                                                     @QueryParam("resourcePath") String resourcePath, @QueryParam("dateFrom") String dateFrom,
-                                                    @QueryParam("dateTo") String dateTo, @QueryParam("first") Integer firstResult,
-                                                    @QueryParam("max") Integer maxResults,
+                                                    @QueryParam("dateTo") String dateTo, @DefaultValue("-1") @QueryParam("first") int firstResult,
+                                                    @DefaultValue("-1") @QueryParam("max") int maxResults,
                                                     @QueryParam("resourceTypes") List<String> resourceTypes) {
         auth.realm().requireViewEvents();
 
@@ -853,10 +854,10 @@ public class RealmAdminResource {
             query.toTime(to);
         }
 
-        if (firstResult != null) {
+        if (firstResult != -1) {
             query.firstResult(firstResult);
         }
-        if (maxResults != null) {
+        if (maxResults != -1) {
             query.maxResults(maxResults);
         } else {
             query.maxResults(Constants.DEFAULT_MAX_RESULTS);
@@ -1066,12 +1067,12 @@ public class RealmAdminResource {
     @Path("partial-export")
     @Produces(MediaType.APPLICATION_JSON)
     @POST
-    public Response partialExport(@QueryParam("exportGroupsAndRoles") Boolean exportGroupsAndRoles,
-                                                     @QueryParam("exportClients") Boolean exportClients) {
+    public Response partialExport(@QueryParam("exportGroupsAndRoles") boolean exportGroupsAndRoles,
+                                                     @QueryParam("exportClients") boolean exportClients) {
         auth.realm().requireViewRealm();
 
-        boolean groupsAndRolesExported = exportGroupsAndRoles != null && exportGroupsAndRoles;
-        boolean clientsExported = exportClients != null && exportClients;
+        boolean groupsAndRolesExported = exportGroupsAndRoles;
+        boolean clientsExported = exportClients;
 
         if (groupsAndRolesExported) {
             auth.groups().requireList();

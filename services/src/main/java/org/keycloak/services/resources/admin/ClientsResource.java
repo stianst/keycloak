@@ -106,8 +106,8 @@ public class ClientsResource {
                                                  @QueryParam("viewableOnly") @DefaultValue("false") boolean viewableOnly,
                                                  @QueryParam("search") @DefaultValue("false") boolean search,
                                                  @QueryParam("q") String searchQuery,
-                                                 @QueryParam("first") Integer firstResult,
-                                                 @QueryParam("max") Integer maxResults) {
+                                                 @DefaultValue("-1") @QueryParam("first") int firstResult,
+                                                 @DefaultValue("-1") @QueryParam("max") int maxResults) {
         auth.clients().requireList();
 
         boolean canView = auth.clients().canView();
