@@ -7,7 +7,10 @@ public class ResourcesProcessor {
 
     @BuildStep
     NativeImageResourcePatternsBuildItem nativeImageResourceBuildItem() {
-        return NativeImageResourcePatternsBuildItem.builder().includePatterns("theme/.*").build();
+        return NativeImageResourcePatternsBuildItem.builder()
+                .includePatterns("theme/.*")
+                .includePatterns("org/keycloak/protocol/oidc/endpoints/.*.html")
+                .build();
     }
 
 }
