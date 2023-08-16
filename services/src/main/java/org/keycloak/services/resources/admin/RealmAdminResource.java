@@ -1057,6 +1057,11 @@ public class RealmAdminResource {
                 .success();
     }
 
+    @Path("attack-detection")
+    public AttackDetectionResource getAttackDetection() {
+        return new AttackDetectionResource(session, auth, adminEvent);
+    }
+
     /**
      * Partial export of existing realm into a JSON file.
      *

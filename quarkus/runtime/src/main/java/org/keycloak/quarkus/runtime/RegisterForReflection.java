@@ -100,6 +100,7 @@ import org.keycloak.services.resources.account.resources.ResourcesService;
 import org.keycloak.services.resources.admin.AdminConsole;
 import org.keycloak.services.resources.admin.AdminCorsPreflightService;
 import org.keycloak.services.resources.admin.AdminRoot;
+import org.keycloak.services.resources.admin.AttackDetectionResource;
 import org.keycloak.services.resources.admin.AuthenticationManagementResource;
 import org.keycloak.services.resources.admin.ClientAttributeCertificateResource;
 import org.keycloak.services.resources.admin.ClientInitialAccessResource;
@@ -257,6 +258,7 @@ import org.keycloak.services.resources.admin.info.ServerInfoAdminResource;
         SessionResource.class,
         KeyResource.class,
         ClientProfilesResource.class,
+        AttackDetectionResource.class,
 
         org.keycloak.admin.ui.rest.AdminExtResource.class,
         org.keycloak.admin.ui.rest.AdminExtProvider.class,
