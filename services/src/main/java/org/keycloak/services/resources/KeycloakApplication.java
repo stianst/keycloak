@@ -18,7 +18,10 @@ package org.keycloak.services.resources;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.jboss.logging.Logger;
+import org.keycloak.BasicParamConverterProvider;
+import org.keycloak.BooleanParamConverter;
 import org.keycloak.Config;
+import org.keycloak.IntegerParamConverter;
 import org.keycloak.common.Profile;
 import org.keycloak.common.crypto.CryptoIntegration;
 import org.keycloak.common.util.Resteasy;
@@ -110,6 +113,7 @@ public class KeycloakApplication extends Application {
 
             singletons.add(new ObjectMapperResolver());
             singletons.add(new WelcomeResource());
+            singletons.add(new BasicParamConverterProvider());
 
             platform.onStartup(this::startup);
             platform.onShutdown(this::shutdown);

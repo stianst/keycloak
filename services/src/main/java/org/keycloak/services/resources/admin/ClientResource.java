@@ -16,6 +16,7 @@
  */
 package org.keycloak.services.resources.admin;
 
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.core.Response.Status;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.annotations.cache.NoCache;
@@ -511,11 +512,8 @@ public class ClientResource {
     @GET
     @NoCache
     @Produces(MediaType.APPLICATION_JSON)
-    public Stream<UserSessionRepresentation> getUserSessions(@QueryParam("first") Integer firstResult, @QueryParam("max") Integer maxResults) {
+    public Stream<UserSessionRepresentation> getUserSessions(@DefaultValue("-1") @QueryParam("first") int firstResult, @DefaultValue("-1") @QueryParam("max") int maxResults) {
         auth.clients().requireView(client);
-
-        firstResult = firstResult != null ? firstResult : -1;
-        maxResults = maxResults != null ? maxResults : Constants.DEFAULT_MAX_RESULTS;
         return session.sessions().getUserSessionsStream(client.getRealm(), client, firstResult, maxResults)
                 .map(ModelToRepresentation::toRepresentation);
     }

@@ -1,5 +1,9 @@
 package org.keycloak.quarkus.runtime;
 
+import org.keycloak.BasicParamConverterProvider;
+import org.keycloak.BooleanParamConverter;
+import org.keycloak.IntegerParamConverter;
+import org.keycloak.admin.ui.rest.AdminExtProvider;
 import org.keycloak.admin.ui.rest.AdminExtResource;
 import org.keycloak.admin.ui.rest.BruteForceUsersResource;
 import org.keycloak.admin.ui.rest.EffectiveRoleMappingResource;
@@ -63,6 +67,7 @@ import org.keycloak.representations.idm.ClientPolicyConditionConfigurationRepres
 import org.keycloak.representations.idm.ClientPolicyConditionRepresentation;
 import org.keycloak.representations.idm.ClientPolicyExecutorRepresentation;
 import org.keycloak.representations.idm.ClientProfilesRepresentation;
+import org.keycloak.representations.idm.ErrorRepresentation;
 import org.keycloak.representations.idm.OAuth2ErrorRepresentation;
 import org.keycloak.representations.idm.PublishedRealmRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
@@ -98,6 +103,7 @@ import org.keycloak.services.resources.admin.AdminRoot;
 import org.keycloak.services.resources.admin.AuthenticationManagementResource;
 import org.keycloak.services.resources.admin.ClientAttributeCertificateResource;
 import org.keycloak.services.resources.admin.ClientInitialAccessResource;
+import org.keycloak.services.resources.admin.ClientProfilesResource;
 import org.keycloak.services.resources.admin.ClientRegistrationPolicyResource;
 import org.keycloak.services.resources.admin.ClientResource;
 import org.keycloak.services.resources.admin.ClientRoleMappingsResource;
@@ -111,6 +117,7 @@ import org.keycloak.services.resources.admin.GroupResource;
 import org.keycloak.services.resources.admin.GroupsResource;
 import org.keycloak.services.resources.admin.IdentityProviderResource;
 import org.keycloak.services.resources.admin.IdentityProvidersResource;
+import org.keycloak.services.resources.admin.KeyResource;
 import org.keycloak.services.resources.admin.ProtocolMappersResource;
 import org.keycloak.services.resources.admin.RealmAdminResource;
 import org.keycloak.services.resources.admin.RealmLocalizationResource;
@@ -120,6 +127,7 @@ import org.keycloak.services.resources.admin.RoleContainerResource;
 import org.keycloak.services.resources.admin.RoleMapperResource;
 import org.keycloak.services.resources.admin.ScopeMappedClientResource;
 import org.keycloak.services.resources.admin.ScopeMappedResource;
+import org.keycloak.services.resources.admin.UserProfileResource;
 import org.keycloak.services.resources.admin.UserResource;
 import org.keycloak.services.resources.admin.UsersResource;
 import org.keycloak.services.resources.admin.info.ServerInfoAdminResource;
@@ -164,7 +172,8 @@ import org.keycloak.services.resources.admin.info.ServerInfoAdminResource;
         TokenMetadataRepresentation.class,
         UserInfo.class,
         VersionRepresentation.class,
-        
+        ErrorRepresentation.class,
+
         AbstractSecuredLocalService.class,
         AccountConsole.class,
         AccountCredentialResource.class,
@@ -244,15 +253,19 @@ import org.keycloak.services.resources.admin.info.ServerInfoAdminResource;
         WelcomeResource.class,
         ServerInfoAdminResource.class,
         AdminConsole.WhoAmI.class,
-
-        AdminExtResource.class,
-        AuthenticationManagementResource.class,
-        BruteForceUsersResource.class,
-        EffectiveRoleMappingResource.class,
-        org.keycloak.admin.ui.rest.GroupsResource.class,
-        RoleMappingResource.class,
+        UserProfileResource.class,
         SessionResource.class,
-        
+        KeyResource.class,
+        ClientProfilesResource.class,
+
+        org.keycloak.admin.ui.rest.AdminExtResource.class,
+        org.keycloak.admin.ui.rest.AdminExtProvider.class,
+        org.keycloak.admin.ui.rest.AuthenticationManagementResource.class,
+        org.keycloak.admin.ui.rest.BruteForceUsersResource.class,
+        org.keycloak.admin.ui.rest.EffectiveRoleMappingResource.class,
+        org.keycloak.admin.ui.rest.GroupsResource.class,
+        org.keycloak.admin.ui.rest.RoleMappingResource.class,
+
         org.keycloak.email.freemarker.beans.AdminEventBean.class,
         org.keycloak.email.freemarker.beans.EventBean.class,
         org.keycloak.email.freemarker.beans.ProfileBean.class,
@@ -290,7 +303,9 @@ import org.keycloak.services.resources.admin.info.ServerInfoAdminResource;
         org.keycloak.models.credential.dto.RecoveryAuthnCodeRepresentation.class,
 
         org.keycloak.protocol.oidc.rar.model.IntermediaryScopeRepresentation.class,
-        org.keycloak.authorization.protection.resource.UmaResourceRepresentation.class
+        org.keycloak.authorization.protection.resource.UmaResourceRepresentation.class,
+
+        BasicParamConverterProvider.class
 })
 public class RegisterForReflection {
 }

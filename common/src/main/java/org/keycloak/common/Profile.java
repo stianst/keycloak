@@ -41,7 +41,7 @@ import java.util.stream.Stream;
 public class Profile {
 
     public enum Feature {
-        AUTHORIZATION("Authorization Service", Type.DEFAULT),
+        AUTHORIZATION("Authorization Service", Type.DISABLED_BY_DEFAULT),
 
         ACCOUNT_API("Account Management REST API", Type.DEFAULT),
         ACCOUNT2("Account Management Console version 2", Type.DEFAULT, Feature.ACCOUNT_API),
