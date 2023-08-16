@@ -100,7 +100,6 @@ public class InfinispanUserSessionProvider implements UserSessionProvider {
         UserSessionAdapter adapter = wrap(realm, entity, false);
         adapter.setPersistenceState(persistenceState);
         sessionCache.put(id, entity);
-        System.out.println("Adding session " + id);
         return adapter;
     }
 
@@ -141,14 +140,7 @@ public class InfinispanUserSessionProvider implements UserSessionProvider {
     }
 
     private UserSessionEntity getUserSessionEntity(RealmModel realm, String id, boolean offline) {
-        System.out.println("Getting session " + id);
         UserSessionEntity entity = sessionCache.get(id);
-        if (entity == null) {
-            System.out.println("Session not found");
-            for (String k : sessionCache.keySet()) {
-                System.out.println("exists: " + k);
-            }
-        }
         if (entity == null || !entity.getRealmId().equals(realm.getId())) return null;
         return entity;
     }

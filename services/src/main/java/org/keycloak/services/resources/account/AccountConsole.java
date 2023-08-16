@@ -22,6 +22,7 @@ import org.keycloak.authentication.requiredactions.DeleteAccount;
 import org.keycloak.common.Profile;
 import org.keycloak.common.Version;
 import org.keycloak.events.EventStoreProvider;
+import org.keycloak.forms.login.freemarker.model.RealmBean;
 import org.keycloak.models.AccountRoles;
 import org.keycloak.models.ClientModel;
 import org.keycloak.models.Constants;
@@ -97,8 +98,7 @@ public class AccountConsole {
             URI authUrl = uriInfo.getBaseUri();
             map.put("authUrl", authUrl.getPath().endsWith("/") ? authUrl : authUrl + "/");
             map.put("baseUrl", accountBaseUrl);
-
-            map.put("realm", realm);
+            map.put("realm", new RealmBean(realm));
             map.put("clientId", Constants.ACCOUNT_CONSOLE_CLIENT_ID);
             map.put("resourceUrl", Urls.themeRoot(authUrl).getPath() + "/" + Constants.ACCOUNT_MANAGEMENT_CLIENT_ID + "/" + theme.getName());
             map.put("resourceCommonUrl", Urls.themeRoot(adminBaseUri).getPath() + "/common/keycloak");
