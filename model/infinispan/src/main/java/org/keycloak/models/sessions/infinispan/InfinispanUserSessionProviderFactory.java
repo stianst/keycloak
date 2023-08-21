@@ -41,14 +41,10 @@ public class InfinispanUserSessionProviderFactory implements UserSessionProvider
     public static final String PROVIDER_ID = "infinispan";
 
     protected final Map<String, UserSessionEntity> sessionCache = new ConcurrentHashMap<>();
-    protected final Map<String, UserSessionEntity> offlineSessionCache = new ConcurrentHashMap<>();
-    protected final Map<UUID, AuthenticatedClientSessionEntity> clientSessionCache = new ConcurrentHashMap<>();
-    protected final Map<UUID, AuthenticatedClientSessionEntity> offlineClientSessionCache = new ConcurrentHashMap<>();
-
 
     @Override
     public InfinispanUserSessionProvider create(KeycloakSession session) {
-        return new InfinispanUserSessionProvider(session, sessionCache, offlineSessionCache, clientSessionCache, offlineClientSessionCache);
+        return new InfinispanUserSessionProvider(session, sessionCache);
     }
 
     @Override

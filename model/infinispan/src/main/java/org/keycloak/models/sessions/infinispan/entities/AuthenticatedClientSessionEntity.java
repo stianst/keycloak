@@ -46,9 +46,9 @@ public class AuthenticatedClientSessionEntity extends SessionEntity {
     private String currentRefreshToken;
     private int currentRefreshTokenUseCount;
 
-    private final UUID id;
+    private final String id;
 
-    public AuthenticatedClientSessionEntity(UUID id) {
+    public AuthenticatedClientSessionEntity(String id) {
         this.id = id;
     }
 
@@ -130,7 +130,7 @@ public class AuthenticatedClientSessionEntity extends SessionEntity {
         this.currentRefreshTokenUseCount = currentRefreshTokenUseCount;
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 

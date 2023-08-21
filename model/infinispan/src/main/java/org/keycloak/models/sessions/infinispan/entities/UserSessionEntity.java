@@ -22,6 +22,7 @@ import org.keycloak.models.UserSessionModel;
 
 import java.util.Map;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -65,7 +66,7 @@ public class UserSessionEntity extends SessionEntity {
 
     private Map<String, String> notes = new ConcurrentHashMap<>();
 
-    private AuthenticatedClientSessionStore authenticatedClientSessions = new AuthenticatedClientSessionStore();
+    private Map<String, AuthenticatedClientSessionEntity> authenticatedClientSessions = new ConcurrentHashMap<>();
 
     public String getUser() {
         return user;
@@ -131,13 +132,10 @@ public class UserSessionEntity extends SessionEntity {
         this.notes = notes;
     }
 
-    public AuthenticatedClientSessionStore getAuthenticatedClientSessions() {
+    public Map<String, AuthenticatedClientSessionEntity> getAuthenticatedClientSessions() {
         return authenticatedClientSessions;
     }
 
-    public void setAuthenticatedClientSessions(AuthenticatedClientSessionStore authenticatedClientSessions) {
-        this.authenticatedClientSessions = authenticatedClientSessions;
-    }
 
     public UserSessionModel.State getState() {
         return state;

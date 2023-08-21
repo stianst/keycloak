@@ -30,6 +30,9 @@ import org.keycloak.models.sessions.infinispan.entities.AuthenticatedClientSessi
 import org.keycloak.models.sessions.infinispan.entities.UserSessionEntity;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -43,21 +46,14 @@ public class InfinispanUserSessionProvider implements UserSessionProvider {
     protected final KeycloakSession session;
 
     protected final Map<String, UserSessionEntity> sessionCache;
-    protected final Map<String, UserSessionEntity> offlineSessionCache;
-    protected final Map<UUID, AuthenticatedClientSessionEntity> clientSessionCache;
-    protected final Map<UUID, AuthenticatedClientSessionEntity> offlineClientSessionCache;
+    protected final Map<String, UserSessionEntity> requestSessionCache;
 
     public InfinispanUserSessionProvider(KeycloakSession session,
-                                         Map<String, UserSessionEntity> sessionCache,
-                                         Map<String, UserSessionEntity> offlineSessionCache,
-                                         Map<UUID, AuthenticatedClientSessionEntity> clientSessionCache,
-                                         Map<UUID, AuthenticatedClientSessionEntity> offlineClientSessionCache) {
+                                         Map<String, UserSessionEntity> sessionCache) {
         this.session = session;
 
         this.sessionCache = sessionCache;
-        this.clientSessionCache = clientSessionCache;
-        this.offlineSessionCache = offlineSessionCache;
-        this.offlineClientSessionCache = offlineClientSessionCache;
+        this.requestSessionCache = new HashMap<>();
     }
 
     @Override
@@ -67,7 +63,8 @@ public class InfinispanUserSessionProvider implements UserSessionProvider {
 
     @Override
     public AuthenticatedClientSessionModel createClientSession(RealmModel realm, ClientModel client, UserSessionModel userSession) {
-        final UUID clientSessionId = UUID.randomUUID();
+        final String clientSessionId = UUID.randomUUID().toString();
+
         AuthenticatedClientSessionEntity entity = new AuthenticatedClientSessionEntity(clientSessionId);
         entity.setRealmId(realm.getId());
         entity.setClientId(client.getId());
@@ -79,11 +76,13 @@ public class InfinispanUserSessionProvider implements UserSessionProvider {
         }
 
         AuthenticatedClientSessionAdapter adapter = new AuthenticatedClientSessionAdapter(session, this, entity, client, userSession, false);
-        clientSessionCache.put(clientSessionId, entity);
-
-        sessionCache.get(userSession.getId()).getAuthenticatedClientSessions().put(client.getId(), clientSessionId);
+        getEntity(userSession.getId()).getAuthenticatedClientSessions().put(clientSessionId, entity);
 
         return adapter;
+    }
+
+    private UserSessionEntity getEntity(String sessionId) {
+        return sessionCache.containsKey(sessionId) ? sessionCache.get(sessionId) : requestSessionCache.get(sessionId);
     }
 
     @Override
@@ -99,7 +98,14 @@ public class InfinispanUserSessionProvider implements UserSessionProvider {
 
         UserSessionAdapter adapter = wrap(realm, entity, false);
         adapter.setPersistenceState(persistenceState);
-        sessionCache.put(id, entity);
+        if (persistenceState.equals(UserSessionModel.SessionPersistenceState.TRANSIENT)) {
+            requestSessionCache.put(id, entity);
+        } else {
+            sessionCache.put(id, entity);
+        }
+
+
+
         return adapter;
     }
 
@@ -126,7 +132,7 @@ public class InfinispanUserSessionProvider implements UserSessionProvider {
 
     protected UserSessionAdapter getUserSession(RealmModel realm, String id, boolean offline) {
 
-        UserSessionEntity userSessionEntityFromCache = getUserSessionEntity(realm, id, offline);
+        UserSessionEntity userSessionEntityFromCache = getEntity(id);
         if (userSessionEntityFromCache != null) {
             return wrap(realm, userSessionEntityFromCache, offline);
         }
@@ -139,15 +145,9 @@ public class InfinispanUserSessionProvider implements UserSessionProvider {
         return null;
     }
 
-    private UserSessionEntity getUserSessionEntity(RealmModel realm, String id, boolean offline) {
-        UserSessionEntity entity = sessionCache.get(id);
-        if (entity == null || !entity.getRealmId().equals(realm.getId())) return null;
-        return entity;
-    }
-
     @Override
     public AuthenticatedClientSessionAdapter getClientSession(UserSessionModel userSession, ClientModel client, String clientSessionId, boolean offline) {
-        AuthenticatedClientSessionEntity entity = clientSessionCache.get(UUID.fromString(clientSessionId));
+        AuthenticatedClientSessionEntity entity = getEntity(userSession.getId()).getAuthenticatedClientSessions().get(clientSessionId);
         return entity != null ? wrap(userSession, client, entity, false) : null;
     }
 
@@ -195,7 +195,12 @@ public class InfinispanUserSessionProvider implements UserSessionProvider {
 
     @Override
     public void removeUserSession(RealmModel realm, UserSessionModel session) {
+        removeUserSession(session.getId());
+    }
 
+    private void removeUserSession(String id) {
+        sessionCache.remove(id);
+        requestSessionCache.remove(id);
     }
 
     @Override
@@ -282,15 +287,6 @@ public class InfinispanUserSessionProvider implements UserSessionProvider {
 
     AuthenticatedClientSessionAdapter wrap(UserSessionModel userSession, ClientModel client, AuthenticatedClientSessionEntity entity, boolean offline) {
         return entity != null ? new AuthenticatedClientSessionAdapter(session,this, entity, client, userSession, offline) : null;
-    }
-
-    UserSessionEntity getUserSessionEntity(RealmModel realm, UserSessionModel userSession, boolean offline) {
-        if (userSession instanceof UserSessionAdapter) {
-            if (!userSession.getRealm().equals(realm)) return null;
-            return ((UserSessionAdapter) userSession).getEntity();
-        } else {
-            return getUserSessionEntity(realm, userSession.getId(), offline);
-        }
     }
 
 

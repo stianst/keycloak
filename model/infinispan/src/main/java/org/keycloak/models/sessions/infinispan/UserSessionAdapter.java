@@ -23,6 +23,7 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.UserSessionModel;
+import org.keycloak.models.sessions.infinispan.entities.AuthenticatedClientSessionEntity;
 import org.keycloak.models.sessions.infinispan.entities.AuthenticatedClientSessionStore;
 import org.keycloak.models.sessions.infinispan.entities.UserSessionEntity;
 
@@ -32,6 +33,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -66,17 +68,16 @@ public class UserSessionAdapter implements UserSessionModel {
 
     @Override
     public Map<String, AuthenticatedClientSessionModel> getAuthenticatedClientSessions() {
-        AuthenticatedClientSessionStore clientSessionEntities = entity.getAuthenticatedClientSessions();
         Map<String, AuthenticatedClientSessionModel> result = new HashMap<>();
 
         List<String> removedClientUUIDS = new LinkedList<>();
 
-        if (clientSessionEntities != null) {
-            clientSessionEntities.forEach((String key, UUID value) -> {
+        if (entity.getAuthenticatedClientSessions() != null) {
+            entity.getAuthenticatedClientSessions().keySet().forEach(key -> {
                 // Check if client still exists
                 ClientModel client = realm.getClientById(key);
                 if (client != null) {
-                    final AuthenticatedClientSessionAdapter clientSession = provider.getClientSession(this, client, value.toString(), offline);
+                    final AuthenticatedClientSessionAdapter clientSession = provider.getClientSession(this, client, key, offline);
                     if (clientSession != null) {
                         result.put(key, clientSession);
                     }
@@ -93,21 +94,18 @@ public class UserSessionAdapter implements UserSessionModel {
 
     @Override
     public AuthenticatedClientSessionModel getAuthenticatedClientSessionByClient(String clientUUID) {
-        AuthenticatedClientSessionStore clientSessionEntities = entity.getAuthenticatedClientSessions();
-        final UUID clientSessionId = clientSessionEntities.get(clientUUID);
+        Optional<AuthenticatedClientSessionEntity> first =
+                entity.getAuthenticatedClientSessions().values().stream().filter(s -> s.getClientId().equals(clientUUID)).findFirst();
 
-        if (clientSessionId == null) {
+        if (first.isPresent()) {
+            ClientModel client = realm.getClientById(clientUUID);
+            if (client == null) {
+                return null;
+            }
+            return provider.getClientSession(this, client, first.get().getId(), offline);
+        } else {
             return null;
         }
-
-        ClientModel client = realm.getClientById(clientUUID);
-
-        if (client != null) {
-            return provider.getClientSession(this, client, clientSessionId, offline);
-        }
-
-        removeAuthenticatedClientSessions(Collections.singleton(clientUUID));
-        return null;
     }
 
     private static final int MINIMUM_INACTIVE_CLIENT_SESSIONS_TO_CLEANUP = 5;
