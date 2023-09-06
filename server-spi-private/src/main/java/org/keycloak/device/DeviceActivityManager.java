@@ -61,8 +61,12 @@ public class DeviceActivityManager {
      * @param session the keycloak session
      */
     public static void attachDevice(UserSessionModel userSession, KeycloakSession session) {
-        DeviceRepresentation current = session.getProvider(DeviceRepresentationProvider.class).deviceRepresentation();
+        DeviceRepresentationProvider provider = session.getProvider(DeviceRepresentationProvider.class);
+        if (provider == null) {
+            return;
+        }
 
+        DeviceRepresentation current = provider.deviceRepresentation();
         if (current != null) {
             try {
                 userSession.setNote(DEVICE_NOTE, Base64.encodeBytes(JsonSerialization.writeValueAsBytes(current)));
