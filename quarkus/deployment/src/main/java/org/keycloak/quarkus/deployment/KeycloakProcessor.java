@@ -47,6 +47,8 @@ import io.quarkus.vertx.http.deployment.FilterBuildItem;
 import io.quarkus.vertx.http.deployment.NonApplicationRootPathBuildItem;
 import io.quarkus.vertx.http.deployment.RouteBuildItem;
 import io.smallrye.config.ConfigValue;
+import jakarta.persistence.Entity;
+import jakarta.persistence.spi.PersistenceUnitTransactionType;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.jpa.boot.internal.ParsedPersistenceXmlDescriptor;
 import org.hibernate.jpa.boot.internal.PersistenceXmlParser;
@@ -69,13 +71,8 @@ import org.keycloak.common.util.StreamUtil;
 import org.keycloak.config.DatabaseOptions;
 import org.keycloak.config.SecurityOptions;
 import org.keycloak.config.StorageOptions;
-import org.keycloak.connections.jpa.DefaultJpaConnectionProviderFactory;
 import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.connections.jpa.JpaConnectionSpi;
-import org.keycloak.connections.jpa.updater.liquibase.LiquibaseJpaUpdaterProviderFactory;
-import org.keycloak.connections.jpa.updater.liquibase.conn.DefaultLiquibaseConnectionProvider;
-import org.keycloak.models.map.storage.jpa.JpaMapStorageProviderFactory;
-import org.keycloak.policy.BlacklistPasswordPolicyProviderFactory;
 import org.keycloak.protocol.ProtocolMapperSpi;
 import org.keycloak.protocol.oidc.mappers.DeployedScriptOIDCProtocolMapper;
 import org.keycloak.protocol.saml.mappers.DeployedScriptSAMLProtocolMapper;
@@ -102,20 +99,9 @@ import org.keycloak.representations.provider.ScriptProviderDescriptor;
 import org.keycloak.representations.provider.ScriptProviderMetadata;
 import org.keycloak.services.ServicesLogger;
 import org.keycloak.theme.ClasspathThemeProviderFactory;
-import org.keycloak.theme.ClasspathThemeResourceProviderFactory;
-import org.keycloak.theme.FolderThemeProviderFactory;
-import org.keycloak.theme.JarThemeProviderFactory;
 import org.keycloak.theme.ThemeResourceSpi;
-import org.keycloak.transaction.JBossJtaTransactionManagerLookup;
-import org.keycloak.url.DefaultHostnameProviderFactory;
-import org.keycloak.url.FixedHostnameProviderFactory;
-import org.keycloak.url.RequestHostnameProviderFactory;
 import org.keycloak.util.JsonSerialization;
-import org.keycloak.vault.FilesKeystoreVaultProviderFactory;
-import org.keycloak.vault.FilesPlainTextVaultProviderFactory;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.spi.PersistenceUnitTransactionType;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -166,21 +152,6 @@ class KeycloakProcessor {
     private static final Map<String, Function<ScriptProviderMetadata, ProviderFactory>> DEPLOYEABLE_SCRIPT_PROVIDERS = new HashMap<>();
     private static final String KEYCLOAK_SCRIPTS_JSON_PATH = "META-INF/keycloak-scripts.json";
 
-    private static final List<Class<? extends ProviderFactory>> IGNORED_PROVIDER_FACTORY = List.of(
-            JBossJtaTransactionManagerLookup.class,
-            DefaultJpaConnectionProviderFactory.class,
-            DefaultLiquibaseConnectionProvider.class,
-            FolderThemeProviderFactory.class,
-            LiquibaseJpaUpdaterProviderFactory.class,
-            DefaultHostnameProviderFactory.class,
-            FixedHostnameProviderFactory.class,
-            RequestHostnameProviderFactory.class,
-            FilesKeystoreVaultProviderFactory.class,
-            FilesPlainTextVaultProviderFactory.class,
-            BlacklistPasswordPolicyProviderFactory.class,
-            ClasspathThemeResourceProviderFactory.class,
-            JarThemeProviderFactory.class,
-            JpaMapStorageProviderFactory.class);
     public static final String QUARKUS_HEALTH_ROOT_PROPERTY = "quarkus.smallrye-health.root-path";
     public static final String QUARKUS_METRICS_PATH_PROPERTY = "quarkus.micrometer.export.prometheus.path";
     public static final String QUARKUS_DEFAULT_HEALTH_PATH = "health";
@@ -576,6 +547,7 @@ class KeycloakProcessor {
      * @param indexDependencyBuildItemBuildProducer
      */
     @BuildStep
+    @Consume(ConfigBuildItem.class)
     void index(BuildProducer<IndexDependencyBuildItem> indexDependencyBuildItemBuildProducer) {
         indexDependencyBuildItemBuildProducer.produce(new IndexDependencyBuildItem("org.liquibase", "liquibase-core"));
         indexDependencyBuildItemBuildProducer.produce(new IndexDependencyBuildItem("org.keycloak", "keycloak-services"));
@@ -705,10 +677,6 @@ class KeycloakProcessor {
             preConfiguredProviders.putAll(deployedScriptProviders);
 
             for (ProviderFactory factory : loadedFactories) {
-                if (IGNORED_PROVIDER_FACTORY.contains(factory.getClass())) {
-                    continue;
-                }
-
                 Config.Scope scope = Config.scope(spi.getName(), factory.getId());
 
                 if (isEnabled(factory, scope)) {

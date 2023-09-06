@@ -35,9 +35,12 @@ public class DefaultProviderLoader implements ProviderLoader {
     private KeycloakDeploymentInfo info;
     private ClassLoader classLoader;
 
+    private ProviderFactoryLoader providerFactoryLoader;
+
     public DefaultProviderLoader(KeycloakDeploymentInfo info, ClassLoader classLoader) {
         this.info = info;
         this.classLoader = classLoader;
+        this.providerFactoryLoader = new ProviderFactoryLoader(classLoader);
     }
 
     @Override
@@ -57,7 +60,7 @@ public class DefaultProviderLoader implements ProviderLoader {
     public List<ProviderFactory> load(Spi spi) {
         List<ProviderFactory> list = new LinkedList<>();
         if (info.hasServices()) {
-            for (ProviderFactory f : ServiceLoader.load(spi.getProviderFactoryClass(), classLoader)) {
+            for (ProviderFactory f : providerFactoryLoader.loadFactories(spi)) {
                 list.add(f);
             }
         }
