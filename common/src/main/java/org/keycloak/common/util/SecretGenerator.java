@@ -70,4 +70,8 @@ public class SecretGenerator {
         return buf;
     }
 
+    public long nextLong() {
+        return random.get().nextLong();
+    }
+
 }

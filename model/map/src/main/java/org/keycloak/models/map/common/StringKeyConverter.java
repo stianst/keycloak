@@ -16,6 +16,8 @@
  */
 package org.keycloak.models.map.common;
 
+import org.keycloak.common.util.SecretGenerator;
+
 import java.security.SecureRandom;
 import java.util.UUID;
 
@@ -104,14 +106,6 @@ public interface StringKeyConverter<K> {
 
         public static final ULongKey INSTANCE = new ULongKey();
 
-        /*
-         * The random number generator used by this class to create random
-         * based UUIDs. In a holder class to defer initialization until needed.
-         */
-        private static class Holder {
-            static final SecureRandom numberGenerator = new SecureRandom();
-        }
-
         @Override
         public String keyToString(Long key) {
             return Long.toUnsignedString(key);
@@ -124,7 +118,7 @@ public interface StringKeyConverter<K> {
 
         @Override
         public Long yieldNewUniqueKey() {
-            return Holder.numberGenerator.nextLong();
+            return SecretGenerator.getInstance().nextLong();
         }
     }
 
