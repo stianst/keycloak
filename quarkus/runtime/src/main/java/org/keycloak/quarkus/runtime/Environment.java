@@ -36,7 +36,9 @@ import io.smallrye.config.SmallRyeConfig;
 
 import org.apache.commons.lang3.SystemUtils;
 import org.keycloak.common.Profile;
+import org.keycloak.common.profile.ProfileConfigResolver;
 import org.keycloak.common.profile.PropertiesFileProfileConfigResolver;
+import org.keycloak.common.profile.PropertiesProfileConfigResolver;
 import org.keycloak.quarkus.runtime.configuration.PersistedConfigSource;
 
 public final class Environment {
@@ -249,9 +251,33 @@ public final class Environment {
         Profile profile = Profile.getInstance();
 
         if (profile == null) {
-            profile = Profile.configure(new QuarkusProfileConfigResolver(), new PropertiesFileProfileConfigResolver());
+            profile = Profile.configure(new NativeDisabledFeatures(), new QuarkusProfileConfigResolver(), new PropertiesFileProfileConfigResolver());
         }
+
 
         return profile;
     }
+
+    public static class NativeDisabledFeatures implements ProfileConfigResolver {
+
+        @Override
+        public Profile.ProfileName getProfileName() {
+            return null;
+        }
+
+        @Override
+        public FeatureConfig getFeatureConfig(Profile.Feature feature) {
+            switch (feature) {
+                case ADMIN_FINE_GRAINED_AUTHZ:
+                case SCRIPTS:
+                case DOCKER:
+                case KERBEROS:
+                case WEB_AUTHN:
+                    return FeatureConfig.DISABLED;
+                default:
+                    return FeatureConfig.UNCONFIGURED;
+            }
+        }
+    }
+
 }
