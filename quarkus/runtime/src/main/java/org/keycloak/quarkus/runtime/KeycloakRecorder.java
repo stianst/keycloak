@@ -70,9 +70,9 @@ public class KeycloakRecorder {
     }
 
     public void configureLiquibase(Map<String, List<String>> services) {
-        ServiceLocator locator = Scope.getCurrentScope().getServiceLocator();
-        if (locator instanceof FastServiceLocator)
-            ((FastServiceLocator) locator).initServices(services);
+//        ServiceLocator locator = Scope.getCurrentScope().getServiceLocator();
+//        if (locator instanceof FastServiceLocator)
+//            ((FastServiceLocator) locator).initServices(services);
     }
 
     public void configSessionFactory(

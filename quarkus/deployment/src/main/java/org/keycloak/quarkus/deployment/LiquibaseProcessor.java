@@ -41,6 +41,10 @@ class LiquibaseProcessor {
     @Record(ExecutionTime.STATIC_INIT)
     @BuildStep
     void configure(KeycloakRecorder recorder, List<JdbcDataSourceBuildItem> jdbcDataSources, CombinedIndexBuildItem indexBuildItem) {
+        if (true) {
+            return;
+        }
+
         DotName liquibaseServiceName = DotName.createSimple(LiquibaseService.class.getName());
         Map<String, List<String>> services = new HashMap<>();
         IndexView index = indexBuildItem.getIndex();
