@@ -19,7 +19,7 @@ package org.keycloak.theme;
 
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModelException;
-import org.owasp.html.Encoding;
+//import org.owasp.html.Encoding;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -44,8 +44,9 @@ public class KeycloakSanitizerMethod implements TemplateMethodModelEx {
 
         html = decodeHtmlFull(html);
 
-        String sanitized = KeycloakSanitizerPolicy.POLICY_DEFINITION.sanitize(html);
-        
+//        String sanitized = KeycloakSanitizerPolicy.POLICY_DEFINITION.sanitize(html);
+        String sanitized = html;
+
         return fixURLs(sanitized);
     }
 
@@ -58,7 +59,8 @@ public class KeycloakSanitizerMethod implements TemplateMethodModelEx {
         String decodedHtml;
 
         for (int i = 0; i < MAX_DECODING_COUNT; i++) {
-            decodedHtml = Encoding.decodeHtml(html);
+//            decodedHtml = Encoding.decodeHtml(html);
+            decodedHtml = html;
             if (decodedHtml.equals(html)) {
                 // HTML is decoded. We can return it
                 return html;
