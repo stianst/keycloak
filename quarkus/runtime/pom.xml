@@ -75,10 +75,12 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-jdbc-mssql</artifactId>
         </dependency>
+<!--
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-jdbc-oracle</artifactId>
         </dependency>
+-->
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-core</artifactId>
@@ -108,8 +110,12 @@
 
         <!-- CLI -->
         <dependency>
-            <groupId>info.picocli</groupId>
-            <artifactId>picocli</artifactId>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-picocli</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-security</artifactId>
         </dependency>
 
         <!-- Keycloak -->
@@ -439,14 +445,9 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.freemarker</groupId>
-            <artifactId>freemarker</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>*</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>io.quarkiverse.freemarker</groupId>
+            <artifactId>quarkus-freemarker</artifactId>
+            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -479,14 +480,8 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>*</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-apache-httpclient</artifactId>
         </dependency>
         <dependency>
             <groupId>org.infinispan</groupId>

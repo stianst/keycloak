@@ -80,6 +80,20 @@
         <module>tests</module>
     </modules>
 
+    <profiles>
+        <profile>
+            <id>native</id>
+            <activation>
+                <property>
+                    <name>native</name>
+                </property>
+            </activation>
+            <modules>
+                <module>server-native</module>
+            </modules>
+        </profile>
+    </profiles>
+
     <repositories>
         <repository>
             <id>central</id>
