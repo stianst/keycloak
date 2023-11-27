@@ -1,0 +1,20 @@
+name: Labeler
+on: 
+  pull_request_target:
+    types: closed
+
+jobs:
+  label:
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+    - run: |
+        echo ${{ github.pull_request.number }}
+        gh pr edit ${{ github.pull_request.number }} --add-label "merged"
+      if: github.repository	== 'keycloak/keycloak' && github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+      env:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
