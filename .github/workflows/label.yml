@@ -13,8 +13,11 @@ jobs:
 
     steps:
     - run: |
-        echo ${{ github.pull_request.number }}
+        echo "PR number: ${{ github.pull_request.number }}"
+        echo "Event: ${{ github.event_name }}"
+        echo "Action: ${{ github.event.action }}"
+        echo "Merged: ${{ github.event.pull_request.merged }}"
         gh pr edit ${{ github.pull_request.number }} --add-label "merged"
-      if: github.repository	== 'stianst/keycloak' && github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+#      if: github.repository	== 'stianst/keycloak' && github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
       env:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
