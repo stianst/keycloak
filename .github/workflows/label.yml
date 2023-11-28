@@ -51,6 +51,6 @@ jobs:
           echo "Issue:    $i"
           gh issue edit $ISSUE -R ${{ github.repository }} --add-label "$LABEL"
         done
-      #if: github.repository	== 'stianst/keycloak' && github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+      if: github.repository	== 'stianst/keycloak' && github.event_name == 'pull_request_target' && github.event.action == 'closed' && github.event.pull_request.merged == true
       env:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
