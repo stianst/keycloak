@@ -36,7 +36,7 @@ jobs:
         LABEL="release/$NEXT_RELEASE"
         echo "Label:      $LABEL"
 
-        gh api repos/$GITHUB_REPOSITORY/labels/$(echo $LABEL | sed 's|/|%2F|g') --silent 2>/dev/null || gh label create -R $GITHUB_REPOSITORY release/26.0.0 -c 0E8A16
+        gh api repos/$GITHUB_REPOSITORY/labels/$(echo $LABEL | sed 's|/|%2F|g') --silent 2>/dev/null || gh label create -R $GITHUB_REPOSITORY $LABEL -c 0E8A16
 
         echo ""
         echo "Updating issues:"
