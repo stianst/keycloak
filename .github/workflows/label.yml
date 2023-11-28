@@ -16,12 +16,6 @@ jobs:
       with:
         sparse-checkout: .github/scripts
     - run: |
-        echo "Repository: ${{ github.event.pull_request.number }}"
-        echo "Event: ${{ github.event_name }}"
-        echo "Action: ${{ github.event.action }}"
-        echo "Merged: ${{ github.event.pull_request.merged }}"
-        echo "Base REF: ${{ github.base_ref }}"
-
         PR_NUMBER="${{ github.event.pull_request.number }}"
 
         echo "Repository: $GITHUB_REPOSITORY"
