@@ -12,12 +12,20 @@ jobs:
       pull-requests: write
 
     steps:
+    - uses: actions/checkout@v4
+      with:
+        sparse-checkout: .github/scripts
     - run: |
         echo "PR number: ${{ github.event.pull_request.number }}"
         echo "Event: ${{ github.event_name }}"
         echo "Action: ${{ github.event.action }}"
         echo "Merged: ${{ github.event.pull_request.merged }}"
-        gh pr edit ${{ github.event.pull_request.number }} -R ${{ github.repository }} --add-label "merged"
+
+        ISSUES=$(.github/scripts/pr-find-issues.sh ${{ github.event.pull_request.number }} ${{ github.repository }})
+        for ISSUE in $ISSUES; do
+          echo "Issue: $i"
+          gh issue edit $ISSUE -R ${{ github.repository }} --add-label "merged"
+        done
 #      if: github.repository	== 'stianst/keycloak' && github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
       env:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
