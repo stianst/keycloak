@@ -17,16 +17,10 @@ jobs:
         sparse-checkout: .github/scripts
     - name: Add release labels 
       run: |
-        echo "${{ github.repository }}"
-        echo "${{ github.event_name }}"
-        echo "${{ github.event.action }}"
-        echo "${{ github.event.pull_request.merged }}"
-      
         PR_NUMBER="${{ github.event.pull_request.number }}"
 
-        echo "Repository: $GITHUB_REPOSITORY"
         echo "Base REF:   $GITHUB_BASE_REF"
-        echo "PR:         $PR_NUMBER"
+        echo "PR:         https://github.com/$GITHUB_REPOSITORY/pull/$PR_NUMBER"
 
         if [ "$GITHUB_BASE_REF" == "main" ]; then
           LAST_MAJOR=$(gh api /repos/$GITHUB_REPOSITORY/branches --paginate --jq .[].name | grep '^release/' | cut -d '/' -f 2 | cut -d '.' -f 1 | sort -n -r | head -n 1)
@@ -37,18 +31,15 @@ jobs:
           LAST_MICRO=$(gh api /repos/keycloak/keycloak/tags --jq .[].name | sort -n -r | grep $MAJOR_MINOR | head -n 1 | cut -d '.' -f 3)
           NEXT_MICRO=$(($LAST_MICRO + 1))
           NEXT_RELEASE="$MAJOR_MINOR.$NEXT_MICRO"
-        else
-          echo "Ignoring PR to $GITHUB_BASE_REF"
-          exit 0
         fi
 
         LABEL="release/$NEXT_RELEASE"
         echo "Label:      $LABEL"
         echo ""
 
+        echo "Updating issues:"
         ISSUES=$(.github/scripts/pr-find-issues.sh $PR_NUMBER $GITHUB_REPOSITORY)
         for ISSUE in $ISSUES; do
-          echo "Issue:    $i"
           gh issue edit $ISSUE -R ${{ github.repository }} --add-label "$LABEL"
         done
       if: github.repository	== 'stianst/keycloak' && github.event_name == 'pull_request_target' && github.event.action == 'closed' && github.event.pull_request.merged == true
