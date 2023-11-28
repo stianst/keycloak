@@ -17,15 +17,15 @@ jobs:
         sparse-checkout: .github/scripts
     - name: Add release labels 
       run: |
-        echo ${{ github.repository }}
-        echo ${{ github.event_name }}
-        echo ${{ github.event.action }}
-        echo ${{ github.event.pull_request.merged }}
+        echo "${{ github.repository }}"
+        echo "${{ github.event_name }}"
+        echo "${{ github.event.action }}"
+        echo "${{ github.event.pull_request.merged }}"
       
         PR_NUMBER="${{ github.event.pull_request.number }}"
 
         echo "Repository: $GITHUB_REPOSITORY"
-        echo "Base REF:   $GITHUB_BASE_REF
+        echo "Base REF:   $GITHUB_BASE_REF"
         echo "PR:         $PR_NUMBER"
 
         if [ "$GITHUB_BASE_REF" == "main" ]; then
