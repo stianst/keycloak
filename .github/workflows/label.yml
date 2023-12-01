@@ -45,7 +45,7 @@ jobs:
           echo ""
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Updating issues:"
-          echo "Updating issues:" >> $GITHUB_STEP_SUMMARY
+          echo "**Updating issues:**" >> $GITHUB_STEP_SUMMARY
           
           ISSUES=$(.github/scripts/pr-find-issues.sh "$PR_NUMBER" "$GITHUB_REPOSITORY")
           for ISSUE in $ISSUES; do
