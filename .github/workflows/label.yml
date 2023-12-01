@@ -20,7 +20,7 @@ jobs:
           PR_NUMBER="${{ github.event.pull_request.number }}"
           
           echo "Base REF:   $GITHUB_BASE_REF"
-          echo "**Branch:** [$GITHUB_BASE_REF](https://github.com/$GITHUB_REPOSITORY/tree/release/$GITHUB_BASE_REF)" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** [$GITHUB_BASE_REF](https://github.com/$GITHUB_REPOSITORY/tree/$GITHUB_BASE_REF)" >> $GITHUB_STEP_SUMMARY
           echo "PR:         https://github.com/$GITHUB_REPOSITORY/pull/$PR_NUMBER"
           echo "**PR:** [$PR_NUMBER](https://github.com/$GITHUB_REPOSITORY/pull/$PR_NUMBER)" >> $GITHUB_STEP_SUMMARY
           
