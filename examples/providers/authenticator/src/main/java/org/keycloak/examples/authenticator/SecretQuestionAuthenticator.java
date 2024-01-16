@@ -17,7 +17,6 @@
 
 package org.keycloak.examples.authenticator;
 
-import org.keycloak.http.HttpCookie;
 import org.keycloak.http.HttpResponse;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
@@ -96,7 +95,7 @@ public class SecretQuestionAuthenticator implements Authenticator, CredentialVal
 
     public void addCookie(AuthenticationFlowContext context, String name, String value, String path, String domain, String comment, int maxAge, boolean secure, boolean httpOnly) {
         HttpResponse response = context.getSession().getContext().getHttpResponse();
-        response.setCookieIfAbsent(new HttpCookie(1, name, value, path, domain, comment, maxAge, secure, httpOnly, null));
+//        response.setCookieIfAbsent(new HttpCookie(1, name, value, path, domain, comment, maxAge, secure, httpOnly, null));
     }
 
 
