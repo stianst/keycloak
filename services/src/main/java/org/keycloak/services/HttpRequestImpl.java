@@ -46,6 +46,7 @@ public class HttpRequestImpl implements HttpRequest {
         this.delegate = delegate;
     }
 
+
     @Override
     public String getHttpMethod() {
         if (delegate == null) {

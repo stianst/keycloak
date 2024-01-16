@@ -17,6 +17,8 @@
 
 package org.keycloak.http;
 
+import jakarta.ws.rs.core.NewCookie;
+
 /**
  * <p>Represents an out coming HTTP response.
  *
@@ -56,7 +58,7 @@ public interface HttpResponse {
      *
      * @param cookie the cookie
      */
-    void setCookieIfAbsent(HttpCookie cookie);
+    void setCookieIfAbsent(NewCookie cookie);
 
     /**
      * Adding cookies at the end of the transaction helps when retrying a transaction might add the

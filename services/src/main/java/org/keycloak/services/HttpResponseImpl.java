@@ -17,20 +17,18 @@
 
 package org.keycloak.services;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import jakarta.ws.rs.core.HttpHeaders;
-
-import org.keycloak.http.HttpCookie;
+import jakarta.ws.rs.core.NewCookie;
 import org.keycloak.http.HttpResponse;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakTransaction;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class HttpResponseImpl implements HttpResponse, KeycloakTransaction {
 
     private final org.jboss.resteasy.spi.HttpResponse delegate;
-    private Set<HttpCookie> cookies;
+    private Set<NewCookie> cookies;
     private boolean transactionActive;
     private boolean writeCookiesOnTransactionComplete;
 
@@ -62,7 +60,7 @@ public class HttpResponseImpl implements HttpResponse, KeycloakTransaction {
     }
 
     @Override
-    public void setCookieIfAbsent(HttpCookie cookie) {
+    public void setCookieIfAbsent(NewCookie cookie) {
         if (cookie == null) {
             throw new IllegalArgumentException("Cookie is null");
         }
@@ -77,7 +75,7 @@ public class HttpResponseImpl implements HttpResponse, KeycloakTransaction {
                 return;
             }
 
-            addHeader(HttpHeaders.SET_COOKIE, cookie.toHeaderValue());
+            delegate.addNewCookie(cookie);
         }
     }
 
@@ -147,8 +145,8 @@ public class HttpResponseImpl implements HttpResponse, KeycloakTransaction {
 
         // Ensure that cookies are only added when the transaction is complete, as otherwise cookies will be set for
         // error pages, or will be added twice when running retries.
-        for (HttpCookie cookie : cookies) {
-            addHeader(HttpHeaders.SET_COOKIE, cookie.toHeaderValue());
+        for (NewCookie cookie : cookies) {
+            delegate.addNewCookie(cookie);
         }
     }
 }
