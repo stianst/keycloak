@@ -793,9 +793,9 @@ public class AuthenticationManager {
         //builder.cookie(new NewCookie(cookieName, encoded, cookiePath, null, null, maxAge, secureOnly));// todo httponly , true);
 
         // With user-storage providers, user ID can contain special characters, which need to be encoded
-        String sessionCookieValue = realm.getName() + "/" + Encode.urlEncode(user.getId());
+        String sessionCookieValue = realm.getName() + "--" + Encode.urlEncode(user.getId());
         if (session != null) {
-            sessionCookieValue += "/" + session.getId();
+            sessionCookieValue += "--" + session.getId();
         }
         // THIS SHOULD NOT BE A HTTPONLY COOKIE!  It is used for OpenID Connect Iframe Session support!
         // Max age should be set to the max lifespan of the session as it's used to invalidate old-sessions on re-login
@@ -947,7 +947,7 @@ public class AuthenticationManager {
         Cookie sessionCookie = getCookie(request.getHttpHeaders().getCookies(), AuthenticationManager.KEYCLOAK_SESSION_COOKIE);
         if (sessionCookie != null) {
 
-            String[] split = sessionCookie.getValue().split("/");
+            String[] split = sessionCookie.getValue().split("--");
             if (split.length >= 3) {
                 String oldSessionId = split[2];
                 if (!oldSessionId.equals(userSession.getId())) {
@@ -999,7 +999,7 @@ public class AuthenticationManager {
             return null;
         }
 
-        String[] parts = cookie.getValue().split("/", 3);
+        String[] parts = cookie.getValue().split("--", 3);
         if (parts.length != 3) {
             logger.debugv("Cannot parse session value from: {0}", KEYCLOAK_SESSION_COOKIE);
             return null;

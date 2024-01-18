@@ -55,7 +55,7 @@ public final class QuarkusHttpResponse implements HttpResponse, KeycloakTransact
 
     @Override
     public void addHeader(String name, String value) {
-        addCookie(name, value);
+        requestContext.serverResponse().addResponseHeader(name, value);
     }
 
     @Override
@@ -79,7 +79,7 @@ public final class QuarkusHttpResponse implements HttpResponse, KeycloakTransact
                 return;
             }
 
-            addCookie(HttpHeaders.SET_COOKIE, RuntimeDelegate.getInstance().createHeaderDelegate(NewCookie.class).toString(cookie));
+            addCookie(cookie);
         }
     }
 
@@ -139,11 +139,12 @@ public final class QuarkusHttpResponse implements HttpResponse, KeycloakTransact
         // Ensure that cookies are only added when the transaction is complete, as otherwise cookies will be set for
         // error pages, or will be added twice when running retries.
         for (NewCookie cookie : cookies) {
-            addCookie(HttpHeaders.SET_COOKIE, RuntimeDelegate.getInstance().createHeaderDelegate(NewCookie.class).toString(cookie));
+            addCookie(cookie);
         }
     }
 
-    private void addCookie(String setCookie, String cookie) {
-        requestContext.serverResponse().addResponseHeader(setCookie, cookie);
+    private void addCookie(NewCookie cookie) {
+        String cookieValue = RuntimeDelegate.getInstance().createHeaderDelegate(NewCookie.class).toString(cookie);
+        requestContext.serverResponse().addResponseHeader(HttpHeaders.SET_COOKIE, cookieValue);
     }
 }

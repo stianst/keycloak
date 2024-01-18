@@ -64,7 +64,7 @@
 
         // If the client and origin from the event match the verified ones from the server, signal if the cookie has changed.
         if (clientId === init.clientId && origin === init.origin) {
-          const [, , cookieSessionState] = cookie.split("/");
+          const [, , cookieSessionState] = cookie.split("--");
           return sessionState === cookieSessionState ? "unchanged" : "changed";
         }
 

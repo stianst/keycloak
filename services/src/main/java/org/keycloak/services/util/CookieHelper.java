@@ -62,9 +62,22 @@ public class CookieHelper {
             sameSite = null;
         }
 
-        NewCookie newCookie = new NewCookie.Builder(name).path(path).domain(domain).comment(comment).maxAge(maxAge).secure(secure).httpOnly(httpOnly).sameSite(NewCookie.SameSite.LAX).value(value).build();
+        boolean secure_sameSite = sameSite == NewCookie.SameSite.NONE || secure; // when SameSite=None, Secure attribute must be set
 
         HttpResponse response = session.getContext().getHttpResponse();
+
+        NewCookie newCookie = new NewCookie.Builder(name)
+                .version(1)
+                .path(path)
+                .domain(domain)
+                .comment(comment)
+                .maxAge(maxAge)
+                .secure(secure_sameSite)
+                .httpOnly(httpOnly)
+                .sameSite(sameSite)
+                .value(value)
+                .build();
+
         response.setCookieIfAbsent(newCookie);
 
         // a workaround for browser in older Apple OSs – browsers ignore cookies with SameSite=None

@@ -17,7 +17,9 @@
 
 package org.keycloak.services;
 
+import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.NewCookie;
+import jakarta.ws.rs.ext.RuntimeDelegate;
 import org.keycloak.http.HttpResponse;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakTransaction;
@@ -75,7 +77,7 @@ public class HttpResponseImpl implements HttpResponse, KeycloakTransaction {
                 return;
             }
 
-            delegate.addNewCookie(cookie);
+            addCookie(cookie);
         }
     }
 
@@ -146,7 +148,11 @@ public class HttpResponseImpl implements HttpResponse, KeycloakTransaction {
         // Ensure that cookies are only added when the transaction is complete, as otherwise cookies will be set for
         // error pages, or will be added twice when running retries.
         for (NewCookie cookie : cookies) {
-            delegate.addNewCookie(cookie);
+            addCookie(cookie);
         }
+    }
+
+    private void addCookie(NewCookie cookie) {
+        delegate.addNewCookie(cookie);
     }
 }
