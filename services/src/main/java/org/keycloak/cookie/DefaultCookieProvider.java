@@ -26,6 +26,17 @@ public class DefaultCookieProvider implements CookieProvider {
         this.context = context;
         this.cookies = context.getRequestHeaders().getCookies();
         this.legacyCookiesEnabled = legacyCookiesEnabled;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("New request to " + context.getHttpRequest().getUri().getPath());
+        sb.append("\n");
+
+        this.cookies.values().stream().forEach(cookie -> {
+            sb.append(" - Cookie: " + cookie.getName() + "=" + cookie.getValue());
+            sb.append("\n");
+        });
+
+        logger.info(sb.toString());
     }
 
     @Override
@@ -48,7 +59,7 @@ public class DefaultCookieProvider implements CookieProvider {
         HttpCookie newCookie = new HttpCookie(1, name, value, path, null, null, maxAge, secure, httpOnly, sameSite);
         context.getHttpResponse().setCookieIfAbsent(newCookie);
 
-        logger.tracef("Setting cookie: name: %s, path: %s, same-site: %s, http-only: %s, max-age: %d", name, path, sameSite, httpOnly, maxAge);
+        logger.infof("Setting cookie: name: %s, path: %s, same-site: %s, http-only: %s, max-age: %d", name, path, sameSite, httpOnly, maxAge);
 
         if (legacyCookiesEnabled && cookieType.supportsSameSiteLegacy()) {
             if (ServerCookie.SameSiteAttributeValue.NONE.equals(sameSite)) {
@@ -57,7 +68,7 @@ public class DefaultCookieProvider implements CookieProvider {
                 HttpCookie legacyCookie = new HttpCookie(1, legacyName, value, path, null, null, maxAge, secure, httpOnly, null);
                 context.getHttpResponse().setCookieIfAbsent(legacyCookie);
 
-                logger.tracef("Setting legacy cookie: name: %s, path: %s, same-site: %s, http-only: %s, max-age: %d", legacyName, path, sameSite, httpOnly, maxAge);
+                logger.infof("Setting legacy cookie: name: %s, path: %s, same-site: %s, http-only: %s, max-age: %d", legacyName, path, sameSite, httpOnly, maxAge);
             }
         } else {
             expireLegacy(cookieType);
@@ -95,7 +106,7 @@ public class DefaultCookieProvider implements CookieProvider {
             HttpCookie newCookie = new HttpCookie(1, cookie.getName(), "", path, null, null, CookieMaxAge.EXPIRED, false, false, null);
             context.getHttpResponse().setCookieIfAbsent(newCookie);
 
-            logger.tracef("Expiring cookie: name: %s, path: %s", cookie.getName(), path);
+            logger.infof("Expiring cookie: name: %s, path: %s", cookie.getName(), path);
         }
     }
 
