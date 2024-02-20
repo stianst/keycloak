@@ -498,6 +498,14 @@ public class RealmAdminResource {
         return new UsersResource(session, auth, adminEvent);
     }
 
+   @Path("organizations")
+    public OrganizationsResource organizations() {
+        if (!Profile.isFeatureEnabled(Profile.Feature.ORGANIZATION)) {
+            throw new NotFoundException();
+        }
+        return new OrganizationsResource(session, auth, adminEvent);
+    }
+
     @NoCache
     @GET
     @Produces(MediaType.APPLICATION_JSON)

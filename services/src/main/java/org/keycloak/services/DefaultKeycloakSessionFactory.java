@@ -313,7 +313,7 @@ public class DefaultKeycloakSessionFactory implements KeycloakSessionFactory, Pr
             return false;
         }
         if (factory instanceof EnvironmentDependentProviderFactory) {
-            return ((EnvironmentDependentProviderFactory) factory).isSupported();
+            return ((EnvironmentDependentProviderFactory) factory).isSupported(scope);
         }
         return true;
     }

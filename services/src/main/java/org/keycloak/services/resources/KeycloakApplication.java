@@ -38,6 +38,7 @@ import org.keycloak.models.dblock.DBLockProvider;
 import org.keycloak.models.utils.KeycloakModelUtils;
 import org.keycloak.models.utils.PostMigrationEvent;
 import org.keycloak.models.utils.RepresentationToModel;
+import org.keycloak.organization.OrganizationProvider;
 import org.keycloak.platform.Platform;
 import org.keycloak.platform.PlatformProvider;
 import org.keycloak.representations.idm.RealmRepresentation;
@@ -226,6 +227,10 @@ public class KeycloakApplication extends Application {
     protected KeycloakSessionFactory createSessionFactory() {
         DefaultKeycloakSessionFactory factory = new DefaultKeycloakSessionFactory();
         factory.init();
+
+        factory.getSpi(OrganizationProvider.class);
+        factory.getProviderFactory(OrganizationProvider.class);
+
         return factory;
     }
 

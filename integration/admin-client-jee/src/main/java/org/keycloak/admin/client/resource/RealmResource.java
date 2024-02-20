@@ -99,6 +99,9 @@ public interface RealmResource {
     @Path("users")
     UsersResource users();
 
+    @Path("organizations")
+    OrganizationsResource organizations();
+
     @Path("roles")
     RolesResource roles();
 
