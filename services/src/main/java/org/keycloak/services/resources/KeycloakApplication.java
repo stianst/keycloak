@@ -26,6 +26,7 @@ import org.keycloak.config.ConfigProviderFactory;
 import org.keycloak.exportimport.ExportImportConfig;
 import org.keycloak.exportimport.ExportImportManager;
 import org.keycloak.exportimport.Strategy;
+import org.keycloak.fedcm.WebIdentityResource;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.KeycloakSessionTask;
@@ -110,6 +111,8 @@ public class KeycloakApplication extends Application {
 
             singletons.add(new ObjectMapperResolver());
             classes.add(WelcomeResource.class);
+
+            classes.add(WebIdentityResource.class);
 
             if (Profile.isFeatureEnabled(Profile.Feature.MULTI_SITE)) {
                 // If we are running in multi-site mode, we need to add a resource which to expose

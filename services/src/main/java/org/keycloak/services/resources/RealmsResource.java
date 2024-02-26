@@ -17,6 +17,7 @@
 package org.keycloak.services.resources;
 
 import org.jboss.logging.Logger;
+import org.keycloak.fedcm.FedCM;
 import org.keycloak.http.HttpRequest;
 import org.keycloak.OAuthErrorException;
 import org.keycloak.authorization.AuthorizationProvider;
@@ -250,6 +251,12 @@ public class RealmsResource {
         resolveRealmAndUpdateSession(name);
         AuthorizationProvider authorization = this.session.getProvider(AuthorizationProvider.class);
         return new AuthorizationService(authorization);
+    }
+
+    @Path("{realm}/fedcm")
+    public Object getFedCM(@PathParam("realm") String name) {
+        resolveRealmAndUpdateSession(name);
+        return new FedCM(session);
     }
 
     /**
