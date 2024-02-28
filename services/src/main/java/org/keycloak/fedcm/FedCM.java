@@ -71,6 +71,8 @@ public class FedCM {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("assertion")
     public AssertionResponse assertion() {
+        // TODO Create some sort of token that isn't a hack ;)
+
         MultivaluedMap<String, String> decodedFormParameters = session.getContext().getHttpRequest().getDecodedFormParameters();
 
         String clientId = decodedFormParameters.getFirst("client_id");
