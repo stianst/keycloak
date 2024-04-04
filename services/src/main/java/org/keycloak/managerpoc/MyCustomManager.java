@@ -4,4 +4,6 @@ import org.keycloak.provider.Manager;
 
 public interface MyCustomManager extends Manager {
 
+    public void doSomething();
+
 }
