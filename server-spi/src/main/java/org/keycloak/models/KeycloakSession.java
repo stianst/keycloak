@@ -19,6 +19,7 @@ package org.keycloak.models;
 
 import org.keycloak.component.ComponentModel;
 import org.keycloak.provider.InvalidationHandler.InvalidableObjectType;
+import org.keycloak.provider.Manager;
 import org.keycloak.provider.Provider;
 import org.keycloak.services.clientpolicy.ClientPolicyManager;
 import org.keycloak.sessions.AuthenticationSessionProvider;
@@ -95,6 +96,8 @@ public interface KeycloakSession extends AutoCloseable {
      * @deprecated Deprecated in favor of {@link #getComponentProvider)
      */
     <T extends Provider> T getProvider(Class<T> clazz, ComponentModel componentModel);
+
+    <T extends Manager> T getManager(Class<T> clazz);
 
     /**
      * Get all provider factories that manage provider instances of class.
