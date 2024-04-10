@@ -171,8 +171,9 @@ public class KeycloakMain implements QuarkusApplication {
     }
 
     private void createAdminUser() {
-        String adminUserName = System.getenv(KEYCLOAK_ADMIN_ENV_VAR);
-        String adminPassword = System.getenv(KEYCLOAK_ADMIN_PASSWORD_ENV_VAR);
+        // TODO TEMPORARY HACK FOR TESTING FRAMEWORK
+        String adminUserName = "admin";
+        String adminPassword = "admin";
 
         if ((adminUserName == null || adminUserName.trim().length() == 0)
                 || (adminPassword == null || adminPassword.trim().length() == 0)) {
