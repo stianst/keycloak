@@ -17,6 +17,7 @@ public class UserKeycloakTest {
     @KeycloakAdminClient
     Keycloak adminClient;
 
+    // The realm is automatically created, and deleted
     @KeycloakTestRealm
     RealmResource realm;
 
