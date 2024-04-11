@@ -19,6 +19,20 @@ public class UserKeycloakTest {
     @KeycloakTestRealm
     RealmResource realm;
 
+// Not implemented, but we could perhaps let a test decide if they want to create a dedicated realm for the test, or
+// use a globally configured realm through a json file
+//    @KeycloakTestRealm(global = true)
+//    RealmResource realm;
+
+// Another option to the above would be to just use a shared class as below, and allow controlling cleanup
+//    @KeycloakTestRealm(config = MyGlobalTestRealm.class, resetAfterAll = false|true, resetAfterEach = false|true)
+//    RealmResource realm;
+
+// Not implemented, but the idea is to be able to supply a class that can create a custom realm rather than just
+// an empty realm
+//    @KeycloakTestRealm(config = UserKeycloakTest.MyRealmConfig.class)
+//    RealmResource realm;
+
     @Test
     public void testCreateUser() {
         UserRepresentation user = new UserRepresentation();
