@@ -40,6 +40,13 @@ public class UserKeycloakTest {
     @KeycloakServerUrl
     String keycloakServerUrl;
 
+    // Ability to inject pages, with some common pages from the framework itself
+    // @Page
+    // UsernamePasswordLoginPage loginPage;
+
+    // Need some way to do easy registering and cleanup of resource, like a user, logout sessions, etc.
+
+
     @Test
     public void testCreateUser() {
         UserRepresentation user = new UserRepresentation();
