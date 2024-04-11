@@ -7,6 +7,7 @@ import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.keycloak.test.framework.KeycloakAdminClient;
+import org.keycloak.test.framework.KeycloakServerUrl;
 import org.keycloak.test.framework.KeycloakTest;
 import org.keycloak.test.framework.KeycloakTestRealm;
 
@@ -32,6 +33,11 @@ public class UserKeycloakTest {
 // an empty realm
 //    @KeycloakTestRealm(config = UserKeycloakTest.MyRealmConfig.class)
 //    RealmResource realm;
+
+    // Have the server url injected, we could extend on this and provide a class instead of string, to provide some
+    // additional things like UriBuilder, account URL, etc.
+    @KeycloakServerUrl
+    String keycloakServerUrl;
 
     @Test
     public void testCreateUser() {
