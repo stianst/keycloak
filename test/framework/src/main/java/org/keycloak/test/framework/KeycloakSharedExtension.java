@@ -40,7 +40,7 @@ public class KeycloakSharedExtension extends AbstractKeycloakExtension implement
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
         Object testInstance = context.getRequiredTestInstance();
-        injector.inject(testInstance);
+        injector.inject(context, testInstance);
     }
 
     public String getServerUrl() {

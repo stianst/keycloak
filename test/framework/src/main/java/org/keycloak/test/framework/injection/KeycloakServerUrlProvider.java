@@ -1,10 +1,10 @@
 package org.keycloak.test.framework.injection;
 
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.keycloak.test.framework.AbstractKeycloakExtension;
 import org.keycloak.test.framework.KeycloakServerUrl;
 
 import java.lang.annotation.Annotation;
-import java.util.function.Supplier;
 
 public class KeycloakServerUrlProvider implements InjectionProvider {
 
@@ -15,12 +15,12 @@ public class KeycloakServerUrlProvider implements InjectionProvider {
     }
 
     @Override
-    public <T extends Annotation> Class<T> getAnnotation() {
-        return (Class<T>) KeycloakServerUrl.class;
+    public Class<? extends Annotation> getAnnotation() {
+        return KeycloakServerUrl.class;
     }
 
     @Override
-    public Supplier<Object> getSupplier() {
-        return extension::getServerUrl;
+    public Object getValue(ExtensionContext context, Annotation annotation) {
+        return extension.getServerUrl();
     }
 }

@@ -46,7 +46,7 @@ public class KeycloakAnnotatedTestExtension extends AbstractKeycloakExtension im
         }
 
         Object testInstance = context.getRequiredTestInstance();
-        injector.inject(testInstance);
+        injector.inject(context, testInstance);
     }
 
 }

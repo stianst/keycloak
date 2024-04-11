@@ -1,12 +1,16 @@
 package org.keycloak.test.framework.injection;
 
+import org.junit.jupiter.api.extension.ExtensionContext;
+
 import java.lang.annotation.Annotation;
-import java.util.function.Supplier;
 
 public interface InjectionProvider {
 
-    <T extends Annotation> Class<T> getAnnotation();
+    Class<? extends Annotation> getAnnotation();
 
-    Supplier<Object> getSupplier();
+    Object getValue(ExtensionContext context, Annotation annotation);
 
+    default void afterEach() {}
+
+    default void afterAll() {};
 }
