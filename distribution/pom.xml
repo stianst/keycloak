@@ -46,6 +46,8 @@
         <module>galleon-feature-packs</module>
         <module>licenses-common</module>
         <module>maven-plugins</module>
+        <module>license-maven-plugin</module>
+        <module>licenses</module>
     </modules>
 
     <repositories>

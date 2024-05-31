@@ -1,0 +1,179 @@
+{
+  "cncfApproved": [
+    "Apache-2.0",
+    "BSD-2-Clause",
+    "BSD-2-Clause-FreeBSD",
+    "BSD-3-Clause",
+    "MIT",
+    "ISC",
+    "Python-2.0",
+    "PostgreSQL",
+    "X11",
+    "Zlib"
+  ],
+  "additionalLicenses": [
+    {
+      "reference": "https://www.eclipse.org/org/documents/edl-v10.html",
+      "isDeprecatedLicenseId": false,
+      "detailsUrl": "https://www.eclipse.org/org/documents/edl-v10.php",
+      "referenceNumber": 999,
+      "name": "Eclipse Distribution License 1.0",
+      "licenseId": "EDL-1.0",
+      "isSpdxListed": false,
+      "isOsiApproved": true,
+      "isFsfLibre": true,
+      "isCncfApproved": true,
+      "licenseReference": "BSD-3-Clause"
+    },
+    {
+      "reference": "https://www.bouncycastle.org/about/license/",
+      "isDeprecatedLicenseId": false,
+      "detailsUrl": "https://www.bouncycastle.org/about/license/",
+      "referenceNumber": 999,
+      "name": "Bouncy Castle Licence",
+      "licenseId": "BouncyCastle",
+      "isSpdxListed": false,
+      "isOsiApproved": true,
+      "isFsfLibre": true,
+      "isCncfApproved": true,
+      "licenseReference": "MIT"
+    },
+    {
+      "reference": "https://www.oracle.com/downloads/licenses/oracle-free-license.html",
+      "isDeprecatedLicenseId": false,
+      "detailsUrl": "https://www.oracle.com/downloads/licenses/oracle-free-license.html",
+      "referenceNumber": 999,
+      "name": "Oracle Free Use Terms and Conditions (FUTC)",
+      "licenseId": "OracleFUTC",
+      "isSpdxListed": false,
+      "isOsiApproved": false,
+      "isFsfLibre": false,
+      "isCncfApproved": false
+    }
+  ],
+  "mappings": [
+    {
+      "licenseId": "Apache-2.0",
+      "nameMappings": [
+        "The Apache Software License, Version 2.0",
+        "The Apache Software License, version 2.0",
+        "The Apache License, Version 2.0",
+        "Apache License, Version 2.0",
+        "Apache License, version 2.0",
+        "Apache 2",
+        "Apache 2.0",
+        "Apache License v2.0",
+        "Apache 2.0 License",
+        "Apache License Version 2.0",
+        "Apache 2 License",
+        "APL2"
+      ]
+    },
+    {
+      "licenseId": "EPL-2.0",
+      "nameMappings": [
+        "EPL 2.0",
+        "Eclipse Public License - v 2.0",
+        "Eclipse Public License v. 2.0"
+      ]
+    },
+    {
+      "licenseId": "EDL-1.0",
+      "nameMappings": [
+        "EDL 1.0",
+        "Eclipse Distribution License - v 1.0",
+        "Eclipse Distribution License v. 1.0"
+      ]
+    },
+    {
+      "licenseId": "EPL-1.0",
+      "nameMappings": [
+        "EPL 1.0"
+      ]
+    },
+    {
+      "licenseId": "LGPL-2.1-or-later",
+      "nameMappings": [
+        "LGPL, version 2.1",
+        "GNU Library General Public License v2.1 or later"
+      ]
+    },
+    {
+      "licenseId": "LGPL-2.1-only",
+      "nameMappings": [
+        "GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1"
+      ]
+    },
+    {
+      "licenseId": "GPL-2.0-only",
+      "nameMappings": [
+        "GPL v2 with the Classpath exception",
+        "The GNU General Public License, v2 with Universal FOSS Exception, v1.0"
+      ],
+      "urlMappings": [
+        "https://oss.oracle.com/licenses/CDDL+GPL-1.1"
+      ]
+    },
+    {
+      "licenseId": "CC0-1.0",
+      "urlMappings": [
+        "http://repository.jboss.org/licenses/cc0-1.0.txt",
+        "http://creativecommons.org/publicdomain/zero/1.0/"
+      ]
+    },
+    {
+      "licenseId": "MIT",
+      "dependencyMappings": [
+        "font-awesome:4.7.0"
+      ],
+      "nameMappings": [
+        "The MIT License",
+        "The MIT License (MIT)"
+      ]
+    },
+    {
+      "licenseId": "OFL-1.1",
+      "dependencyMappings": [
+        "font-awesome:4.7.0"
+      ]
+    },
+    {
+      "licenseId": "UPL-1.0",
+      "nameMappings": [
+        "Universal Permissive License, Version 1.0"
+      ]
+    },
+    {
+      "licenseId": "OracleFUTC",
+      "nameMappings": [
+        "Oracle Free Use Terms and Conditions (FUTC)"
+      ]
+    },
+    {
+      "licenseId": "BSD-2-Clause",
+      "dependencyMappings": [
+        "dk.brics.automaton:automaton:1.11-8"
+      ]
+    },
+    {
+      "licenseId": "BSD-3-Clause",
+      "nameMappings": [
+        "BSD 3-Clause License"
+      ]
+    },
+    {
+      "licenseId": "MPL-2.0",
+      "nameMappings": [
+        "Mozilla Public License Version 2.0"
+      ]
+    }
+  ],
+  "excludedDependencies": [
+    "bootstrap-touchspin:*",
+    "drmonty-datatables-colvis:*",
+    "google-code-prettify:*",
+    "org.keycloak:*:*",
+    "admin-ui:null"
+
+  ]
+}
