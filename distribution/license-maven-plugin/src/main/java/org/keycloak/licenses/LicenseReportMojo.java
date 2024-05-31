@@ -23,14 +23,17 @@ public class LicenseReportMojo extends AbstractMojo {
     @Parameter(property = "additionalConfig", required = true)
     private File additionalConfig;
 
-    @Parameter(property = "licenses", required = true)
-    private File licenses;
+    @Parameter(property = "licensesDir", required = true)
+    private File licensesDir;
+
+    @Parameter(property = "reports")
+    private File[] reports;
 
     @Parameter(property = "mvnReports")
-    private List<File> mvnReports;
+    private File[] mvnReports;
 
     @Parameter(property = "pnpmReports")
-    private List<File> pnpmReports;
+    private File[] pnpmReports;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -58,8 +61,8 @@ public class LicenseReportMojo extends AbstractMojo {
         }
 
         try {
-            licensesReport.createReport(outputDir, licenses, false);
-            
+            licensesReport.createReport(outputDir, licensesDir, false, reports);
+
             getLog().info("Report: " + new File(outputDir, "report.html").toURI().toURL());
             getLog().info("CNCF Report: " + new File(outputDir, "cncf-report.html").toURI().toURL());
         } catch (Exception e) {

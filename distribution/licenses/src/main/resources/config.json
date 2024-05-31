@@ -124,7 +124,7 @@
     {
       "licenseId": "MIT",
       "dependencyMappings": [
-        "font-awesome:4.7.0"
+        "font-awesome:*"
       ],
       "nameMappings": [
         "The MIT License",

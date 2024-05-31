@@ -45,7 +45,7 @@ public class LicensesReport {
         dependencies.addAll(pnpmReportParser.parse());
     }
 
-    public void createReport(File outputDirectory, File licensesDirectory, boolean excludeCncfApproved) throws IOException, TemplateException {
+    public void createReport(File outputDirectory, File licensesDirectory, boolean excludeCncfApproved, File... reports) throws IOException, TemplateException {
         if (!outputDirectory.isDirectory()) {
             outputDirectory.mkdirs();
         }
@@ -119,17 +119,14 @@ public class LicensesReport {
             try {
                 licenseContent.put(l.getLicenseId(), new String(licenseFile.toURI().toURL().openStream().readAllBytes(), StandardCharsets.UTF_8));
             } catch (Exception ex) {
-                throw new RuntimeException("License file not found: " + licenseFile.getAbsolutePath() + " (" + l.getName() + ") " + "(" + String.join(", ", e.getValue()));
+                licenseContent.put(l.getLicenseId(), "MISSING");
+//                throw new RuntimeException("License file not found: " + licenseFile.getAbsolutePath() + " (" + l.getName() + ") " + "(" + String.join(", ", e.getValue()));
             }
         }
 
-        PrintWriter pw = new PrintWriter("report.html");
-        new FreeMarkerReport().render("report.ftl", licenseMap, spdxLicenses, licenseContent, new FileWriter(new File(outputDirectory, "report.html")));
-        pw.close();
-
-        pw = new PrintWriter("cncf-report.html");
-        new FreeMarkerReport().render("cncf-report.ftl", licenseMap, spdxLicenses, licenseContent, new FileWriter(new File(outputDirectory, "cncf-report.html")));
-        pw.close();
+        for (File report : reports) {
+            new FreeMarkerReport().render(report, licenseMap, spdxLicenses, licenseContent, new FileWriter(new File(outputDirectory, report.getName().replace(".ftl", ".html"))));
+        }
     }
 
 }

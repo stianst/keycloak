@@ -15,6 +15,10 @@ public class PnpmReportParser {
 
     private final File file;
 
+    public static void main(String[] args) throws IOException {
+        new PnpmReportParser(new File("/home/st/dev/keycloak/distribution/licenses/target/pnpm/licenses.json")).parse();
+    }
+
     public PnpmReportParser(File file) {
         this.file = file;
     }
@@ -32,7 +36,11 @@ public class PnpmReportParser {
         for (Map.Entry<String, PnpmDependency[]> e : report.entrySet()) {
             String license = e.getKey();
             for (PnpmDependency d : e.getValue()) {
-                Dependency dependency = new Dependency(d.getName() + ":" + d.getVersion());
+                String version = d.getVersion();
+                if (version == null && d.getVersions() != null) {
+                    version = d.getVersions()[0];
+                }
+                Dependency dependency = new Dependency(d.getName() + ":" + version);
                 dependency.addLicenseInfo(license, null);
                 list.add(dependency);
             }
@@ -46,6 +54,7 @@ public class PnpmReportParser {
 
         private String name;
         private String version;
+        private String[] versions;
 
         public String getName() {
             return name;
@@ -63,6 +72,13 @@ public class PnpmReportParser {
             this.version = version;
         }
 
+        public String[] getVersions() {
+            return versions;
+        }
+
+        public void setVersions(String[] versions) {
+            this.versions = versions;
+        }
     }
 
 

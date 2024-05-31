@@ -28,10 +28,83 @@
     <name>Keycloak Distribution Licenses Report</name>
 
     <dependencies>
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-quarkus-server-deployment</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.quarkus</groupId>
+                    <artifactId>quarkus-ide-launcher</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.sun.activation</groupId>
+                    <artifactId>jakarta.activation</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.keycloak</groupId>-->
+<!--            <artifactId>keycloak-operator</artifactId>-->
+<!--        </dependency>-->
     </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.0.2</version>
+                <executions>
+                    <execution>
+                        <id>copy-pnpm</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/pnpm</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/../..</directory>
+                                    <includes>
+                                        <include>pnpm-lock.yaml</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>pnpm-licenses</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <workingDirectory>${basedir}/target/pnpm</workingDirectory>
+                            <executable>pnpm</executable>
+                            <commandlineArgs>licenses list --prod --json</commandlineArgs>
+                            <outputFile>${basedir}/target/pnpm/licenses.json</outputFile>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>download-licenses</id>
+                        <goals>
+                            <goal>download-licenses</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.keycloak.licenses</groupId>
                 <artifactId>license-maven-plugin</artifactId>
@@ -45,12 +118,16 @@
                 </executions>
                 <configuration>
                     <additionalConfig>${project.basedir}/src/main/resources/config.json</additionalConfig>
-                    <licenses>${project.basedir}/src/main/resources/licenses</licenses>
+                    <licensesDir>${project.basedir}/src/main/resources/licenses</licensesDir>
+                    <reports>
+                        <report>${project.basedir}/src/main/resources/reports/report.ftl</report>
+                        <report>${project.basedir}/src/main/resources/reports/cncf-report.ftl</report>
+                    </reports>
                     <mvnReports>
-                        <mvnReport>${project.basedir}/../../quarkus/deployment/target/generated-resources/licenses.xml</mvnReport>
+                        <mvnReport>${project.basedir}/target/generated-resources/licenses.xml</mvnReport>
                     </mvnReports>
                     <pnpmReports>
-                        <pnpmReport>/home/st/tmp/keycloak/licenses.json</pnpmReport>
+                        <pnpmReport>${project.basedir}/target/pnpm/licenses.json</pnpmReport>
                     </pnpmReports>
                 </configuration>
             </plugin>
