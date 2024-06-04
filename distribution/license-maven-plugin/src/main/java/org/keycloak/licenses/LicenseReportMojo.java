@@ -1,16 +1,26 @@
 package org.keycloak.licenses;
 
-import freemarker.template.TemplateException;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuilder;
+import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.project.ProjectBuildingResult;
 
+import javax.inject.Provider;
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 
@@ -34,9 +44,34 @@ public class LicenseReportMojo extends AbstractMojo {
 
     @Parameter(property = "pnpmReports")
     private File[] pnpmReports;
-
+@Component
+private MavenSession mavenSessionProvider;
+    @Component
+    private ProjectBuilder mavenProjectBuilder;
+    @Parameter(defaultValue = "${project.remoteArtifactRepositories}", readonly = true)
+    protected List<ArtifactRepository> remoteRepositories;
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+
+        ProjectBuildingRequest projectBuildingRequest = new DefaultProjectBuildingRequest(
+                mavenSessionProvider.getProjectBuildingRequest())
+                .setRemoteRepositories(remoteRepositories)
+                .setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL)
+                .setResolveDependencies(false)
+                .setProcessPlugins(false);
+
+
+        getLog().info(mavenProjectBuilder.toString());
+        for (Artifact a : project.getDependencyArtifacts()) {
+            getLog().info(a.toString());
+            try {
+                ProjectBuildingResult build = mavenProjectBuilder.build(a, true, projectBuildingRequest);
+                getLog().info(build.getProject().getLicenses().get(0).getName());
+            } catch (ProjectBuildingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         File outputDir = project.getBasedir().toPath().resolve("target").resolve("licenses").toFile();
 
         getLog().info("Additional config: " + additionalConfig.getAbsolutePath());
