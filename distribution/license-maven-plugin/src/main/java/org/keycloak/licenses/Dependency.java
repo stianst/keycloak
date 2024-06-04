@@ -1,5 +1,7 @@
 package org.keycloak.licenses;
 
+import org.keycloak.licenses.spdx.License;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -28,6 +30,7 @@ public class Dependency {
 
         private String name;
         private String url;
+        private License matchedLicense;
 
         public DependencyLicenseInfo(String name, String url) {
             this.name = name;
@@ -40,6 +43,14 @@ public class Dependency {
 
         public String getUrl() {
             return url;
+        }
+
+        public License getMatchedLicense() {
+            return matchedLicense;
+        }
+
+        public void setMatchedLicense(License matchedLicense) {
+            this.matchedLicense = matchedLicense;
         }
     }
 

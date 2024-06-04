@@ -74,7 +74,8 @@
       "nameMappings": [
         "EPL 2.0",
         "Eclipse Public License - v 2.0",
-        "Eclipse Public License v. 2.0"
+        "Eclipse Public License v. 2.0",
+        "Eclipse Public License, Version 2.0"
       ]
     },
     {
@@ -88,7 +89,8 @@
     {
       "licenseId": "EPL-1.0",
       "nameMappings": [
-        "EPL 1.0"
+        "EPL 1.0",
+        "Eclipse Public License - v 1.0"
       ]
     },
     {

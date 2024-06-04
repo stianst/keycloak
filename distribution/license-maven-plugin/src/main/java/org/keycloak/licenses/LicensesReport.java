@@ -12,14 +12,14 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -43,6 +43,46 @@ public class LicensesReport {
     public void parsePnpm(File file) throws ParserConfigurationException, IOException, SAXException {
         PnpmReportParser pnpmReportParser = new PnpmReportParser(file);
         dependencies.addAll(pnpmReportParser.parse());
+    }
+
+    public List<Dependency> getDependencies() {
+        return dependencies;
+    }
+
+    public void findMatches() {
+        for (Dependency d : dependencies) {
+            for (Dependency.DependencyLicenseInfo i : d.getLicenseInfo()) {
+                License matchedLicense = spdxLicenses.findByNameOrLicenseId(i.getName());
+                if (matchedLicense != null) {
+                    i.setMatchedLicense(matchedLicense);
+                }
+            }
+        }
+    }
+
+    public License findBestMatch(Dependency dependency) {
+        List<Dependency.DependencyLicenseInfo> licenseInfo = dependency.getLicenseInfo();
+        List<License> matchedLicenses = licenseInfo.stream().map(Dependency.DependencyLicenseInfo::getMatchedLicense).filter(Objects::nonNull).sorted(Comparator.comparing(License::getLicenseId)).toList();
+        if (matchedLicenses.isEmpty()) {
+            return null;
+        }
+
+        Optional<License> match = matchedLicenses.stream().filter(License::isCncfApproved).findFirst();
+        if (match.isPresent()) {
+            return match.get();
+        }
+
+        match = matchedLicenses.stream().filter(License::isOsiApproved).findFirst();
+        if (match.isPresent()) {
+            return match.get();
+        }
+
+        match = matchedLicenses.stream().filter(License::isFsfLibre).findFirst();
+        if (match.isPresent()) {
+            return match.get();
+        }
+
+        return null;
     }
 
     public void createReport(File outputDirectory, File licensesDirectory, boolean excludeCncfApproved, File... reports) throws IOException, TemplateException {
