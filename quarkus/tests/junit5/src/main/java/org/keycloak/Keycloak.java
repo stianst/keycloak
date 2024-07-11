@@ -313,4 +313,9 @@ public class Keycloak {
         application = null;
         curated = null;
     }
+
+    public ClassLoader getClassLoader() {
+        return application.getClassLoader();
+    }
+
 }

@@ -37,6 +37,7 @@ public final class QuarkusKeycloakSessionFactory extends DefaultKeycloakSessionF
 
     public static QuarkusKeycloakSessionFactory getInstance() {
         if (INSTANCE == null) {
+            System.err.println("XXXXXXXXXXXXXX creating session factory " + QuarkusKeycloakSessionFactory.class.getClassLoader());
             INSTANCE = new QuarkusKeycloakSessionFactory();
         }
 
@@ -44,6 +45,7 @@ public final class QuarkusKeycloakSessionFactory extends DefaultKeycloakSessionF
     }
 
     public static void setInstance(QuarkusKeycloakSessionFactory instance) {
+        System.err.println("YYYYYYYYYYY setting session factory " + QuarkusKeycloakSessionFactory.class.getClassLoader());
         INSTANCE = instance;
     }
 
