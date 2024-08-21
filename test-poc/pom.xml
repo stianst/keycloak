@@ -36,6 +36,7 @@
         <module>framework</module>
         <module>examples</module>
         <module>showcase</module>
+        <module>provider-test-experiment</module>
     </modules>
 
 </project>
