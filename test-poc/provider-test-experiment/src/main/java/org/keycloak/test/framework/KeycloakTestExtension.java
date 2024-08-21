@@ -11,6 +11,10 @@ public class KeycloakTestExtension implements BeforeEachCallback {
 
     @Override
     public void beforeEach(ExtensionContext extensionContext) throws Exception {
+            System.setProperty("java.util.logging.manager", "org.jboss.logmanager.LogManager");
+            System.setProperty("picocli.disable.closures", "true");
+            System.setProperty("java.util.concurrent.ForkJoinPool.common.threadFactory", "io.quarkus.bootstrap.forkjoin.QuarkusForkJoinWorkerThreadFactory");
+
         Keycloak.builder().start("start-dev", "--cache=local");
     }
 }

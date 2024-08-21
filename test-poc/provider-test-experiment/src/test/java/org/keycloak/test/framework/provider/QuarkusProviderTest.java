@@ -34,7 +34,7 @@ public class QuarkusProviderTest {
                     "kc.hostname-strict", "false",
                     "kc.http-enabled", "true",
                     "kc.cache", "local",
-                    "kc.spi-single-use-object-infinispan-persist-revoked-tokens", "false");
+                    "kc.db", "dev-mem");
         }
     }
 
