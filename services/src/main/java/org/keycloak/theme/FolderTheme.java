@@ -19,6 +19,7 @@ package org.keycloak.theme;
 
 import org.keycloak.models.RealmModel;
 import org.keycloak.services.util.LocaleUtil;
+import org.keycloak.utils.SafePath;
 
 import java.io.File;
 import java.io.IOException;
@@ -93,13 +94,8 @@ public class FolderTheme implements Theme {
         if (File.separatorChar != '/') {
             path = path.replace('/', File.separatorChar);
         }
-
-        File file = new File(resourcesDir, path);
-        if (!file.isFile() || !file.getCanonicalPath().startsWith(resourcesDir.getCanonicalPath() + File.separator)) {
-            return null;
-        } else {
-            return file.toURI().toURL().openStream();
-        }
+        File file = SafePath.resolve(resourcesDir, new File(resourcesDir, path));
+        return file != null ? file.toURI().toURL().openStream() : null;
     }
 
     @Override

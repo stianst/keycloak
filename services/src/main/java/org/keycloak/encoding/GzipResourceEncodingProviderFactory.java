@@ -29,7 +29,7 @@ public class GzipResourceEncodingProviderFactory implements ResourceEncodingProv
             cacheDir = initCacheDir();
         }
 
-        return new GzipResourceEncodingProvider(session, cacheDir);
+        return new GzipResourceEncodingProvider(cacheDir);
     }
 
     @Override

@@ -9,6 +9,7 @@ import java.util.Properties;
 import org.keycloak.Config;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
+import org.keycloak.utils.SafePath;
 
 public class ClasspathThemeResourceProviderFactory implements ThemeResourceProviderFactory, ThemeResourceProvider {
 
@@ -45,17 +46,8 @@ public class ClasspathThemeResourceProviderFactory implements ThemeResourceProvi
     }
 
     protected InputStream getResourceAsStream(String path, URL rootResourceURL) throws IOException {
-        if (rootResourceURL == null) {
-            return null;
-        }
-        final String rootPath = rootResourceURL.getPath();
-        final URL resourceURL = classLoader.getResource(THEME_RESOURCES_RESOURCES + path);
-        if(resourceURL == null || !resourceURL.getPath().startsWith(rootPath)) {
-            return null;
-        }
-        else {
-            return resourceURL.openConnection().getInputStream();
-        }
+        URL resourceURL = SafePath.resolve(rootResourceURL, classLoader.getResource(THEME_RESOURCES_RESOURCES + path));
+        return resourceURL != null ? resourceURL.openConnection().getInputStream() : null;
     }
 
     @Override

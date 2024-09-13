@@ -131,11 +131,12 @@ public class JsResource {
 
         ResourceEncodingProvider encodingProvider = ResourceEncodingHelper.getResourceEncodingProvider(session, contentType);
 
-        InputStream inputStream;
-        if (encodingProvider != null) {
-            inputStream = encodingProvider.getEncodedStream(() -> getClass().getClassLoader().getResourceAsStream(name), "js", name);
-        } else {
-            inputStream = getClass().getClassLoader().getResourceAsStream(name);
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(name);
+        if (encodingProvider != null && inputStream != null) {
+            InputStream encoded = encodingProvider.getEncodedStream(inputStream, "js", name);
+            if (encoded != null) {
+                inputStream = encoded;
+            }
         }
 
         if (inputStream != null) {

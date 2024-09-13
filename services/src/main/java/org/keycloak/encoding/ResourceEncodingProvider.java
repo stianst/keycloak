@@ -7,18 +7,12 @@ import java.io.InputStream;
 
 public interface ResourceEncodingProvider extends Provider {
 
-    InputStream getEncodedStream(StreamSupplier producer, String... path);
+    InputStream getEncodedStream(InputStream unencodedStream, String... path);
 
     String getEncoding();
 
     @Override
     default void close() {
-    }
-
-    interface StreamSupplier {
-
-        InputStream getInputStream() throws IOException;
-
     }
 
 }

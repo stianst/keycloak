@@ -19,6 +19,7 @@ package org.keycloak.theme;
 
 import org.keycloak.models.RealmModel;
 import org.keycloak.services.util.LocaleUtil;
+import org.keycloak.utils.SafePath;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -118,13 +119,8 @@ public class ClassLoaderTheme implements Theme {
             rootPath = rootPath.substring(0, rootPath.length() -1);
         }
 
-        final URL resourceURL = classLoader.getResource(resourceRoot + path);
-        if(resourceURL == null || !resourceURL.getPath().startsWith(rootPath)) {
-            return null;
-        }
-        else {
-            return resourceURL.openConnection().getInputStream();
-        }
+        URL resourceURL = SafePath.resolve(rootResourceURL, classLoader.getResource(resourceRoot + path));
+        return resourceURL != null ? resourceURL.openConnection().getInputStream() : null;
     }
 
     @Override

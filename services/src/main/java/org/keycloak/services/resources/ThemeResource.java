@@ -84,11 +84,12 @@ public class ThemeResource {
             Theme theme = session.theme().getTheme(themeName, Theme.Type.valueOf(themType.toUpperCase()));
             ResourceEncodingProvider encodingProvider = session.theme().isCacheEnabled() ? ResourceEncodingHelper.getResourceEncodingProvider(session, contentType) : null;
 
-            InputStream resource;
-            if (encodingProvider != null) {
-                resource = encodingProvider.getEncodedStream(() -> theme.getResourceAsStream(path), themType, themeName, path.replace('/', File.separatorChar));
-            } else {
-                resource = theme.getResourceAsStream(path);
+            InputStream resource = theme.getResourceAsStream(path);
+            if (encodingProvider != null && resource != null) {
+                InputStream encoded = encodingProvider.getEncodedStream(resource, themType, themeName, path.replace('/', File.separatorChar));
+                if (encoded != null) {
+                    resource = encoded;
+                }
             }
 
             if (resource != null) {
