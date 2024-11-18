@@ -15,6 +15,7 @@ import org.keycloak.test.framework.realm.ManagedClient;
 import org.keycloak.test.framework.realm.ManagedRealm;
 import org.keycloak.test.framework.realm.ManagedUser;
 import org.keycloak.test.framework.realm.RealmConfig;
+import org.keycloak.test.framework.realm.RealmConfigBuilder;
 import org.keycloak.test.framework.realm.UserConfig;
 
 @KeycloakIntegrationTest
@@ -51,12 +52,12 @@ public class FancyRealmTest {
     static class MyRealm implements RealmConfig {
 
         @Override
-        public RealmRepresentation getRepresentation() {
-            return builder()
+        public RealmConfigBuilder configure(RealmConfigBuilder realm) {
+            return realm
                     .roles("role-1", "role-2")
-                    .groups("group-1", "group-2")
-                    .build();
+                    .groups("group-1", "group-2");
         }
+
     }
 
     static class MyClient implements ClientConfig {

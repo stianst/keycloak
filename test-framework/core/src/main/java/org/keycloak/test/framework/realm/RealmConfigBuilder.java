@@ -9,13 +9,28 @@ public class RealmConfigBuilder {
 
     private final RealmRepresentation representation;
 
-    public RealmConfigBuilder() {
-        this.representation = new RealmRepresentation();
-        this.representation.setEnabled(true);
+    private RealmConfigBuilder(RealmRepresentation rep) {
+        this.representation = rep;
+    }
+
+    public static RealmConfigBuilder create() {
+        RealmRepresentation rep = new RealmRepresentation();
+        rep.setEnabled(true);
+        return new RealmConfigBuilder(rep);
+    }
+
+    public static RealmConfigBuilder update(RealmRepresentation rep) {
+
+        return new RealmConfigBuilder(rep);
     }
 
     public RealmConfigBuilder name(String name) {
         representation.setRealm(name);
+        return this;
+    }
+
+    public RealmConfigBuilder registrationEmailAsUsername(boolean registrationEmailAsUsername) {
+        representation.setRegistrationEmailAsUsername(registrationEmailAsUsername);
         return this;
     }
 
