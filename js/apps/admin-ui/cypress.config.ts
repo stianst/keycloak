@@ -16,7 +16,7 @@ export default defineConfig({
   experimentalMemoryManagement: true,
 
   retries: {
-    runMode: 3,
+    runMode: 1,
   },
 
   e2e: {
