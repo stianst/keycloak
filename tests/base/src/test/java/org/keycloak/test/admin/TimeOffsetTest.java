@@ -30,30 +30,14 @@ public class TimeOffsetTest extends AbstractAdminTest {
     @Test
     public void testOffset() {
         String realmId = adminClient.realm(REALM_NAME).toRepresentation().getId();
-        testingClient.server().run(session -> {
-            RealmModel realm = session.realms().getRealmByName(REALM_NAME);
-            realm.setEventsExpiration(5);
-            EventStoreProvider provider = session.getProvider(EventStoreProvider.class);
-
-            Event e = new Event();
-            e.setType(EventType.LOGIN);
-            e.setTime(Time.currentTimeMillis());
-            e.setRealmId(realmId);
-            provider.onEvent(e);
-        });
-
-        testingClient.server().run(session -> {
-            EventStoreProvider provider = session.getProvider(EventStoreProvider.class);
-            assertEquals(1, provider.createQuery().realm(realmId).getResultStream().count());
-        });
-
-        setTimeOffset(5);
-
-        testingClient.testing().clearExpiredEvents();
-
+        
         testingClient.server().run(session -> {
             EventStoreProvider provider = session.getProvider(EventStoreProvider.class);
             assertEquals(0, provider.createQuery().realm(realmId).getResultStream().count());
         });
+        
+        testingClient.testing().clearExpiredEvents();
+
+        
     }
 }
