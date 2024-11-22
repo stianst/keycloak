@@ -12,6 +12,8 @@ import org.keycloak.test.framework.injection.Supplier;
 import org.keycloak.test.framework.injection.SupplierHelpers;
 import org.keycloak.test.framework.injection.SupplierOrder;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 public abstract class AbstractKeycloakServerSupplier implements Supplier<KeycloakServer, KeycloakIntegrationTest> {
 
     @Override
@@ -24,41 +26,51 @@ public abstract class AbstractKeycloakServerSupplier implements Supplier<Keycloa
         return KeycloakIntegrationTest.class;
     }
 
+    private static final AtomicReference<KeycloakServer> SERVER = new AtomicReference<>();
+
     @Override
     public KeycloakServer getValue(InstanceContext<KeycloakServer, KeycloakIntegrationTest> instanceContext) {
-        KeycloakIntegrationTest annotation = instanceContext.getAnnotation();
-        KeycloakServerConfig serverConfig = SupplierHelpers.getInstance(annotation.config());
+        synchronized (SERVER) {
+            if (SERVER.get() != null) {
+                return SERVER.get();
+            }
 
-        KeycloakServerConfigBuilder command = KeycloakServerConfigBuilder.startDev()
-                .cache("local")
-                .bootstrapAdminClient(Config.getAdminClientId(), Config.getAdminClientSecret());
+            KeycloakIntegrationTest annotation = instanceContext.getAnnotation();
+            KeycloakServerConfig serverConfig = SupplierHelpers.getInstance(annotation.config());
 
-        command.log().handlers(KeycloakServerConfigBuilder.LogHandlers.CONSOLE);
+            KeycloakServerConfigBuilder command = KeycloakServerConfigBuilder.startDev()
+                    .cache("local")
+                    .bootstrapAdminClient(Config.getAdminClientId(), Config.getAdminClientSecret());
 
-        command = serverConfig.configure(command);
+            command.log().handlers(KeycloakServerConfigBuilder.LogHandlers.CONSOLE);
 
-        if (requiresDatabase()) {
-            instanceContext.getDependency(TestDatabase.class);
+            command = serverConfig.configure(command);
+
+            if (requiresDatabase()) {
+                instanceContext.getDependency(TestDatabase.class);
+            }
+
+            ServerConfigInterceptorHelper interceptor = new ServerConfigInterceptorHelper(instanceContext.getRegistry());
+            command = interceptor.intercept(command, instanceContext);
+
+            command.log().fromConfig(Config.getConfig());
+
+            getLogger().info("Starting Keycloak test server");
+            if (getLogger().isDebugEnabled()) {
+                getLogger().debugv("Startup command and options: \n\t{0}", String.join("\n\t", command.toArgs()));
+            }
+
+            long start = System.currentTimeMillis();
+
+            KeycloakServer server = getServer();
+            server.start(command);
+
+            getLogger().infov("Keycloak test server started in {0} ms", System.currentTimeMillis() - start);
+
+            SERVER.set(server);
+
+            return server;
         }
-
-        ServerConfigInterceptorHelper interceptor = new ServerConfigInterceptorHelper(instanceContext.getRegistry());
-        command = interceptor.intercept(command, instanceContext);
-
-        command.log().fromConfig(Config.getConfig());
-
-        getLogger().info("Starting Keycloak test server");
-        if (getLogger().isDebugEnabled()) {
-            getLogger().debugv("Startup command and options: \n\t{0}", String.join("\n\t", command.toArgs()));
-        }
-
-        long start = System.currentTimeMillis();
-
-        KeycloakServer server = getServer();
-        server.start(command);
-
-        getLogger().infov("Keycloak test server started in {0} ms", System.currentTimeMillis() - start);
-
-        return server;
     }
 
     @Override
