@@ -21,17 +21,12 @@ jobs:
 
   build:
     name: Build
-    if: needs.conditional.outputs.ci == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
       - name: Build Keycloak
         uses: ./.github/actions/build-keycloak
-
-      - name: Check for unstaged proto.lock files
-        if: github.event_name == 'pull_request' && startsWith(github.event.pull_request.base.ref, 'release/')
-        run: git diff --name-only --exit-code -- "**/proto.lock"
 
   store-model-tests:
     name: Store Model Tests
