@@ -1,11 +1,6 @@
 name: Keycloak Operator CI
 
 on:
-  push:
-    branches-ignore:
-      - main
-      - dependabot/**
-  pull_request:
   workflow_dispatch:
 
 env:
@@ -17,11 +12,6 @@ env:
 defaults:
   run:
     shell: bash
-
-concurrency:
-  # Only cancel jobs for PR updates
-  group: operator-ci-${{ github.ref }}
-  cancel-in-progress: true
 
 jobs:
 
