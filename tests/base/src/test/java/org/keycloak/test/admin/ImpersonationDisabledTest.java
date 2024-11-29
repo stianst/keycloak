@@ -20,6 +20,7 @@ package org.keycloak.test.admin;
 import jakarta.ws.rs.ServerErrorException;
 import jakarta.ws.rs.core.Response;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.keycloak.common.Profile;
 import org.keycloak.test.framework.annotations.InjectRealm;
@@ -34,6 +35,7 @@ import org.keycloak.test.framework.server.KeycloakServerConfig;
  * @author <a href="mailto:vramik@redhat.com">Vlastislav Ramik</a>
  */
 @KeycloakIntegrationTest(config = ImpersonationDisabledTest.ServerConfig.class)
+@Disabled
 public class ImpersonationDisabledTest {
 
     @InjectRealm

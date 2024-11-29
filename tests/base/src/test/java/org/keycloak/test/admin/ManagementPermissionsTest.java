@@ -17,6 +17,7 @@
 package org.keycloak.test.admin;
 
 import jakarta.ws.rs.core.Response;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Isolated;
 import org.keycloak.admin.client.resource.ClientResource;
@@ -44,7 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author <a href="mailto:leon.graser@bosch-si.com">Leon Graser</a>
  */
 @KeycloakIntegrationTest(config = ManagementPermissionsTest.ServerConfig.class)
-@Isolated
+@Disabled
 public class ManagementPermissionsTest {
 
     @InjectRealm

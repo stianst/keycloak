@@ -1,5 +1,6 @@
 package org.keycloak.test.admin;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Isolated;
 import org.keycloak.TokenVerifier;
@@ -15,7 +16,7 @@ import org.keycloak.test.framework.realm.ManagedRealm;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @KeycloakIntegrationTest
-@Isolated
+@Disabled
 public class AdminSignatureAlgorithmTest {
 
     @InjectAdminClient

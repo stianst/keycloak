@@ -90,7 +90,7 @@ public abstract class AbstractKeycloakServerSupplier implements Supplier<Keycloa
 
     @Override
     public void close(InstanceContext<KeycloakServer, KeycloakIntegrationTest> instanceContext) {
-        instanceContext.getValue().stop();
+//        instanceContext.getValue().stop();
     }
 
     public abstract KeycloakServer getServer();
