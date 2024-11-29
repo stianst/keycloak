@@ -97,7 +97,6 @@
         <hibernate-orm.plugin.version>6.2.13.Final</hibernate-orm.plugin.version>
         <hibernate.c3p0.version>6.2.13.Final</hibernate.c3p0.version>
         <infinispan.version>15.0.11.Final</infinispan.version>
-        <!-- protostream.plugin.version property can be replaced with protostream.version once protostream.version >= 5.0.12.Final (IPROTO-395) -->
         <protostream.plugin.version>5.0.12.Final</protostream.plugin.version>
 
         <!--JAKARTA-->
@@ -156,15 +155,15 @@
         <twitter4j.version>4.1.2</twitter4j.version>
 
         <!-- Databases - also published to db.adoc as "Tested Version" -->
-        <mysql.version>8.0</mysql.version>
+        <mysql.version>8.4</mysql.version>
         <mysql.container>mysql:${mysql.version}</mysql.container>
         <mysql-jdbc.version>8.3.0</mysql-jdbc.version>
-        <postgresql.version>16</postgresql.version>
+        <postgresql.version>17</postgresql.version>
         <postgresql.container>postgres:${postgresql.version}</postgresql.container>
         <aurora-postgresql.version>16.1</aurora-postgresql.version>
         <aws-jdbc-wrapper.version>2.3.1</aws-jdbc-wrapper.version>
         <postgresql-jdbc.version>42.7.4</postgresql-jdbc.version>
-        <mariadb.version>10.11</mariadb.version>
+        <mariadb.version>11.4</mariadb.version>
         <mariadb.container>mariadb:${mariadb.version}</mariadb.container>
         <mariadb-jdbc.version>3.4.1</mariadb-jdbc.version>
         <mssql.version>2022</mssql.version>
@@ -945,6 +944,11 @@
             <dependency>
                 <groupId>org.keycloak</groupId>
                 <artifactId>keycloak-themes</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.keycloak</groupId>
+                <artifactId>keycloak-themes-vendor</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
