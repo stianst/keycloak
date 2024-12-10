@@ -39,7 +39,7 @@ jobs:
         run: |
           TESTS="KcOidcBrokerTest#testPostBrokerLoginFlowWithOTP_bruteForceEnabled,KcSamlBrokerTest#testPostBrokerLoginFlowWithOTP_bruteForceEnabled,SAMLClockSkewAdapterTest#testTokenTimeIsValid,KerberosLdapCrossRealmTrustTest#test03SpnegoLoginUsernamePassword"
           echo "Tests: $TESTS"
-          for i in $(seq 1 100); do
+          for i in $(seq 1 500); do
             echo "========================================================================="
             echo $i
             echo "========================================================================="
