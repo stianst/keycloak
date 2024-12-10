@@ -1,0 +1,44 @@
+name: Stability - Base Reruns
+
+on:
+  workflow_dispatch:
+
+env:
+  MAVEN_ARGS: "-B -nsu -Daether.connector.http.connectionMaxTtl=25"
+  SUREFIRE_RERUN_FAILING_COUNT: 0
+  SUREFIRE_RETRY: "-Dsurefire.rerunFailingTestsCount=0"
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Keycloak
+        uses: ./.github/actions/build-keycloak
+
+  base-integration-tests:
+    name: Base IT
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: integration-test-setup
+        name: Integration test setup
+        uses: ./.github/actions/integration-test-setup
+
+      - name: Run base tests
+        run: |
+          TESTS="KcOidcBrokerTest#testPostBrokerLoginFlowWithOTP_bruteForceEnabled,KcOidcBrokerTest#testPostBrokerLoginFlowWithOTP_bruteForceEnabled,SAMLClockSkewAdapterTest#testTokenTimeIsValid,KerberosLdapCrossRealmTrustTest#test03SpnegoLoginUsernamePassword"
+          echo "Tests: $TESTS"
+          for i in $(seq 1 100); dp
+            ./mvnw test ${{ env.SUREFIRE_RETRY }} -Pauth-server-quarkus -Dtest=$TESTS -pl testsuite/integration-arquillian/tests/base 2>&1 | misc/log/trimmer.sh
+          done
