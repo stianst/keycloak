@@ -39,6 +39,9 @@ jobs:
         run: |
           TESTS="KcOidcBrokerTest#testPostBrokerLoginFlowWithOTP_bruteForceEnabled,KcOidcBrokerTest#testPostBrokerLoginFlowWithOTP_bruteForceEnabled,SAMLClockSkewAdapterTest#testTokenTimeIsValid,KerberosLdapCrossRealmTrustTest#test03SpnegoLoginUsernamePassword"
           echo "Tests: $TESTS"
-          for i in $(seq 1 100); dp
+          for i in $(seq 1 100); do
+            echo "========================================================================="
+            echo $i
+            echo "========================================================================="
             ./mvnw test ${{ env.SUREFIRE_RETRY }} -Pauth-server-quarkus -Dtest=$TESTS -pl testsuite/integration-arquillian/tests/base 2>&1 | misc/log/trimmer.sh
           done
