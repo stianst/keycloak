@@ -49,9 +49,13 @@ jobs:
           TESTS="${{ inputs.tests }}"
           COUNT=${{ inputs.count }}
           echo "Tests: $TESTS, count: $COUNT"
+          FAILURES=0
           for i in $(seq 1 $COUNT); do
             echo "========================================================================="
             echo Run: $i
             echo "========================================================================="
             ./mvnw test ${{ env.SUREFIRE_RETRY }} -Pauth-server-quarkus -Dtest=$TESTS -pl testsuite/integration-arquillian/tests/base 2>&1 | misc/log/trimmer.sh
+            FAILURES=$(($FAILURES + $?))
           done
+          echo "Failures: $FAILURES"
+          exit $FAILURES
