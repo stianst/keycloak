@@ -27,7 +27,7 @@ jobs:
     name: Base IT
     needs: build
     runs-on: ubuntu-latest
-    timeout-minutes: 100
+    timeout-minutes: 360
     steps:
       - uses: actions/checkout@v4
 
