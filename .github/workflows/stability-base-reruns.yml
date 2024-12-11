@@ -2,6 +2,15 @@ name: Stability - Base Reruns
 
 on:
   workflow_dispatch:
+    inputs:
+      tests:
+        type: string
+        description: Tests to run
+        required: true
+      count:
+        type: number
+        description: Number of re-runs
+        default: 50
 
 env:
   MAVEN_ARGS: "-B -nsu -Daether.connector.http.connectionMaxTtl=25"
@@ -37,11 +46,12 @@ jobs:
 
       - name: Run base tests
         run: |
-          TESTS="KcOidcBrokerTest,KcSamlBrokerTest,SAMLClockSkewAdapterTest,KerberosLdapCrossRealmTrustTest"
-          echo "Tests: $TESTS"
-          for i in $(seq 1 50); do
+          TESTS="${{ inputs.tests }}"
+          COUNT=${{ inputs.count }}
+          echo "Tests: $TESTS, count: $COUNT"
+          for i in $(seq 1 $COUNT); do
             echo "========================================================================="
-            echo $i
+            echo Run: $i
             echo "========================================================================="
             ./mvnw test ${{ env.SUREFIRE_RETRY }} -Pauth-server-quarkus -Dtest=$TESTS -pl testsuite/integration-arquillian/tests/base 2>&1 | misc/log/trimmer.sh
           done
