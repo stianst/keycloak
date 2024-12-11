@@ -37,9 +37,9 @@ jobs:
 
       - name: Run base tests
         run: |
-          TESTS="KcOidcBrokerTest#testPostBrokerLoginFlowWithOTP_bruteForceEnabled,KcSamlBrokerTest#testPostBrokerLoginFlowWithOTP_bruteForceEnabled,SAMLClockSkewAdapterTest#testTokenTimeIsValid,KerberosLdapCrossRealmTrustTest#test03SpnegoLoginUsernamePassword"
+          TESTS="KcOidcBrokerTest,KcSamlBrokerTest,SAMLClockSkewAdapterTest,KerberosLdapCrossRealmTrustTest"
           echo "Tests: $TESTS"
-          for i in $(seq 1 500); do
+          for i in $(seq 1 50); do
             echo "========================================================================="
             echo $i
             echo "========================================================================="
