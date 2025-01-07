@@ -1,0 +1,39 @@
+name: Stability - Store Model
+
+on:
+  workflow_dispatch:
+
+env:
+  MAVEN_ARGS: "-B -nsu -Daether.connector.http.connectionMaxTtl=25"
+  SUREFIRE_RERUN_FAILING_COUNT: 0
+  SUREFIRE_RETRY: "-Dsurefire.rerunFailingTestsCount=0"
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Keycloak
+        uses: ./.github/actions/build-keycloak
+
+  store-model-tests:
+    name: Store Model Tests
+    runs-on: ubuntu-latest
+    needs: [build]
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: integration-test-setup
+        name: Integration test setup
+        uses: ./.github/actions/integration-test-setup
+
+      - name: Run model tests
+        run: testsuite/model/test-all-profiles.sh ${{ env.SUREFIRE_RETRY }}
