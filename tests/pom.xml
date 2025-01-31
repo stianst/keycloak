@@ -35,6 +35,7 @@
     <modules>
         <module>base</module>
         <module>utils</module>
+        <module>migration-util</module>
     </modules>
 
 </project>
