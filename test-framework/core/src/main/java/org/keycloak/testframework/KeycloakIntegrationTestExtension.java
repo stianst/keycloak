@@ -81,7 +81,8 @@ public class KeycloakIntegrationTestExtension implements BeforeAllCallback, Befo
     }
 
     private Registry getRegistry(ExtensionContext context) {
-        ExtensionContext.Store store = context.getRoot().getStore(ExtensionContext.Namespace.GLOBAL);
+        System.out.println(Thread.currentThread().getName());
+        ExtensionContext.Store store = context.getRoot().getStore(ExtensionContext.Namespace.create(Thread.currentThread().getName()));
         Registry registry = (Registry) store.getOrComputeIfAbsent(Registry.class, r -> new Registry());
         registry.setCurrentContext(context);
         return registry;

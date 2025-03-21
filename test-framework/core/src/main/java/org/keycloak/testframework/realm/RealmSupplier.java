@@ -35,7 +35,7 @@ public class RealmSupplier implements Supplier<ManagedRealm, InjectRealm> {
             realmRepresentation = realmConfigBuilder.build();
 
             if (realmRepresentation.getRealm() == null) {
-                realmRepresentation.setRealm(SupplierHelpers.createName(instanceContext));
+                realmRepresentation.setRealm(SupplierHelpers.createName(instanceContext) + "-" + hashCode());
             }
 
             if (realmRepresentation.getId() == null) {

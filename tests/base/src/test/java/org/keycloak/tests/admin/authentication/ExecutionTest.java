@@ -21,6 +21,7 @@ import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.Response;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.keycloak.authentication.AuthenticationFlow;
 import org.keycloak.authentication.authenticators.browser.UsernameFormFactory;
@@ -48,6 +49,7 @@ import static org.hamcrest.Matchers.hasItems;
  * @author <a href="mailto:mstrukel@redhat.com">Marko Strukelj</a>
  */
 @KeycloakIntegrationTest
+@Tag("parallel")
 public class ExecutionTest extends AbstractAuthenticationTest {
 
     // KEYCLOAK-7975

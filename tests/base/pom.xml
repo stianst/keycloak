@@ -117,6 +117,30 @@
         </dependency>
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>parallel</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <properties>
+                                <configurationParameters>
+                                    junit.jupiter.execution.parallel.enabled=true
+                                    junit.jupiter.execution.parallel.config.strategy=fixed
+                                    junit.jupiter.execution.parallel.config.fixed.parallelism=4
+                                    junit.jupiter.execution.parallel.mode.default=same_thread
+                                    junit.jupiter.execution.parallel.mode.classes.default=concurrent
+                                </configurationParameters>
+                            </properties>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
     <build>
         <plugins>
             <plugin>

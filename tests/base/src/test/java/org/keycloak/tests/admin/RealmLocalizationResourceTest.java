@@ -19,6 +19,7 @@ package org.keycloak.tests.admin;
 
 import jakarta.ws.rs.NotFoundException;
 import org.hamcrest.CoreMatchers;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.testframework.annotations.InjectRealm;
@@ -37,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @KeycloakIntegrationTest
+@Tag("parallel")
 public class RealmLocalizationResourceTest {
 
     @InjectRealm(config = RealmLocaleConfig.class)

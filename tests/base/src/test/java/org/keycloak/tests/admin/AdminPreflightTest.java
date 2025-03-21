@@ -3,6 +3,7 @@ package org.keycloak.tests.admin;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpOptions;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.keycloak.services.cors.Cors;
 import org.keycloak.testframework.annotations.InjectHttpClient;
@@ -16,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @KeycloakIntegrationTest
+@Tag("parallel")
 public class AdminPreflightTest {
 
     @InjectHttpClient

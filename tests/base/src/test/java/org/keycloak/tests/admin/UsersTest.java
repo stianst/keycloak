@@ -17,6 +17,7 @@
 
 package org.keycloak.tests.admin;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -35,6 +36,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 
 @KeycloakIntegrationTest
+@Tag("parallel")
 public class UsersTest {
 
     @InjectRealm(lifecycle = LifeCycle.METHOD)

@@ -20,6 +20,7 @@ package org.keycloak.tests.admin.client;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.keycloak.admin.client.resource.ClientScopeResource;
 import org.keycloak.common.constants.ServiceAccountConstants;
@@ -44,6 +45,7 @@ import java.util.stream.Collectors;
  * @author rmartinc
  */
 @KeycloakIntegrationTest
+@Tag("parallel")
 public class ServiceAccountClientTest {
 
     @InjectRealm

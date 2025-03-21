@@ -21,6 +21,7 @@ import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.keycloak.admin.client.resource.RoleByIdResource;
 import org.keycloak.events.admin.OperationType;
@@ -64,6 +65,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
  */
 @KeycloakIntegrationTest
+@Tag("parallel")
 public class RoleByIdResourceTest {
 
     @InjectRealm(lifecycle = LifeCycle.METHOD)

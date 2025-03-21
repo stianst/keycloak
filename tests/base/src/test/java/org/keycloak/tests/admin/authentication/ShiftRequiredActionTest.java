@@ -19,6 +19,7 @@ package org.keycloak.tests.admin.authentication;
 
 import jakarta.ws.rs.NotFoundException;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.keycloak.events.admin.OperationType;
 import org.keycloak.events.admin.ResourceType;
@@ -33,6 +34,7 @@ import java.util.List;
  * @author <a href="mailto:wadahiro@gmail.com">Hiroyuki Wada</a>
  */
 @KeycloakIntegrationTest
+@Tag("parallel")
 public class ShiftRequiredActionTest extends AbstractAuthenticationTest {
 
     @Test

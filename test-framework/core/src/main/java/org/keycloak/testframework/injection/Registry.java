@@ -22,6 +22,7 @@ public class Registry implements ExtensionContext.Store.CloseableResource {
     private final List<RequestedInstance<?, ?>> requestedInstances = new LinkedList<>();
 
     public Registry() {
+        System.out.println("Registry " + hashCode());
         extensions = new Extensions();
         logger = new RegistryLogger(extensions.getValueTypeAlias());
     }

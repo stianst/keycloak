@@ -2,6 +2,7 @@ package org.keycloak.tests.admin;
 
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.keycloak.models.BrowserSecurityHeaders;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -14,6 +15,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
 @KeycloakIntegrationTest
+@Tag("parallel")
 public class AdminHeadersTest {
 
     @InjectRealm

@@ -26,6 +26,7 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.resource.ClientResource;
@@ -76,6 +77,7 @@ import static org.keycloak.tests.utils.matchers.Matchers.statusCodeIs;
  * @author <a href="mailto:mstrukel@redhat.com">Marko Strukelj</a>
  */
 @KeycloakIntegrationTest
+@Tag("parallel")
 public class FlowTest extends AbstractAuthenticationTest {
 
     // KEYCLOAK-3681: Delete top flow doesn't delete all subflows

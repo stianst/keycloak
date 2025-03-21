@@ -23,6 +23,7 @@ import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.keycloak.admin.client.resource.ClientScopeResource;
 import org.keycloak.admin.client.resource.ClientScopesResource;
@@ -49,6 +50,7 @@ import jakarta.ws.rs.core.Response;
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
 @KeycloakIntegrationTest
+@Tag("parallel")
 public class ClientScopeProtocolMapperTest extends AbstractProtocolMapperTest {
 
     @InjectRealm

@@ -22,6 +22,7 @@ import java.util.Collections;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.keycloak.admin.client.resource.ProtocolMappersResource;
@@ -49,6 +50,7 @@ import jakarta.ws.rs.core.Response;
  */
 @TestMethodOrder(MethodOrderer.MethodName.class)
 @KeycloakIntegrationTest
+@Tag("parallel")
 public class ClientProtocolMapperTest extends AbstractProtocolMapperTest {
 
     @InjectClient(config = OidcClient.class, ref = "oidcClient")

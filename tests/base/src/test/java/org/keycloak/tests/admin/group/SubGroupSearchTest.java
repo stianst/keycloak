@@ -1,6 +1,7 @@
 package org.keycloak.tests.admin.group;
 
 import jakarta.ws.rs.core.Response;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.representations.idm.GroupRepresentation;
@@ -28,6 +29,7 @@ import static org.keycloak.tests.admin.group.GroupSearchTest.ATTR_QUOTES_NAME;
 import static org.keycloak.tests.admin.group.GroupSearchTest.ATTR_QUOTES_VAL;
 
 @KeycloakIntegrationTest
+@Tag("parallel")
 public class SubGroupSearchTest {
 
     @InjectRealm

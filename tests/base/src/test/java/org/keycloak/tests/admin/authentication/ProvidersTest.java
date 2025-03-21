@@ -18,6 +18,7 @@
 package org.keycloak.tests.admin.authentication;
 
 import jakarta.ws.rs.NotFoundException;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 import org.keycloak.authentication.authenticators.broker.IdpCreateUserIfUniqueAuthenticatorFactory;
@@ -44,6 +45,7 @@ import static org.hamcrest.Matchers.is;
  * @author <a href="mailto:mstrukel@redhat.com">Marko Strukelj</a>
  */
 @KeycloakIntegrationTest
+@Tag("parallel")
 public class ProvidersTest extends AbstractAuthenticationTest {
 
     @Test

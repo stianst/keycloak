@@ -17,6 +17,7 @@
 
 package org.keycloak.tests.admin;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
@@ -46,6 +47,7 @@ import static org.keycloak.representations.idm.ComponentRepresentation.SECRET_VA
  * @author <a href="mailto:bruno@abstractj.org">Bruno Oliveira</a>
  */
 @KeycloakIntegrationTest
+@Tag("parallel")
 public class SMTPConnectionTest {
 
     @InjectRealm(config = SMTPRealmWithClientAndUser.class)

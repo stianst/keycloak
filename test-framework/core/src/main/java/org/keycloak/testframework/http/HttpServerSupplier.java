@@ -15,7 +15,7 @@ public class HttpServerSupplier implements Supplier<HttpServer, InjectHttpServer
     @Override
     public HttpServer getValue(InstanceContext<HttpServer, InjectHttpServer> instanceContext) {
         try {
-            HttpServer httpServer = HttpServer.create(new InetSocketAddress("127.0.0.1", 8500), 10);
+            HttpServer httpServer = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 10);
             httpServer.start();
             return httpServer;
         } catch (IOException e) {

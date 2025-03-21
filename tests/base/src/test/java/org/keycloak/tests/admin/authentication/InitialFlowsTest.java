@@ -18,6 +18,7 @@
 package org.keycloak.tests.admin.authentication;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.keycloak.representations.idm.AuthenticationExecutionExportRepresentation;
 import org.keycloak.representations.idm.AuthenticationExecutionInfoRepresentation;
@@ -37,6 +38,7 @@ import java.util.List;
  * @author <a href="mailto:mstrukel@redhat.com">Marko Strukelj</a>
  */
 @KeycloakIntegrationTest
+@Tag("parallel")
 public class InitialFlowsTest extends AbstractAuthenticationTest {
 
     private HashMap<String, AuthenticatorConfigRepresentation> configs = new HashMap<>();
