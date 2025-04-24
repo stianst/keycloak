@@ -100,7 +100,6 @@ jobs:
     needs:
       - build-keycloak
       - generate-test-seed
-    if: needs.conditional.outputs.js-ci == 'true'
     runs-on: ubuntu-latest
     env:
       WORKSPACE: keycloak-admin-ui
