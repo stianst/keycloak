@@ -1512,7 +1512,7 @@ public class DefaultExportImportManager implements ExportImportManager {
         String defaultProvider = null;
         if (rep.getIdentityProviders() != null) {
             for (IdentityProviderRepresentation i : rep.getIdentityProviders()) {
-                if (i.isEnabled() && i.isAuthenticateByDefault()) {
+                if (i.isEnabled() && Boolean.TRUE.equals(i.isAuthenticateByDefault())) {
                     defaultProvider = i.getProviderId();
                     break;
                 }

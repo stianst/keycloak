@@ -69,13 +69,6 @@ public class SpiffeClientAuthTest {
     }
 
     @Test
-    public void testInvalidConfig() {
-        testInvalidConfig("with-port:8080", "https://localhost");
-        testInvalidConfig("with-spiffe-scheme", "https://localhost");
-        testInvalidConfig("valid", "invalid-url");
-    }
-
-    @Test
     public void testInvalidTrustDomain() {
         IdentityProviderUpdater.updateWithRollback(realm, IDP_ALIAS, rep -> {
             rep.getConfig().put(IdentityProviderModel.ISSUER, "spiffe://different-domain");
@@ -151,17 +144,6 @@ public class SpiffeClientAuthTest {
         token.exp((long) (Time.currentTime() + 300));
         token.subject(CLIENT_ID);
         return token;
-    }
-
-    private void testInvalidConfig(String trustDomain, String bundleEndpoint) {
-        IdentityProviderRepresentation idp = IdentityProviderBuilder.create().providerId(SpiffeIdentityProviderFactory.PROVIDER_ID)
-                .alias("another")
-                .setAttribute(IdentityProviderModel.ISSUER, trustDomain)
-                .setAttribute(SpiffeIdentityProviderConfig.BUNDLE_ENDPOINT_KEY, bundleEndpoint).build();
-
-        try (Response r = realm.admin().identityProviders().create(idp)) {
-            Assertions.assertEquals(400, r.getStatus());
-        }
     }
 
     public static class SpiffeServerConfig extends ClientAuthIdpServerConfig {

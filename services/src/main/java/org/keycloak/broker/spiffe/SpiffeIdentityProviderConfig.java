@@ -23,7 +23,7 @@ public class SpiffeIdentityProviderConfig extends IdentityProviderModel {
     }
 
     @Override
-    public boolean isHideOnLogin() {
+    public Boolean isHideOnLogin() {
         return true;
     }
 

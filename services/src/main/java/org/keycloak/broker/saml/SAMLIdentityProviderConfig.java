@@ -22,6 +22,7 @@ import org.keycloak.common.enums.SslRequired;
 import org.keycloak.dom.saml.v2.protocol.AuthnContextComparisonType;
 import org.keycloak.models.IdentityProviderModel;
 import org.keycloak.models.RealmModel;
+import org.keycloak.models.UserIdentityProviderModel;
 import org.keycloak.protocol.saml.SamlPrincipalType;
 import org.keycloak.saml.common.constants.JBossSAMLURIConstants;
 import org.keycloak.saml.common.util.XmlKeyInfoKeyNameTransformer;
@@ -30,7 +31,7 @@ import org.keycloak.utils.StringUtil;
 /**
  * @author Pedro Igor
  */
-public class SAMLIdentityProviderConfig extends IdentityProviderModel {
+public class SAMLIdentityProviderConfig extends UserIdentityProviderModel {
 
     public static final XmlKeyInfoKeyNameTransformer DEFAULT_XML_KEY_INFO_KEY_NAME_TRANSFORMER = XmlKeyInfoKeyNameTransformer.NONE;
 

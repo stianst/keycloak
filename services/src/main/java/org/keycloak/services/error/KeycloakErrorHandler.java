@@ -57,6 +57,8 @@ public class KeycloakErrorHandler implements ExceptionMapper<Throwable> {
 
     @Override
     public Response toResponse(Throwable throwable) {
+        throwable.printStackTrace();
+
         KeycloakSession session = KeycloakSessionUtil.getKeycloakSession();
 
         if (session == null) {

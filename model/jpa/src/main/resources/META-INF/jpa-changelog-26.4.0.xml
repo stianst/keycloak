@@ -59,5 +59,20 @@
             <column name="POLICY_PROVIDER_ID" />
         </createIndex>
     </changeSet>
+    
+    <changeSet id="26.0.4-idp" author="keycloak">
+        <dropDefaultValue tableName="IDENTITY_PROVIDER" columnName="TRUST_EMAIL"/>
+        <dropNotNullConstraint tableName="IDENTITY_PROVIDER" columnName="TRUST_EMAIL"/>
+        <dropDefaultValue tableName="IDENTITY_PROVIDER" columnName="STORE_TOKEN"/>
+        <dropNotNullConstraint tableName="IDENTITY_PROVIDER" columnName="STORE_TOKEN"/>
+        <dropDefaultValue tableName="IDENTITY_PROVIDER" columnName="LINK_ONLY"/>
+        <dropNotNullConstraint tableName="IDENTITY_PROVIDER" columnName="LINK_ONLY"/>
+        <dropDefaultValue tableName="IDENTITY_PROVIDER" columnName="HIDE_ON_LOGIN"/>
+        <dropNotNullConstraint tableName="IDENTITY_PROVIDER" columnName="HIDE_ON_LOGIN"/>
+        <dropDefaultValue tableName="IDENTITY_PROVIDER" columnName="ADD_TOKEN_ROLE"/>
+        <dropNotNullConstraint tableName="IDENTITY_PROVIDER" columnName="ADD_TOKEN_ROLE"/>
+        <dropDefaultValue tableName="IDENTITY_PROVIDER" columnName="AUTHENTICATE_BY_DEFAULT"/>
+        <dropNotNullConstraint tableName="IDENTITY_PROVIDER" columnName="AUTHENTICATE_BY_DEFAULT"/>
+    </changeSet>
 
 </databaseChangeLog>

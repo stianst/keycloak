@@ -16,7 +16,6 @@
  */
 package org.keycloak.models;
 
-import java.util.Optional;
 import org.keycloak.common.Profile;
 import org.keycloak.common.Profile.Feature;
 import java.io.Serializable;
@@ -76,18 +75,18 @@ public class IdentityProviderModel implements Serializable {
 
     private boolean enabled;
 
-    private boolean trustEmail;
+    private Boolean trustEmail;
 
-    private boolean storeToken;
+    private Boolean storeToken;
 
-    protected boolean addReadTokenRoleOnCreate;
+    protected Boolean addReadTokenRoleOnCreate;
 
-    protected boolean linkOnly;
+    protected Boolean linkOnly;
 
     /**
      * Specifies if particular provider should be used by default for authentication even before displaying login screen
      */
-    private boolean authenticateByDefault;
+    private Boolean authenticateByDefault;
 
     private String firstBrokerLoginFlowId;
 
@@ -99,7 +98,7 @@ public class IdentityProviderModel implements Serializable {
 
     private String displayIconClasses;
 
-    private boolean hideOnLogin;
+    private Boolean hideOnLogin;
 
     /**
      * <p>A map containing the configuration and properties for a specific identity provider instance and implementation. The items
@@ -159,33 +158,33 @@ public class IdentityProviderModel implements Serializable {
         return this.enabled;
     }
 
-    public void setEnabled(boolean enabled) {
+    public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
     }
 
-    public boolean isStoreToken() {
+    public Boolean isStoreToken() {
         return this.storeToken;
     }
 
-    public void setStoreToken(boolean storeToken) {
+    public void setStoreToken(Boolean storeToken) {
         this.storeToken = storeToken;
     }
 
-    public boolean isLinkOnly() {
+    public Boolean isLinkOnly() {
         return linkOnly;
     }
 
-    public void setLinkOnly(boolean linkOnly) {
+    public void setLinkOnly(Boolean linkOnly) {
         this.linkOnly = linkOnly;
     }
 
     @Deprecated
-    public boolean isAuthenticateByDefault() {
+    public Boolean isAuthenticateByDefault() {
         return authenticateByDefault;
     }
 
     @Deprecated
-    public void setAuthenticateByDefault(boolean authenticateByDefault) {
+    public void setAuthenticateByDefault(Boolean authenticateByDefault) {
         this.authenticateByDefault = authenticateByDefault;
     }
 
@@ -213,19 +212,19 @@ public class IdentityProviderModel implements Serializable {
         this.config = config;
     }
 
-    public boolean isAddReadTokenRoleOnCreate() {
+    public Boolean isAddReadTokenRoleOnCreate() {
         return addReadTokenRoleOnCreate;
     }
 
-    public void setAddReadTokenRoleOnCreate(boolean addReadTokenRoleOnCreate) {
+    public void setAddReadTokenRoleOnCreate(Boolean addReadTokenRoleOnCreate) {
         this.addReadTokenRoleOnCreate = addReadTokenRoleOnCreate;
     }
 
-    public boolean isTrustEmail() {
+    public Boolean isTrustEmail() {
         return trustEmail;
     }
 
-    public void setTrustEmail(boolean trustEmail) {
+    public void setTrustEmail(Boolean trustEmail) {
         this.trustEmail = trustEmail;
     }
 
@@ -284,11 +283,11 @@ public class IdentityProviderModel implements Serializable {
     }
 
 
-    public boolean isHideOnLogin() {
+    public Boolean isHideOnLogin() {
         return this.hideOnLogin;
     }
 
-    public void setHideOnLogin(boolean hideOnLogin) {
+    public void setHideOnLogin(Boolean hideOnLogin) {
         this.hideOnLogin = hideOnLogin;
     }
 

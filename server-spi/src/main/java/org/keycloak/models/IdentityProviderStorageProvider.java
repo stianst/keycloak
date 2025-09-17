@@ -220,9 +220,9 @@ public interface IdentityProviderStorageProvider extends Provider {
 
         ENABLED(IdentityProviderModel.ENABLED, Boolean.TRUE.toString(), IdentityProviderModel::isEnabled),
 
-        LINK_ONLY(IdentityProviderModel.LINK_ONLY, Boolean.FALSE.toString(), Predicate.not(IdentityProviderModel::isLinkOnly)),
+        LINK_ONLY(IdentityProviderModel.LINK_ONLY, Boolean.FALSE.toString(), i -> Boolean.TRUE.equals(i.isLinkOnly())),
 
-        HIDE_ON_LOGIN(IdentityProviderModel.HIDE_ON_LOGIN, Boolean.FALSE.toString(), Predicate.not(IdentityProviderModel::isHideOnLogin));
+        HIDE_ON_LOGIN(IdentityProviderModel.HIDE_ON_LOGIN, Boolean.FALSE.toString(), i -> Boolean.TRUE.equals(i.isHideOnLogin()));
 
         private final String key;
         private final String value;

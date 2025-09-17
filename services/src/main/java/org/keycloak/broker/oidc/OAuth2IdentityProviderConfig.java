@@ -22,6 +22,7 @@ import org.keycloak.OAuth2Constants;
 import org.keycloak.common.enums.SslRequired;
 import org.keycloak.models.IdentityProviderModel;
 import org.keycloak.models.RealmModel;
+import org.keycloak.models.UserIdentityProviderModel;
 import org.keycloak.protocol.oidc.OIDCLoginProtocol;
 import org.keycloak.representations.IDToken;
 
@@ -30,7 +31,7 @@ import java.util.Arrays;
 /**
  * @author Pedro Igor
  */
-public class OAuth2IdentityProviderConfig extends IdentityProviderModel {
+public class OAuth2IdentityProviderConfig extends UserIdentityProviderModel {
 
     public static final String PKCE_ENABLED = "pkceEnabled";
     public static final String PKCE_METHOD = "pkceMethod";
