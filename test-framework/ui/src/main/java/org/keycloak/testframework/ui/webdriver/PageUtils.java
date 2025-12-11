@@ -5,6 +5,8 @@ import java.lang.reflect.Constructor;
 import org.keycloak.testframework.ui.page.AbstractPage;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
 
 public class PageUtils {
@@ -36,6 +38,14 @@ public class PageUtils {
 
     public String getPageSource() {
         return managed.driver().getPageSource();
+    }
+
+    public void clickButton(WebElement element) {
+        if (managed.getBrowserType().equals(BrowserType.CHROME)) {
+            element.sendKeys(Keys.ENTER);
+        } else {
+            element.click();
+        }
     }
 
 }

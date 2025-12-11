@@ -42,7 +42,7 @@ public class LoginPage extends AbstractLoginPage {
     }
 
     public void submit() {
-        submitButton.click();
+        driver.page().clickButton(submitButton);
     }
 
     public void clickSocial(String alias) {
