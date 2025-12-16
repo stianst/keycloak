@@ -6,18 +6,29 @@ import org.keycloak.testframework.database.TestDatabase;
 import org.keycloak.testframework.https.ManagedCertificates;
 import org.keycloak.testframework.infinispan.InfinispanServer;
 import org.keycloak.testframework.injection.AbstractInterceptorHelper;
+import org.keycloak.testframework.injection.Dependency;
 import org.keycloak.testframework.injection.InstanceContext;
 import org.keycloak.testframework.injection.LifeCycle;
 import org.keycloak.testframework.injection.Registry;
 import org.keycloak.testframework.injection.RequestedInstance;
-import org.keycloak.testframework.injection.RequiredDependencies;
+import org.keycloak.testframework.injection.DependenciesBuilder;
 import org.keycloak.testframework.injection.Supplier;
 import org.keycloak.testframework.injection.SupplierHelpers;
 import org.keycloak.testframework.injection.SupplierOrder;
 
 import org.jboss.logging.Logger;
 
+import java.util.List;
+
 public abstract class AbstractKeycloakServerSupplier implements Supplier<KeycloakServer, KeycloakIntegrationTest> {
+
+    @Override
+    public List<Dependency> getDependencies(RequestedInstance<KeycloakServer, KeycloakIntegrationTest> instanceContext) {
+        DependenciesBuilder builder = DependenciesBuilder.create(ManagedCertificates.class);
+        if (requiresDatabase()) {
+            builder.add(TestDatabase.class);
+        }
+    }
 
     @Override
     public KeycloakServer getValue(InstanceContext<KeycloakServer, KeycloakIntegrationTest> instanceContext) {
@@ -94,11 +105,6 @@ public abstract class AbstractKeycloakServerSupplier implements Supplier<Keycloa
     @Override
     public void close(InstanceContext<KeycloakServer, KeycloakIntegrationTest> instanceContext) {
         instanceContext.getValue().stop();
-    }
-
-    @Override
-    public RequiredDependencies getDependencies() {
-        return RequiredDependencies.create(ManagedCertificates.class);
     }
 
     public abstract KeycloakServer getServer();

@@ -3,12 +3,10 @@ package org.keycloak.testframework.injection;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -52,11 +50,6 @@ public class Registry implements ExtensionContext.Store.CloseableResource {
             dependency = getRequestedDependency(typeClass, ref, dependent);
             if (dependency != null) {
                 return dependency;
-            } else {
-                dependency = getUnConfiguredDependency(typeClass, ref, dependent);
-                if (dependency != null) {
-                    return dependency;
-                }
             }
         }
 
@@ -147,16 +140,20 @@ public class Registry implements ExtensionContext.Store.CloseableResource {
             }
         }
 
-        List<RequiredDependencies.RequiredDependency> dependencies = requestedInstances.stream().flatMap(r -> r.getSupplier().getDependencies().getList().stream()).toList();
-        for (RequiredDependencies.RequiredDependency dependency : dependencies) {
-            boolean dependencyRequested = requestedInstances.stream().anyMatch(r -> r.getValueType().equals(dependency.valueType()) && Objects.equals(r.getRef(), dependency.ref()));
-            if (!dependencyRequested) {
-                Supplier<?, ?> supplier = extensions.findSupplierByType(dependency.valueType());
-                Annotation defaultAnnotation = DefaultAnnotationProxy.proxy(supplier.getAnnotationClass(), dependency.ref());
-                RequestedInstance<?, ?> requestDependency = createRequestedInstance(new Annotation[]{ defaultAnnotation }, dependency.valueType());
-                requestedInstances.add(requestDependency);
+        List<RequestedInstance<?, ?>> missingDependencies = new LinkedList<>();
+        for (RequestedInstance requestedInstance : requestedInstances) {
+            List<Dependency> dependencies =  requestedInstance.getSupplier().getDependencies(requestedInstance);
+            for (Dependency dependency : dependencies) {
+                boolean dependencyMissing = requestedInstances.stream().noneMatch(r -> r.getValueType().equals(dependency.valueType()) && Objects.equals(r.getRef(), dependency.ref()));
+                if (dependencyMissing) {
+                    Supplier<?, ?> supplier = extensions.findSupplierByType(dependency.valueType());
+                    Annotation defaultAnnotation = DefaultAnnotationProxy.proxy(supplier.getAnnotationClass(), dependency.ref());
+                    RequestedInstance<?, ?> requestDependency = createRequestedInstance(new Annotation[]{ defaultAnnotation }, dependency.valueType());
+                    missingDependencies.add(requestDependency);
+                }
             }
         }
+        requestedInstances.addAll(missingDependencies);
 
         logger.logRequestedInstances(requestedInstances);
     }
