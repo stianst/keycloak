@@ -1,11 +1,7 @@
 package org.keycloak.testframework.remote;
 
-import java.util.List;
-
 import org.keycloak.testframework.annotations.InjectTestDatabase;
 import org.keycloak.testframework.database.TestDatabase;
-import org.keycloak.testframework.injection.DependenciesBuilder;
-import org.keycloak.testframework.injection.Dependency;
 import org.keycloak.testframework.injection.InstanceContext;
 import org.keycloak.testframework.injection.LifeCycle;
 import org.keycloak.testframework.injection.RequestedInstance;
@@ -15,11 +11,6 @@ import org.keycloak.testframework.server.KeycloakServerConfigBuilder;
 import org.keycloak.testframework.server.KeycloakServerConfigInterceptor;
 
 public class RemoteProvidersSupplier implements Supplier<RemoteProviders, InjectRemoteProviders>, KeycloakServerConfigInterceptor<TestDatabase, InjectTestDatabase> {
-
-    @Override
-    public List<Dependency> getDependencies(RequestedInstance<RemoteProviders, InjectRemoteProviders> instanceContext) {
-        return DependenciesBuilder.none();
-    }
 
     @Override
     public RemoteProviders getValue(InstanceContext<RemoteProviders, InjectRemoteProviders> instanceContext) {

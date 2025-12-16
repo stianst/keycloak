@@ -2,7 +2,10 @@ package org.keycloak.testframework.remote.runonserver;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
+import org.keycloak.testframework.injection.DependenciesBuilder;
+import org.keycloak.testframework.injection.Dependency;
 import org.keycloak.testframework.injection.InstanceContext;
 import org.keycloak.testframework.injection.LifeCycle;
 import org.keycloak.testframework.injection.RequestedInstance;
@@ -14,6 +17,14 @@ import org.keycloak.testframework.remote.RemoteProviders;
 import org.apache.http.client.HttpClient;
 
 public class RunOnServerSupplier implements Supplier<RunOnServerClient, InjectRunOnServer> {
+
+    @Override
+    public List<Dependency> getDependencies(RequestedInstance<RunOnServerClient, InjectRunOnServer> instanceContext) {
+        return DependenciesBuilder.create(HttpClient.class)
+                .add(ManagedRealm.class, instanceContext.getAnnotation().realmRef())
+                .add(RemoteProviders.class)
+                .add(TestClassServer.class).build();
+    }
 
     @Override
     public RunOnServerClient getValue(InstanceContext<RunOnServerClient, InjectRunOnServer> instanceContext) {

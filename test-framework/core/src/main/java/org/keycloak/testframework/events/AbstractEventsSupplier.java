@@ -3,11 +3,11 @@ package org.keycloak.testframework.events;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
+import org.keycloak.testframework.injection.DependenciesBuilder;
 import org.keycloak.testframework.injection.Dependency;
 import org.keycloak.testframework.injection.InstanceContext;
 import org.keycloak.testframework.injection.LifeCycle;
 import org.keycloak.testframework.injection.RequestedInstance;
-import org.keycloak.testframework.injection.DependenciesBuilder;
 import org.keycloak.testframework.injection.Supplier;
 import org.keycloak.testframework.injection.SupplierHelpers;
 import org.keycloak.testframework.realm.ManagedRealm;

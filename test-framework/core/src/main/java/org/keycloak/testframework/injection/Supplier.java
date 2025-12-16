@@ -45,6 +45,8 @@ public interface Supplier<T, S extends Annotation> {
         return SupplierOrder.DEFAULT;
     }
 
-    List<Dependency> getDependencies(RequestedInstance<T, S> instanceContext);
+    default List<Dependency> getDependencies(RequestedInstance<T, S> instanceContext) {
+        return List.of();
+    }
 
 }

@@ -1,25 +1,16 @@
 package org.keycloak.testframework.crypto;
 
-import java.util.List;
-
 import org.keycloak.common.crypto.CryptoIntegration;
 import org.keycloak.common.crypto.FipsMode;
 import org.keycloak.crypto.def.DefaultCryptoProvider;
 import org.keycloak.testframework.annotations.InjectCryptoHelper;
 import org.keycloak.testframework.config.Config;
-import org.keycloak.testframework.injection.DependenciesBuilder;
-import org.keycloak.testframework.injection.Dependency;
 import org.keycloak.testframework.injection.InstanceContext;
 import org.keycloak.testframework.injection.LifeCycle;
 import org.keycloak.testframework.injection.RequestedInstance;
 import org.keycloak.testframework.injection.Supplier;
 
 public class CryptoHelperSupplier implements Supplier<CryptoHelper, InjectCryptoHelper> {
-
-    @Override
-    public List<Dependency> getDependencies(RequestedInstance<CryptoHelper, InjectCryptoHelper> instanceContext) {
-        return DependenciesBuilder.none();
-    }
 
     @Override
     public CryptoHelper getValue(InstanceContext<CryptoHelper, InjectCryptoHelper> instanceContext) {

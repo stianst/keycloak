@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import org.junit.jupiter.api.extension.ExtensionContext;
-
 import org.keycloak.testframework.server.KeycloakServer;
+
+import org.junit.jupiter.api.extension.ExtensionContext;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class Registry implements ExtensionContext.Store.CloseableResource {
@@ -32,6 +32,10 @@ public class Registry implements ExtensionContext.Store.CloseableResource {
         return logger;
     }
 
+    Extensions getExtensions() {
+        return extensions;
+    }
+
     public ExtensionContext getCurrentContext() {
         return currentContext;
     }
@@ -41,13 +45,19 @@ public class Registry implements ExtensionContext.Store.CloseableResource {
     }
 
     public <T> T getDependency(Class<T> typeClass, String ref, InstanceContext dependent) {
-        ref = StringUtil.convertEmptyToNull(ref);
+        String lookupRef = StringUtil.convertEmptyToNull(ref);
+
+        List<Dependency> declaredDependencies = dependent.getDeclaredDependencies();
+        if (declaredDependencies.stream().noneMatch(d -> d.valueType().equals(typeClass) && Objects.equals(d.ref(), lookupRef))) {
+            throw new RuntimeException("Tried to retrieve non-declared dependency " + typeClass.getSimpleName() + ":" + lookupRef);
+        }
+
         T dependency;
-        dependency = getDeployedDependency(typeClass, ref, dependent);
+        dependency = getDeployedDependency(typeClass, lookupRef, dependent);
         if (dependency != null) {
             return dependency;
         } else {
-            dependency = getRequestedDependency(typeClass, ref, dependent);
+            dependency = getRequestedDependency(typeClass, lookupRef, dependent);
             if (dependency != null) {
                 return dependency;
             }
@@ -67,7 +77,7 @@ public class Registry implements ExtensionContext.Store.CloseableResource {
     private <T> T getDeployedDependency(Class<T> typeClass, String ref, InstanceContext dependent) {
         InstanceContext dependency = getDeployedInstance(typeClass, ref);
         if (dependency != null) {
-            dependency.registerDependency(dependent);
+            dependency.registerDependent(dependent);
 
             logger.logDependencyInjection(dependent, dependency, RegistryLogger.InjectionType.EXISTING);
 
@@ -79,9 +89,9 @@ public class Registry implements ExtensionContext.Store.CloseableResource {
     private <T> T getRequestedDependency(Class<T> typeClass, String ref, InstanceContext dependent) {
         RequestedInstance requestedDependency = getRequestedInstance(typeClass, ref);
         if (requestedDependency != null) {
-            InstanceContext dependency = new InstanceContext<Object, Annotation>(requestedDependency.getInstanceId(), this, requestedDependency.getSupplier(), requestedDependency.getAnnotation(), requestedDependency.getValueType());
+            InstanceContext dependency = new InstanceContext<Object, Annotation>(requestedDependency.getInstanceId(), this, requestedDependency.getSupplier(), requestedDependency.getAnnotation(), requestedDependency.getValueType(), requestedDependency.getDeclaredDependencies());
             dependency.setValue(requestedDependency.getSupplier().getValue(dependency));
-            dependency.registerDependency(dependent);
+            dependency.registerDependent(dependent);
             deployedInstances.add(dependency);
 
             requestedInstances.remove(requestedDependency);
@@ -91,22 +101,6 @@ public class Registry implements ExtensionContext.Store.CloseableResource {
             return (T) dependency.getValue();
         }
         return null;
-    }
-
-    private <T> T getUnConfiguredDependency(Class<T> typeClass, String ref, InstanceContext dependent) {
-        InstanceContext dependency;
-        Supplier<?, ?> supplier = extensions.findSupplierByType(typeClass);
-        Annotation defaultAnnotation = DefaultAnnotationProxy.proxy(supplier.getAnnotationClass(), ref);
-        dependency = new InstanceContext(-1, this, supplier, defaultAnnotation, typeClass);
-
-        dependency.registerDependency(dependent);
-        dependency.setValue(supplier.getValue(dependency));
-
-        deployedInstances.add(dependency);
-
-        logger.logDependencyInjection(dependent, dependency, RegistryLogger.InjectionType.UN_CONFIGURED);
-
-        return (T) dependency.getValue();
     }
 
     public void beforeEach(Object testInstance) {
@@ -140,20 +134,9 @@ public class Registry implements ExtensionContext.Store.CloseableResource {
             }
         }
 
-        List<RequestedInstance<?, ?>> missingDependencies = new LinkedList<>();
-        for (RequestedInstance requestedInstance : requestedInstances) {
-            List<Dependency> dependencies =  requestedInstance.getSupplier().getDependencies(requestedInstance);
-            for (Dependency dependency : dependencies) {
-                boolean dependencyMissing = requestedInstances.stream().noneMatch(r -> r.getValueType().equals(dependency.valueType()) && Objects.equals(r.getRef(), dependency.ref()));
-                if (dependencyMissing) {
-                    Supplier<?, ?> supplier = extensions.findSupplierByType(dependency.valueType());
-                    Annotation defaultAnnotation = DefaultAnnotationProxy.proxy(supplier.getAnnotationClass(), dependency.ref());
-                    RequestedInstance<?, ?> requestDependency = createRequestedInstance(new Annotation[]{ defaultAnnotation }, dependency.valueType());
-                    missingDependencies.add(requestDependency);
-                }
-            }
-        }
-        requestedInstances.addAll(missingDependencies);
+        DependencyGraphResolver dependencyGraphResolver = new DependencyGraphResolver(this);
+        List<RequestedInstance<?, ?>> missingInstances = dependencyGraphResolver.getMissingInstances();
+        requestedInstances.addAll(missingInstances);
 
         logger.logRequestedInstances(requestedInstances);
     }
@@ -191,13 +174,13 @@ public class Registry implements ExtensionContext.Store.CloseableResource {
             RequestedInstance requestedInstance = requestedInstances.remove(0);
 
             if (getDeployedInstance(requestedInstance) == null) {
-                InstanceContext instance = new InstanceContext(requestedInstance.getInstanceId(), this, requestedInstance.getSupplier(), requestedInstance.getAnnotation(), requestedInstance.getValueType());
+                InstanceContext instance = new InstanceContext(requestedInstance.getInstanceId(), this, requestedInstance.getSupplier(), requestedInstance.getAnnotation(), requestedInstance.getValueType(), requestedInstance.getDeclaredDependencies());
                 instance.setValue(requestedInstance.getSupplier().getValue(instance));
                 deployedInstances.add(instance);
 
-                if (!requestedInstance.getDependencies().isEmpty()) {
-                    Set<InstanceContext<?,?>> dependencies = requestedInstance.getDependencies();
-                    dependencies.forEach(instance::registerDependency);
+                if (!requestedInstance.getDependents().isEmpty()) {
+                    Set<InstanceContext<?,?>> dependencies = requestedInstance.getDependents();
+                    dependencies.forEach(instance::registerDependent);
                 }
 
                 logger.logCreatedInstance(requestedInstance, instance);
@@ -249,7 +232,7 @@ public class Registry implements ExtensionContext.Store.CloseableResource {
         return extensions.getSuppliers();
     }
 
-    private RequestedInstance<?, ?> createRequestedInstance(Annotation[] annotations, Class<?> valueType) {
+    RequestedInstance<?, ?> createRequestedInstance(Annotation[] annotations, Class<?> valueType) {
         if (annotations != null) {
             for (Annotation annotation : annotations) {
                 Supplier<?, ?> supplier = extensions.findSupplierByAnnotation(annotation);
@@ -260,7 +243,7 @@ public class Registry implements ExtensionContext.Store.CloseableResource {
         } else {
             Supplier<?, ?> supplier = extensions.findSupplierByType(valueType);
             if (supplier != null) {
-                Annotation defaultAnnotation = DefaultAnnotationProxy.proxy(supplier.getAnnotationClass(), "");
+                Annotation defaultAnnotation = DefaultAnnotationProxy.proxy(supplier.getAnnotationClass(), null);
                 return new RequestedInstance(supplier, defaultAnnotation, valueType);
             }
         }
@@ -284,7 +267,7 @@ public class Registry implements ExtensionContext.Store.CloseableResource {
     private void destroy(InstanceContext instanceContext) {
         boolean removed = deployedInstances.remove(instanceContext);
         if (removed) {
-            Set<InstanceContext> dependencies = instanceContext.getDependencies();
+            Set<InstanceContext> dependencies = instanceContext.getDependents();
             dependencies.forEach(this::destroy);
             instanceContext.getSupplier().close(instanceContext);
 

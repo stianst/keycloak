@@ -1,53 +1,47 @@
 package org.keycloak.testframework.server;
 
+import java.util.List;
+
 import org.keycloak.testframework.annotations.KeycloakIntegrationTest;
 import org.keycloak.testframework.config.Config;
 import org.keycloak.testframework.database.TestDatabase;
 import org.keycloak.testframework.https.ManagedCertificates;
 import org.keycloak.testframework.infinispan.InfinispanServer;
 import org.keycloak.testframework.injection.AbstractInterceptorHelper;
+import org.keycloak.testframework.injection.DependenciesBuilder;
 import org.keycloak.testframework.injection.Dependency;
 import org.keycloak.testframework.injection.InstanceContext;
 import org.keycloak.testframework.injection.LifeCycle;
 import org.keycloak.testframework.injection.Registry;
 import org.keycloak.testframework.injection.RequestedInstance;
-import org.keycloak.testframework.injection.DependenciesBuilder;
 import org.keycloak.testframework.injection.Supplier;
 import org.keycloak.testframework.injection.SupplierHelpers;
 import org.keycloak.testframework.injection.SupplierOrder;
 
 import org.jboss.logging.Logger;
 
-import java.util.List;
-
 public abstract class AbstractKeycloakServerSupplier implements Supplier<KeycloakServer, KeycloakIntegrationTest> {
 
     @Override
     public List<Dependency> getDependencies(RequestedInstance<KeycloakServer, KeycloakIntegrationTest> instanceContext) {
-        DependenciesBuilder builder = DependenciesBuilder.create(ManagedCertificates.class);
+        KeycloakServerConfigBuilder command = getKeycloakServerConfigBuilder(instanceContext.getAnnotation());
+
+        DependenciesBuilder builder = DependenciesBuilder.create(ManagedCertificates.class).add(ManagedCertificates.class);
         if (requiresDatabase()) {
             builder.add(TestDatabase.class);
         }
+
+        if (command.isExternalInfinispanEnabled()) {
+            builder.add(InfinispanServer.class);
+        }
+
+        return builder.build();
     }
 
     @Override
     public KeycloakServer getValue(InstanceContext<KeycloakServer, KeycloakIntegrationTest> instanceContext) {
-        KeycloakIntegrationTest annotation = instanceContext.getAnnotation();
-        KeycloakServerConfig serverConfig = SupplierHelpers.getInstance(annotation.config());
 
-        KeycloakServerConfigBuilder command = KeycloakServerConfigBuilder.startDev()
-                .bootstrapAdminClient(Config.getAdminClientId(), Config.getAdminClientSecret())
-                .bootstrapAdminUser(Config.getAdminUsername(), Config.getAdminPassword());
-
-        command.log().handlers(KeycloakServerConfigBuilder.LogHandlers.CONSOLE);
-
-        String supplierConfig = Config.getSupplierConfig(KeycloakServer.class);
-        if (supplierConfig != null) {
-            KeycloakServerConfig serverConfigOverride = SupplierHelpers.getInstance(supplierConfig);
-            serverConfigOverride.configure(command);
-        }
-
-        command = serverConfig.configure(command);
+        KeycloakServerConfigBuilder command = getKeycloakServerConfigBuilder(instanceContext.getAnnotation());
 
         // Database startup and Keycloak connection setup
         if (requiresDatabase()) {
@@ -90,6 +84,24 @@ public abstract class AbstractKeycloakServerSupplier implements Supplier<Keycloa
         getLogger().infov("Keycloak test server started in {0} ms", System.currentTimeMillis() - start);
 
         return server;
+    }
+
+    private static KeycloakServerConfigBuilder getKeycloakServerConfigBuilder(KeycloakIntegrationTest annotation) {
+        KeycloakServerConfig serverConfig = SupplierHelpers.getInstance(annotation.config());
+        KeycloakServerConfigBuilder command = KeycloakServerConfigBuilder.startDev()
+                .bootstrapAdminClient(Config.getAdminClientId(), Config.getAdminClientSecret())
+                .bootstrapAdminUser(Config.getAdminUsername(), Config.getAdminPassword());
+
+        command.log().handlers(KeycloakServerConfigBuilder.LogHandlers.CONSOLE);
+
+        String supplierConfig = Config.getSupplierConfig(KeycloakServer.class);
+        if (supplierConfig != null) {
+            KeycloakServerConfig serverConfigOverride = SupplierHelpers.getInstance(supplierConfig);
+            serverConfigOverride.configure(command);
+        }
+
+        command = serverConfig.configure(command);
+        return command;
     }
 
     @Override
