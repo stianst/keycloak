@@ -3,13 +3,17 @@ package org.keycloak.testframework.injection;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import org.junit.jupiter.api.extension.ExtensionContext;
+
+import org.keycloak.testframework.server.KeycloakServer;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class Registry implements ExtensionContext.Store.CloseableResource {
@@ -131,7 +135,7 @@ public class Registry implements ExtensionContext.Store.CloseableResource {
         }
 
         Class testClass = testInstance.getClass();
-        RequestedInstance requestedServerInstance = createRequestedInstance(testClass.getAnnotations(), null);
+        RequestedInstance requestedServerInstance = createRequestedInstance(testClass.getAnnotations(), KeycloakServer.class);
         if (requestedServerInstance != null) {
             requestedInstances.add(requestedServerInstance);
         }
@@ -140,6 +144,17 @@ public class Registry implements ExtensionContext.Store.CloseableResource {
             RequestedInstance requestedInstance = createRequestedInstance(f.getAnnotations(), f.getType());
             if (requestedInstance != null) {
                 requestedInstances.add(requestedInstance);
+            }
+        }
+
+        List<RequiredDependencies.RequiredDependency> dependencies = requestedInstances.stream().flatMap(r -> r.getSupplier().getDependencies().getList().stream()).toList();
+        for (RequiredDependencies.RequiredDependency dependency : dependencies) {
+            boolean dependencyRequested = requestedInstances.stream().anyMatch(r -> r.getValueType().equals(dependency.valueType()) && Objects.equals(r.getRef(), dependency.ref()));
+            if (!dependencyRequested) {
+                Supplier<?, ?> supplier = extensions.findSupplierByType(dependency.valueType());
+                Annotation defaultAnnotation = DefaultAnnotationProxy.proxy(supplier.getAnnotationClass(), dependency.ref());
+                RequestedInstance<?, ?> requestDependency = createRequestedInstance(new Annotation[]{ defaultAnnotation }, dependency.valueType());
+                requestedInstances.add(requestDependency);
             }
         }
 
