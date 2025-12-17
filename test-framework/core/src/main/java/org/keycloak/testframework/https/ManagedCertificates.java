@@ -1,5 +1,6 @@
 package org.keycloak.testframework.https;
 
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,6 +19,7 @@ import org.keycloak.common.crypto.CryptoProvider;
 import org.keycloak.common.util.KeystoreUtil;
 import org.keycloak.crypto.def.DefaultCryptoProvider;
 
+import org.apache.http.conn.ssl.TrustAllStrategy;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.jboss.logging.Logger;
 
@@ -40,7 +42,10 @@ public class ManagedCertificates {
     private Path serverTruststorePath;
 
     private Path clientKeystorePath;
+    private KeyStore clientKeyStore;
+
     private Path clientTruststorePath;
+    private KeyStore clientTrustStore;
 
     private SSLContext clientSslContext;
 
@@ -62,6 +67,9 @@ public class ManagedCertificates {
 
         if (!Files.exists(serverKeystorePath) || !Files.exists(serverTruststorePath) || !Files.exists(clientKeystorePath) || !Files.exists(clientTruststorePath)) {
             createStores();
+        } else {
+            clientKeyStore = load(clientKeystorePath);
+            clientTrustStore = load(clientTruststorePath);
         }
 
         clientSslContext = tlsEnabled ? createClientSSLContext() : null;
@@ -99,10 +107,10 @@ public class ManagedCertificates {
     private SSLContext createClientSSLContext() {
         try {
             SSLContextBuilder sslContextBuilder = SSLContextBuilder.create()
-                    .loadTrustMaterial(clientTruststorePath.toFile(), STORE_PASSWORD_CHARS);
+                    .loadTrustMaterial(clientTrustStore, TrustAllStrategy.INSTANCE);
 
             if (mTlsEnabled) {
-                sslContextBuilder.loadKeyMaterial(clientKeystorePath.toFile(), STORE_PASSWORD_CHARS, STORE_PASSWORD_CHARS);
+                sslContextBuilder.loadKeyMaterial(clientKeyStore, STORE_PASSWORD_CHARS);
             }
 
             return sslContextBuilder.build();
@@ -129,12 +137,12 @@ public class ManagedCertificates {
             serverTrustStore.setCertificateEntry("myclient-certificate", clientCertificate);
             save(serverTrustStore, serverTruststorePath);
 
-            KeyStore clientKeyStore = cryptoProvider.getKeyStore(keystoreFormat);
+            clientKeyStore = cryptoProvider.getKeyStore(keystoreFormat);
             clientKeyStore.load(null, STORE_PASSWORD_CHARS);
             clientKeyStore.setKeyEntry("client-key", clientKeyPair.getPrivate(), STORE_PASSWORD_CHARS, new X509Certificate[] { clientCertificate });
             save(clientKeyStore, clientKeystorePath);
 
-            KeyStore clientTrustStore = cryptoProvider.getKeyStore(keystoreFormat);
+            clientTrustStore = cryptoProvider.getKeyStore(keystoreFormat);
             clientTrustStore.load(null, STORE_PASSWORD_CHARS);
             clientTrustStore.setCertificateEntry("server-certificate", serverCertificate);
             save(clientTrustStore, clientTruststorePath);
@@ -150,6 +158,16 @@ public class ManagedCertificates {
     private void save(KeyStore store, Path storePath) throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
         try (FileOutputStream fos = new FileOutputStream(storePath.toFile())) {
             store.store(fos, STORE_PASSWORD_CHARS);
+        }
+    }
+
+    private KeyStore load(Path keyStorePath) {
+        try (FileInputStream fis = new FileInputStream(keyStorePath.toFile())) {
+            KeyStore keyStore = cryptoProvider.getKeyStore(keystoreFormat);
+            keyStore.load(fis, STORE_PASSWORD_CHARS);
+            return keyStore;
+        } catch (Exception e) {
+            throw new ManagedCertificatesException(e);
         }
     }
 
