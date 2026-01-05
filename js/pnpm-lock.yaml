@@ -87,8 +87,8 @@ importers:
         specifier: ^25.6.0
         version: 25.6.0(typescript@5.9.3)
       i18next-fetch-backend:
-        specifier: ^6.0.0
-        version: 6.0.0
+        specifier: ^7.0.0
+        version: 7.0.0
       keycloak-js:
         specifier: ^26.2.0
         version: 26.2.0
@@ -187,8 +187,8 @@ importers:
         specifier: ^25.6.0
         version: 25.6.0(typescript@5.9.3)
       i18next-fetch-backend:
-        specifier: ^6.0.0
-        version: 6.0.0
+        specifier: ^7.0.0
+        version: 7.0.0
       jszip:
         specifier: ^3.10.1
         version: 3.10.1
@@ -2889,9 +2889,9 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  i18next-fetch-backend@6.0.0:
-    resolution: {integrity: sha512-kVqnydqLVMZfVlOuP2nf71cREydlxEKLH43jUXAFdOku/GF+6b9fBg31anoos5XncdhdtiYgL9fheqMrtXRwng==}
-    engines: {node: '>=18'}
+  i18next-fetch-backend@7.0.0:
+    resolution: {integrity: sha512-BUS/xzHDXNwGKKBQTaNWxY3xvgC40jcYw+4nSpTlaxcGenAubgIgBFuq4CIeeYcs3UkAQs8mf5y6iLnHhd01vw==}
+    engines: {node: '>=20'}
 
   i18next@25.6.0:
     resolution: {integrity: sha512-tTn8fLrwBYtnclpL5aPXK/tAYBLWVvoHM1zdfXoRNLcI+RvtMsoZRV98ePlaW3khHYKuNh/Q65W/+NVFUeIwVw==}
@@ -4383,6 +4383,7 @@ packages:
   whatwg-encoding@3.1.1:
     resolution: {integrity: sha512-6qN4hJdMwfYBtE3YBTTHhoeuUrDBPZmbQaxWAqSALV/MeEnR5z1xd8UKud2RAkFoPkmB+hli1TZSnyi84xz1vQ==}
     engines: {node: '>=18'}
+    deprecated: Use @exodus/bytes instead for a more spec-conformant and faster implementation
 
   whatwg-mimetype@4.0.0:
     resolution: {integrity: sha512-QaKxh0eNIi2mE9p2vEdzfagOKHCcj1pJ56EEHGQOVxp8r9/iszLUUV7v89x9O1p/T+NlTM5W7jW6+cz4Fq1YVg==}
@@ -5126,7 +5127,7 @@ snapshots:
       file-saver: 2.0.5
       flat: 6.0.1
       i18next: 25.6.0(typescript@5.9.3)
-      i18next-fetch-backend: 6.0.0
+      i18next-fetch-backend: 7.0.0
       jszip: 3.10.1
       keycloak-js: 26.2.0
       lodash-es: 4.17.21
@@ -7214,7 +7215,7 @@ snapshots:
 
   husky@9.1.7: {}
 
-  i18next-fetch-backend@6.0.0: {}
+  i18next-fetch-backend@7.0.0: {}
 
   i18next@25.6.0(typescript@5.9.3):
     dependencies:
