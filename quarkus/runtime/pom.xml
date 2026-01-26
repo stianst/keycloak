@@ -139,12 +139,6 @@
             <artifactId>rdf-urdna</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct</artifactId>
-            <version>${org.mapstruct.version}</version>
-        </dependency>
-
         <!-- Hibernate validator -->
         <dependency>
             <groupId>io.quarkus</groupId>
@@ -677,16 +671,6 @@
             <groupId>org.infinispan</groupId>
             <artifactId>infinispan-component-annotations</artifactId>
             <scope>provided</scope>
-        </dependency>
-        <!-- required for query/search in the external Infinispan server -->
-        <dependency>
-            <groupId>org.infinispan</groupId>
-            <artifactId>infinispan-remote-query-client</artifactId>
-        </dependency>
-        <!-- to be removed after https://issues.redhat.com/browse/ISPN-16220 -->
-        <dependency>
-            <groupId>org.infinispan</groupId>
-            <artifactId>infinispan-query-dsl</artifactId>
         </dependency>
         <dependency>
             <groupId>jakarta.xml.bind</groupId>

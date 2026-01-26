@@ -20,6 +20,8 @@ package org.keycloak.protocol.oid4vc;
 import java.util.HashMap;
 import java.util.Map;
 
+import jakarta.ws.rs.core.Response;
+
 import org.keycloak.Config;
 import org.keycloak.constants.OID4VCIConstants;
 import org.keycloak.events.EventBuilder;
@@ -29,6 +31,7 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.ProtocolMapperModel;
 import org.keycloak.models.RealmModel;
+import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.KeycloakModelUtils;
 import org.keycloak.models.utils.ModelToRepresentation;
 import org.keycloak.models.utils.RepresentationToModel;
@@ -40,9 +43,12 @@ import org.keycloak.protocol.oid4vc.issuance.mappers.OID4VCUserAttributeMapper;
 import org.keycloak.protocol.oidc.OIDCLoginProtocolFactory;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.ClientScopeRepresentation;
+import org.keycloak.services.ErrorResponse;
+import org.keycloak.services.ErrorResponseException;
 
 import org.jboss.logging.Logger;
 
+import static org.keycloak.OID4VCConstants.CLAIM_NAME_SUBJECT_ID;
 import static org.keycloak.constants.OID4VCIConstants.OID4VC_PROTOCOL;
 import static org.keycloak.models.ClientScopeModel.INCLUDE_IN_TOKEN_SCOPE;
 import static org.keycloak.models.oid4vci.CredentialScopeModel.CONFIGURATION_ID;
@@ -88,11 +94,11 @@ public class OID4VCLoginProtocolFactory implements LoginProtocolFactory, OID4VCE
 
 	@Override
 	public void init(Config.Scope config) {
-		builtins.put(SUBJECT_ID_MAPPER, OID4VCSubjectIdMapper.create("subject id", "id"));
+		builtins.put(SUBJECT_ID_MAPPER, OID4VCSubjectIdMapper.create(SUBJECT_ID_MAPPER, CLAIM_NAME_SUBJECT_ID, UserModel.ID));
 		builtins.put(USERNAME_MAPPER, OID4VCUserAttributeMapper.create(USERNAME_MAPPER, "username", "username", false));
 		builtins.put(EMAIL_MAPPER, OID4VCUserAttributeMapper.create(EMAIL_MAPPER, "email", "email", false));
 		builtins.put(FIRST_NAME_MAPPER, OID4VCUserAttributeMapper.create(FIRST_NAME_MAPPER, "firstName", "firstName", false));
-		builtins.put(LAST_NAME_MAPPER, OID4VCUserAttributeMapper.create(LAST_NAME_MAPPER, "lastName", "familyName", false));
+		builtins.put(LAST_NAME_MAPPER, OID4VCUserAttributeMapper.create(LAST_NAME_MAPPER, "familyName", "lastName", false));
 	}
 
 	@Override
@@ -161,6 +167,23 @@ public class OID4VCLoginProtocolFactory implements LoginProtocolFactory, OID4VCE
         clientScope.getAttributes().computeIfAbsent(HASH_ALGORITHM, k -> HASH_ALGORITHM_DEFAULT);
         clientScope.getAttributes().computeIfAbsent(TOKEN_JWS_TYPE, k -> TOKEN_TYPE_DEFAULT);
         clientScope.getAttributes().computeIfAbsent(EXPIRY_IN_SECONDS, k -> String.valueOf(EXPIRY_IN_SECONDS_DEFAULT));
+    }
+
+    @Override
+    public void validateClientScope(KeycloakSession session, ClientScopeRepresentation clientScope) throws ErrorResponseException {
+        LoginProtocolFactory.super.validateClientScope(session, clientScope);
+
+        RealmModel realm = session.getContext().getRealm();
+        if (!realm.isVerifiableCredentialsEnabled()) {
+            throw ErrorResponse.error(
+                    "OID4VC protocol cannot be used when Verifiable Credentials is disabled for the realm",
+                    Response.Status.BAD_REQUEST);
+        }
+    }
+
+    @Override
+    public boolean isValidClientScope(KeycloakSession session, ClientModel client, ClientScopeModel clientScope) {
+        return session.getContext().getRealm().isVerifiableCredentialsEnabled();
     }
 
     @Override

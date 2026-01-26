@@ -20,6 +20,8 @@ package org.keycloak.quarkus.deployment;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -98,6 +100,7 @@ import org.keycloak.quarkus.runtime.services.health.KeycloakClusterReadyHealthCh
 import org.keycloak.quarkus.runtime.services.health.KeycloakReadyHealthCheck;
 import org.keycloak.quarkus.runtime.storage.database.jpa.NamedJpaConnectionProviderFactory;
 import org.keycloak.quarkus.runtime.themes.FlatClasspathThemeResourceProviderFactory;
+import org.keycloak.quarkus.runtime.validation.HibernateValidatorFactoryCustomizer;
 import org.keycloak.representations.provider.ScriptProviderDescriptor;
 import org.keycloak.representations.provider.ScriptProviderMetadata;
 import org.keycloak.representations.userprofile.config.UPConfig;
@@ -128,6 +131,7 @@ import io.quarkus.bootstrap.logging.InitialConfigurator;
 import io.quarkus.datasource.deployment.spi.DevServicesDatasourceResultBuildItem;
 import io.quarkus.datasource.runtime.DataSourcesBuildTimeConfig;
 import io.quarkus.deployment.IsDevelopment;
+import io.quarkus.deployment.IsTest;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.annotations.Consume;
@@ -139,6 +143,7 @@ import io.quarkus.deployment.builditem.FeatureBuildItem;
 import io.quarkus.deployment.builditem.GeneratedResourceBuildItem;
 import io.quarkus.deployment.builditem.HotDeploymentWatchedFileBuildItem;
 import io.quarkus.deployment.builditem.IndexDependencyBuildItem;
+import io.quarkus.deployment.builditem.RuntimeConfigSetupCompleteBuildItem;
 import io.quarkus.deployment.builditem.StaticInitConfigBuilderBuildItem;
 import io.quarkus.hibernate.orm.deployment.HibernateOrmConfig;
 import io.quarkus.hibernate.orm.deployment.PersistenceXmlDescriptorBuildItem;
@@ -239,8 +244,16 @@ class KeycloakProcessor {
         return new FeatureBuildItem("keycloak");
     }
 
+    /**
+     * Initialize configuration in runtime during the static initialization
+     * <p>
+     * We need to wait for the full configuration initialization on the Quarkus side (see {@link RuntimeConfigSetupCompleteBuildItem}).
+     * <p>
+     * It prevents issues like https://github.com/keycloak/keycloak/issues/45501
+     */
     @Record(ExecutionTime.STATIC_INIT)
     @BuildStep
+    @Consume(RuntimeConfigSetupCompleteBuildItem.class)
     @Produce(ConfigBuildItem.class)
     void initConfig(KeycloakRecorder recorder) {
         // other buildsteps directly use the Config
@@ -849,6 +862,16 @@ class KeycloakProcessor {
         removeBeans.produce(new BuildTimeConditionBuildItem(disabledBean.asClass(), false));
     }
 
+    @BuildStep(onlyIfNot = IsTest.class) // needed for embedded Keycloak
+    void disableHibernateValidatorCustomizer(BuildProducer<BuildTimeConditionBuildItem> removeBeans, CombinedIndexBuildItem index) {
+        if (!Profile.isFeatureEnabled(Profile.Feature.CLIENT_ADMIN_API_V2)) {
+            // disables the filter
+            ClassInfo disabledBean = index.getIndex()
+                    .getClassByName(DotName.createSimple(HibernateValidatorFactoryCustomizer.class.getName()));
+            removeBeans.produce(new BuildTimeConditionBuildItem(disabledBean.asClass(), false));
+        }
+    }
+
     @BuildStep
     void disableMdcContextFilter(BuildProducer<BuildTimeConditionBuildItem> removeBeans, CombinedIndexBuildItem index) {
         if (!Configuration.isTrue(LoggingOptions.LOG_MDC_ENABLED)) {
@@ -1041,9 +1064,13 @@ class KeycloakProcessor {
                 // descriptor is at META-INF/
                 Path basePath = Path.of(url.getPath()).getParent().getParent();
 
+                String path = basePath.resolve(fileName).toString();
+                if (!path.startsWith(url.getProtocol())) {
+                    path = url.getProtocol() + ":" + path;
+                }
                 try {
-                    return basePath.resolve(fileName).toUri().toURL().openStream();
-                } catch (IOException e) {
+                    return new URI(path).toURL().openStream();
+                } catch (IOException | URISyntaxException e) {
                     throw new RuntimeException("Failed to read script file from: " + fileName);
                 }
             });

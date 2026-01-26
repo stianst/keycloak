@@ -32,21 +32,20 @@ import org.keycloak.models.ClientModel;
 import org.keycloak.models.ClientSessionContext;
 import org.keycloak.models.Constants;
 import org.keycloak.models.UserSessionModel;
-import org.keycloak.protocol.oid4vc.issuance.OID4VCAuthorizationDetailsResponse;
+import org.keycloak.protocol.oid4vc.issuance.OID4VCAuthorizationDetailResponse;
 import org.keycloak.protocol.oid4vc.issuance.OID4VCIssuerEndpoint;
 import org.keycloak.protocol.oid4vc.issuance.credentialoffer.CredentialOfferStorage;
 import org.keycloak.protocol.oidc.OIDCLoginProtocol;
 import org.keycloak.protocol.oidc.TokenManager.AccessTokenResponseBuilder;
-import org.keycloak.protocol.oidc.rar.AuthorizationDetailsResponse;
 import org.keycloak.representations.AccessToken;
 import org.keycloak.representations.AccessTokenResponse;
+import org.keycloak.representations.AuthorizationDetailsResponse;
 import org.keycloak.services.CorsErrorResponseException;
 import org.keycloak.util.JsonSerialization;
 import org.keycloak.utils.MediaType;
 
 import org.jboss.logging.Logger;
 
-import static org.keycloak.OAuth2Constants.AUTHORIZATION_DETAILS;
 import static org.keycloak.services.util.DefaultClientSessionContext.fromClientSessionAndScopeParameter;
 
 public class PreAuthorizedCodeGrantType extends OAuth2GrantTypeBase {
@@ -59,6 +58,15 @@ public class PreAuthorizedCodeGrantType extends OAuth2GrantTypeBase {
     public Response process(Context context) {
         LOGGER.debug("Process grant request for preauthorized.");
         setContext(context);
+
+        // Check if OID4VCI functionality is enabled for the realm
+        if (!realm.isVerifiableCredentialsEnabled()) {
+            LOGGER.debugf("OID4VCI functionality is disabled for realm '%s'. Verifiable Credentials switch is off.", realm.getName());
+            event.error(Errors.INVALID_CLIENT);
+            throw new CorsErrorResponseException(cors, OAuthErrorException.INVALID_CLIENT,
+                    "OID4VCI functionality is disabled for this realm",
+                    Response.Status.FORBIDDEN);
+        }
 
         // See: https://openid.net/specs/openid-4-verifiable-credential-issuance-1_0.html#name-token-request
         String code = formParams.getFirst(PreAuthorizedCodeGrantTypeFactory.CODE_REQUEST_PARAM);
@@ -127,9 +135,12 @@ public class PreAuthorizedCodeGrantType extends OAuth2GrantTypeBase {
         // set the client as retrieved from the pre-authorized session
         session.getContext().setClient(clientModel);
 
+        event.client(clientModel)
+                .user(userModel);
+
         // Process authorization_details using provider discovery
         List<AuthorizationDetailsResponse> authorizationDetailsResponses = processAuthorizationDetails(userSession, sessionContext);
-        LOGGER.infof("Initial authorization_details processing result: %s", authorizationDetailsResponses);
+        LOGGER.debugf("Initial authorization_details processing result: %s", authorizationDetailsResponses);
 
         // If no authorization_details were processed from the request, try to generate them from credential offer
         if (authorizationDetailsResponses == null || authorizationDetailsResponses.isEmpty()) {
@@ -146,7 +157,7 @@ public class PreAuthorizedCodeGrantType extends OAuth2GrantTypeBase {
         }
 
         // Add authorization_details to the OfferState and otherClaims
-        var authDetails = (OID4VCAuthorizationDetailsResponse) authorizationDetailsResponses.get(0);
+        var authDetails = (OID4VCAuthorizationDetailResponse) authorizationDetailsResponses.get(0);
         offerState.setAuthorizationDetails(authDetails);
         offerStorage.replaceOfferState(session, offerState);
 
@@ -157,7 +168,7 @@ public class PreAuthorizedCodeGrantType extends OAuth2GrantTypeBase {
                 userSession,
                 sessionContext);
 
-        accessToken.setOtherClaims(AUTHORIZATION_DETAILS, authorizationDetailsResponses);
+        accessToken.setAuthorizationDetails(authorizationDetailsResponses);
 
         AccessTokenResponseBuilder responseBuilder = tokenManager.responseBuilder(
                 clientSession.getRealm(),
@@ -170,7 +181,7 @@ public class PreAuthorizedCodeGrantType extends OAuth2GrantTypeBase {
         AccessTokenResponse tokenResponse;
         try {
             tokenResponse = responseBuilder.build();
-            tokenResponse.setOtherClaims(AUTHORIZATION_DETAILS, authorizationDetailsResponses);
+            tokenResponse.setAuthorizationDetails(authorizationDetailsResponses);
         } catch (RuntimeException re) {
             String errorMessage = "Cannot get encryption KEK";
             if (errorMessage.equals(re.getMessage())) {

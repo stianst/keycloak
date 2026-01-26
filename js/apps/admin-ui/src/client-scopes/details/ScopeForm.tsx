@@ -29,6 +29,7 @@ import {
 import { convertAttributeNameToForm, convertToFormValues } from "../../util";
 import useIsFeatureEnabled, { Feature } from "../../utils/useIsFeatureEnabled";
 import { toClientScopes } from "../routes/ClientScopes";
+import { removeEmptyOid4vcAttributes } from "./oid4vciAttributes";
 
 const OID4VC_PROTOCOL = "oid4vc";
 const VC_FORMAT_JWT_VC = "jwt_vc";
@@ -61,7 +62,7 @@ export const ScopeForm = ({ clientScope, save }: ScopeFormProps) => {
   const form = useForm<ClientScopeDefaultOptionalType>({ mode: "onChange" });
   const { control, handleSubmit, setValue, formState } = form;
   const { isDirty, isValid } = formState;
-  const { realm } = useRealm();
+  const { realm, realmRepresentation } = useRealm();
 
   const providers = useLoginProviders();
   const serverInfo = useServerInfo();
@@ -74,6 +75,17 @@ export const ScopeForm = ({ clientScope, save }: ScopeFormProps) => {
       serverInfo?.providers?.signature?.providers
         ? Object.keys(serverInfo.providers.signature.providers)
         : [],
+    [serverInfo],
+  );
+
+  // Get available hash algorithms from server info
+  const hashAlgorithms = serverInfo?.providers?.hash?.providers
+    ? Object.keys(serverInfo.providers.hash.providers)
+    : [];
+
+  // Get available asymmetric signature algorithms from server info
+  const asymmetricSigAlgOptions = useMemo(
+    () => serverInfo?.cryptoInfo?.clientSignatureAsymmetricAlgorithms ?? [],
     [serverInfo],
   );
 
@@ -140,7 +152,9 @@ export const ScopeForm = ({ clientScope, save }: ScopeFormProps) => {
   });
 
   const isOid4vcProtocol = selectedProtocol === OID4VC_PROTOCOL;
-  const isOid4vcEnabled = isFeatureEnabled(Feature.OpenId4VCI);
+  const isOid4vcEnabled =
+    isFeatureEnabled(Feature.OpenId4VCI) &&
+    realmRepresentation?.verifiableCredentialsEnabled;
   const isNotSaml = selectedProtocol != "saml";
 
   const setDynamicRegex = (value: string, append: boolean) =>
@@ -156,10 +170,19 @@ export const ScopeForm = ({ clientScope, save }: ScopeFormProps) => {
     convertToFormValues(clientScope ?? {}, setValue);
   }, [clientScope, setValue]);
 
+  /* Form-level validation handles correctness; here we only prune known optional
+     OID4VC fields when empty. If new attributes are added, extend
+     OID4VC_ATTRIBUTE_KEYS (and related validation) so they participate in cleanup. */
+  const onSubmit = (values: ClientScopeDefaultOptionalType) => {
+    const isOid4vc = values.protocol === OID4VC_PROTOCOL;
+    const cleaned = isOid4vc ? removeEmptyOid4vcAttributes(values) : values;
+    save(cleaned);
+  };
+
   return (
     <FormAccess
       role="manage-clients"
-      onSubmit={handleSubmit(save)}
+      onSubmit={handleSubmit(onSubmit)}
       isHorizontal
     >
       <FormProvider {...form}>
@@ -320,6 +343,9 @@ export const ScopeForm = ({ clientScope, save }: ScopeFormProps) => {
               labelIcon={t("credentialLifetimeHelp")}
               type="number"
               min={1}
+              defaultValue={
+                clientScope?.attributes?.["vc.expiry_in_seconds"] ?? "31536000"
+              }
             />
             <SelectControl
               id="kc-vc-format"
@@ -365,6 +391,45 @@ export const ScopeForm = ({ clientScope, save }: ScopeFormProps) => {
                     clientScope?.attributes?.["vc.signing_key_id"] ?? "",
                 }}
                 options={keyOptions}
+              />
+            )}
+            {asymmetricSigAlgOptions.length > 0 && (
+              <SelectControl
+                id="kc-credential-signing-alg"
+                name={convertAttributeNameToForm<ClientScopeDefaultOptionalType>(
+                  "attributes.vc.credential_signing_alg",
+                )}
+                label={t("credentialSigningAlgorithm")}
+                labelIcon={t("credentialSigningAlgorithmHelp")}
+                controller={{
+                  defaultValue:
+                    clientScope?.attributes?.["vc.credential_signing_alg"] ??
+                    "",
+                }}
+                options={asymmetricSigAlgOptions.map((alg) => ({
+                  key: alg,
+                  value: alg,
+                }))}
+              />
+            )}
+            {hashAlgorithms.length > 0 && (
+              <SelectControl
+                id="kc-hash-algorithm"
+                name={convertAttributeNameToForm<ClientScopeDefaultOptionalType>(
+                  "attributes.vc.credential_build_config.hash_algorithm",
+                )}
+                label={t("hashAlgorithm")}
+                labelIcon={t("hashAlgorithmHelp")}
+                controller={{
+                  defaultValue:
+                    clientScope?.attributes?.[
+                      "vc.credential_build_config.hash_algorithm"
+                    ] ?? "SHA-256",
+                }}
+                options={hashAlgorithms.map((alg) => ({
+                  key: alg,
+                  value: alg,
+                }))}
               />
             )}
             <TextAreaControl

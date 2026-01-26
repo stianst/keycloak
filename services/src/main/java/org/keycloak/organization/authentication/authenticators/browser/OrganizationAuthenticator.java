@@ -183,7 +183,7 @@ public class OrganizationAuthenticator extends IdentityProviderAuthenticator {
             // if re-authenticating in the scope of an organization
             context.success();
         } else {
-            attempted(context);
+            attempted(context, username);
         }
     }
 
@@ -261,7 +261,7 @@ public class OrganizationAuthenticator extends IdentityProviderAuthenticator {
 
     private boolean tryRedirectBroker(AuthenticationFlowContext context, OrganizationModel organization, UserModel user, String username, String domain) {
         // the user has credentials set; do not redirect to allow the user to pick how to authenticate
-        if (user != null && user.credentialManager().getStoredCredentialsStream().findAny().isPresent()) {
+        if (user != null && user.credentialManager().getFirstFactorCredentialsStream().findAny().isPresent()) {
             return false;
         }
 

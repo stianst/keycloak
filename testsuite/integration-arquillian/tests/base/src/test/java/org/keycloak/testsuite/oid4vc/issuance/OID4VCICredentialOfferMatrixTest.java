@@ -16,6 +16,7 @@
  */
 package org.keycloak.testsuite.oid4vc.issuance;
 
+import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -30,12 +31,13 @@ import org.keycloak.OAuth2Constants;
 import org.keycloak.TokenVerifier;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.jose.jws.JWSInput;
-import org.keycloak.protocol.oid4vc.model.AuthorizationDetail;
+import org.keycloak.protocol.oid4vc.issuance.OID4VCAuthorizationDetailResponse;
 import org.keycloak.protocol.oid4vc.model.CredentialIssuer;
 import org.keycloak.protocol.oid4vc.model.CredentialOfferURI;
 import org.keycloak.protocol.oid4vc.model.CredentialRequest;
 import org.keycloak.protocol.oid4vc.model.CredentialResponse;
 import org.keycloak.protocol.oid4vc.model.CredentialsOffer;
+import org.keycloak.protocol.oid4vc.model.OID4VCAuthorizationDetail;
 import org.keycloak.protocol.oid4vc.model.PreAuthorizedCode;
 import org.keycloak.protocol.oid4vc.model.SupportedCredentialConfiguration;
 import org.keycloak.protocol.oid4vc.model.VerifiableCredential;
@@ -64,7 +66,6 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 
-import static org.keycloak.OAuth2Constants.CREDENTIAL_IDENTIFIERS;
 import static org.keycloak.OAuth2Constants.OPENID_CREDENTIAL;
 import static org.keycloak.constants.OID4VCIConstants.CREDENTIAL_OFFER_CREATE;
 import static org.keycloak.protocol.oid4vc.model.ErrorType.INVALID_CREDENTIAL_OFFER_REQUEST;
@@ -82,26 +83,26 @@ import static org.junit.Assert.fail;
 /**
  * Credential Offer Validity Matrix
  * <p>
- * +----------+-----------+---------+---------+------------------------------------------------------+
- * | pre-auth | clientId  | username  | Valid   | Notes                                                |
- * +----------+-----------+---------+---------+------------------------------------------------------+
- * | no       | no        | no      | yes     | Generic offer; any logged-in user may redeem.        |
- * | no       | no        | yes     | yes     | Offer restricted to a specific user.                 |
- * | no       | yes       | no      | yes     | Bound to client; user determined at login.           |
- * | no       | yes       | yes     | yes     | Bound to both client and user.                       |
- * +----------+-----------+---------+---------+------------------------------------------------------+
- * | yes      | no        | no      | no      | Pre-auth requires a user subject; missing username.   |
- * | yes      | no        | yes     | yes     | Pre-auth for a specific user; client issuer defined. |
- * | yes      | yes       | no      | no      | Same as above; username required.                      |
- * | yes      | yes       | yes     | yes     | Fully constrained: user + client.                    |
- * +----------+-----------+---------+---------+------------------------------------------------------+
+ * +----------+-----------+----------+---------+------------------------------------------------------+
+ * | pre-auth | clientId  | username | Valid   | Notes                                                |
+ * +----------+-----------+----------+---------+------------------------------------------------------+
+ * | no       | no        | no       | yes     | Generic offer; any logged-in user may redeem.        |
+ * | no       | no        | yes      | yes     | Offer restricted to a specific user.                 |
+ * | no       | yes       | no       | yes     | Bound to client; user determined at login.           |
+ * | no       | yes       | yes      | yes     | Bound to both client and user.                       |
+ * +----------+-----------+----------+---------+------------------------------------------------------+
+ * | yes      | no        | no       | no      | Pre-auth requires a user subject; missing username.  |
+ * | yes      | no        | yes      | yes     | Pre-auth for a specific user; client issuer defined. |
+ * | yes      | yes       | no       | no      | Same as above; username required.                    |
+ * | yes      | yes       | yes      | yes     | Fully constrained: user + client.                    |
+ * +----------+-----------+----------+---------+------------------------------------------------------+
  */
 public class OID4VCICredentialOfferMatrixTest extends OID4VCIssuerEndpointTest {
 
     String issUsername = "john";
     String issClientId = clientId;
 
-    String namedUsername = "alice";
+    String appUsername = "alice";
 
     String credScopeName = jwtTypeCredentialScopeName;
     String credConfigId = jwtTypeCredentialConfigurationIdName;
@@ -133,24 +134,24 @@ public class OID4VCICredentialOfferMatrixTest extends OID4VCIssuerEndpointTest {
     @Test
     public void testVariousLogins() {
         assertNotNull(getBearerTokenAndLogout(issClientId, issUsername, "openid"));
-        assertNotNull(getBearerTokenAndLogout(issClientId, namedUsername, "openid"));
+        assertNotNull(getBearerTokenAndLogout(issClientId, appUsername, "openid"));
         assertNotNull(getBearerTokenAndLogout(namedClientId, issUsername, "openid"));
-        assertNotNull(getBearerTokenAndLogout(namedClientId, namedUsername, "openid"));
+        assertNotNull(getBearerTokenAndLogout(namedClientId, appUsername, "openid"));
     }
 
     @Test
     public void testCredentialWithoutOffer() throws Exception {
 
-        var ctx = newTestContext(false, null, namedUsername);
+        var ctx = newTestContext(false, null, appUsername);
 
-        AuthorizationDetail authDetail = new AuthorizationDetail();
+        OID4VCAuthorizationDetailResponse authDetail = new OID4VCAuthorizationDetailResponse();
         authDetail.setType(OPENID_CREDENTIAL);
         authDetail.setCredentialConfigurationId(credConfigId);
         authDetail.setLocations(List.of(ctx.issuerMetadata.getCredentialIssuer()));
 
-        // [TODO] Requires Credential scope in AuthorizationRequest although already given in AuthorizationDetails
+        // [TODO #44320] Requires Credential scope in AuthorizationRequest although already given in AuthorizationDetails
         // https://github.com/keycloak/keycloak/issues/44320
-        String accessToken = getBearerToken(issClientId, ctx.appUser, credScopeName, authDetail);
+        String accessToken = getBearerToken(issClientId, ctx.appUser, credScopeName, convertToAuthzDetail(authDetail));
 
         CredentialResponse credResponse = getCredentialByAuthDetail(ctx, accessToken, authDetail);
         verifyCredentialResponse(ctx, credResponse);
@@ -163,7 +164,7 @@ public class OID4VCICredentialOfferMatrixTest extends OID4VCIssuerEndpointTest {
 
     @Test
     public void testCredentialOffer_noPreAuth_noClientId_UserId() throws Exception {
-        runCredentialOfferTest(newTestContext(false, null, namedUsername));
+        runCredentialOfferTest(newTestContext(false, null, appUsername));
     }
 
     @Test
@@ -173,7 +174,7 @@ public class OID4VCICredentialOfferMatrixTest extends OID4VCIssuerEndpointTest {
 
     @Test
     public void testCredentialOffer_noPreAuth_ClientId_UserId() throws Exception {
-        runCredentialOfferTest(newTestContext(false, namedClientId, namedUsername));
+        runCredentialOfferTest(newTestContext(false, namedClientId, appUsername));
     }
 
     // Pre Authorized --------------------------------------------------------------------------------------------------
@@ -191,7 +192,7 @@ public class OID4VCICredentialOfferMatrixTest extends OID4VCIssuerEndpointTest {
 
     @Test
     public void testCredentialOffer_PreAuth_noClientId_UserId() throws Exception {
-        runCredentialOfferTest(newTestContext(true, null, namedUsername));
+        runCredentialOfferTest(newTestContext(true, null, appUsername));
     }
 
     @Test
@@ -207,22 +208,22 @@ public class OID4VCICredentialOfferMatrixTest extends OID4VCIssuerEndpointTest {
 
     @Test
     public void testCredentialOffer_PreAuth_ClientId_Username() throws Exception {
-        runCredentialOfferTest(newTestContext(true, namedClientId, namedUsername));
+        runCredentialOfferTest(newTestContext(true, namedClientId, appUsername));
     }
 
     @Test
     public void testCredentialOffer_PreAuth_ClientId_Username_disabledUser() throws Exception {
         // Disable user
-        UserResource user = ApiUtil.findUserByUsernameId(testRealm(), namedUsername);
+        UserResource user = ApiUtil.findUserByUsernameId(testRealm(), appUsername);
         UserRepresentation userRep = user.toRepresentation();
         userRep.setEnabled(false);
         user.update(userRep);
 
         try {
-            runCredentialOfferTest(newTestContext(true, namedClientId, namedUsername));
+            runCredentialOfferTest(newTestContext(true, namedClientId, appUsername));
             fail("Expected " + INVALID_CREDENTIAL_OFFER_REQUEST.name());
         } catch (RuntimeException ex) {
-            List.of(INVALID_CREDENTIAL_OFFER_REQUEST.name(), "User '" + namedUsername + "' disabled")
+            List.of(INVALID_CREDENTIAL_OFFER_REQUEST.name(), "User '" + appUsername + "' disabled")
                     .forEach(it -> assertTrue(ex.getMessage() + " does not contain " + it, ex.getMessage().contains(it)));
         } finally {
             // Re-enable user
@@ -272,7 +273,7 @@ public class OID4VCICredentialOfferMatrixTest extends OID4VCIssuerEndpointTest {
                 //  4. does not reflect anything from the credential offer
                 //
                 AccessTokenResponse accessToken = getPreAuthorizedAccessTokenResponse(ctx, credOffer);
-                List<AuthorizationDetail> authDetails = accessToken.getAuthorizationDetails();
+                List<OID4VCAuthorizationDetailResponse> authDetails = accessToken.getAuthorizationDetails(OID4VCAuthorizationDetailResponse.class);
                 if (authDetails == null)
                     throw new IllegalStateException("No authorization_details in token response");
                 if (authDetails.size() > 1)
@@ -286,7 +287,7 @@ public class OID4VCICredentialOfferMatrixTest extends OID4VCIssuerEndpointTest {
             } else {
 
                 String clientId = ctx.appClient != null ? ctx.appClient : namedClientId;
-                String userId = ctx.appUser != null ? ctx.appUser : namedUsername;
+                String userId = ctx.appUser != null ? ctx.appUser : appUsername;
                 String credConfigId = credOffer.getCredentialConfigurationIds().get(0);
 
                 SupportedCredentialConfiguration credConfig = ctx.issuerMetadata.getCredentialsSupported().get(credConfigId);
@@ -317,7 +318,7 @@ public class OID4VCICredentialOfferMatrixTest extends OID4VCIssuerEndpointTest {
         }
     }
 
-    private String getBearerToken(String clientId, String username, String scope, AuthorizationDetail... authDetail) {
+    private String getBearerToken(String clientId, String username, String scope, OID4VCAuthorizationDetail... authDetail) {
         ClientRepresentation client = testRealm().clients().findByClientId(clientId).get(0);
         String authCode = getAuthorizationCode(oauth, client, username, scope);
         return getBearerToken(oauth, authCode, authDetail).getAccessToken();
@@ -387,9 +388,8 @@ public class OID4VCICredentialOfferMatrixTest extends OID4VCIssuerEndpointTest {
         return new AccessTokenResponse(accessTokenResponse);
     }
 
-    private CredentialResponse getCredentialByAuthDetail(OfferTestContext ctx, String accessToken, AuthorizationDetail authDetail) throws Exception {
-        @SuppressWarnings("unchecked")
-        List<String> credIdentifiers = (List<String>) authDetail.getAdditionalFields().get(CREDENTIAL_IDENTIFIERS);
+    private CredentialResponse getCredentialByAuthDetail(OfferTestContext ctx, String accessToken, OID4VCAuthorizationDetailResponse authDetail) throws Exception {
+        List<String> credIdentifiers = authDetail.getCredentialIdentifiers();
         var credentialRequest = new CredentialRequest();
         if (credIdentifiers != null) {
             if (credIdentifiers.size() > 1)
@@ -439,7 +439,7 @@ public class OID4VCICredentialOfferMatrixTest extends OID4VCIssuerEndpointTest {
         CredentialResponse.Credential credentialObj = credResponse.getCredentials().get(0);
         assertNotNull("The first credential in the array should not be null", credentialObj);
 
-        String expUsername = ctx.appUser != null ? ctx.appUser : namedUsername;
+        String expUsername = ctx.appUser != null ? ctx.appUser : appUsername;
 
         JsonWebToken jsonWebToken = TokenVerifier.create((String) credentialObj.getCredential(), JsonWebToken.class).getToken();
         assertEquals("did:web:test.org", jsonWebToken.getIssuer());
@@ -480,5 +480,9 @@ public class OID4VCICredentialOfferMatrixTest extends OID4VCIssuerEndpointTest {
         }
         includeRoles.forEach(it -> assertTrue("Missing role: " + it, allRoles.contains(it)));
         excludeRoles.forEach(it -> assertFalse("Invalid role: " + it, allRoles.contains(it)));
+    }
+
+    private OID4VCAuthorizationDetail convertToAuthzDetail(Object oid4vcDetails) throws IOException {
+        return JsonSerialization.readValue(JsonSerialization.writeValueAsString(oid4vcDetails), OID4VCAuthorizationDetail.class);
     }
 }
