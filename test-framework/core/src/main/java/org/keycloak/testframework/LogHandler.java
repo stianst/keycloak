@@ -12,10 +12,13 @@ import org.jboss.logging.Logger;
 import org.jboss.logmanager.LogManager;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
-public class LogHandler {
+import org.keycloak.testframework.github.GitHubActions;
+
+public class LogHandler implements AutoCloseable {
 
     private static final Logger LOGGER = Logger.getLogger("testinfo");
     private final boolean logFilterEnabled;
+    private GitHubActions gitHubActions = new GitHubActions();
 
     public LogHandler() {
         logFilterEnabled = Config.get("kc.test.log.filter", false, Boolean.class);
@@ -54,7 +57,13 @@ public class LogHandler {
     }
 
     public void afterAll(ExtensionContext context) {
-        logTestClassStatus(context, Status.FINISHED, Logger.Level.DEBUG);
+        Status status = context.getExecutionException().isPresent() ? Status.FAILED : Status.SUCCESS;
+        if (status == Status.FAILED) {
+            gitHubActions.onClassError();
+        } else {
+            gitHubActions.onClassSuccess();
+        }
+        logTestClassStatus(context, status, Logger.Level.DEBUG);
     }
 
     public void afterEachStarting(ExtensionContext context) {
@@ -65,23 +74,31 @@ public class LogHandler {
     }
 
     public void testSuccessful(ExtensionContext context) {
+        gitHubActions.onMethodSuccess();
         clearLogFilter(false);
         logTestMethodStatus(context, Status.SUCCESS, Logger.Level.DEBUG);
     }
 
     public void testFailed(ExtensionContext context) {
+        gitHubActions.onMethodFailed();
         clearLogFilter(true);
         logTestMethodStatus(context, Status.FAILED, Logger.Level.ERROR);
     }
 
     public void testAborted(ExtensionContext context) {
+        gitHubActions.onMethodAborted();
         clearLogFilter(true);
         logTestMethodStatus(context, Status.ABORTED, Logger.Level.ERROR);
     }
 
     public void testDisabled(ExtensionContext context) {
+        gitHubActions.onMethodDisabled();
         clearLogFilter(false);
         logTestMethodStatus(context, Status.DISABLED, Logger.Level.DEBUG);
+    }
+
+    public void close() {
+        gitHubActions.printSummary();
     }
 
     private void logDivider(Logger.Level level) {

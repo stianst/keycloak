@@ -1,5 +1,7 @@
 package org.keycloak.tests;
 
+import org.junit.jupiter.api.Disabled;
+
 import org.keycloak.testframework.annotations.KeycloakIntegrationTest;
 
 import org.junit.jupiter.api.Assertions;
@@ -11,6 +13,12 @@ public class PassingTest {
     @Test
     public void failingTest() {
         Assertions.assertEquals(1, 1);
+    }
+
+    @Test
+    @Disabled
+    public void disabledTest() {
+        Assertions.assertEquals(1, 2);
     }
 
 }

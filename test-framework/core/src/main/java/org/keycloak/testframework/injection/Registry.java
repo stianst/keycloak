@@ -263,6 +263,7 @@ public class Registry implements AutoCloseable {
         logger.logClose();
         List<InstanceContext<?, ?>> destroy = deployedInstances.stream().sorted(InstanceContextComparator.INSTANCE.reversed()).toList();
         destroy.forEach(this::destroy);
+
     }
 
     List<Supplier<?, ?>> getSuppliers() {
