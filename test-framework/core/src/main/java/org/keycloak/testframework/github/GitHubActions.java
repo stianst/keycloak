@@ -124,33 +124,38 @@ public class GitHubActions {
         if (gitHubStepSummary != null) {
             try {
                 PrintWriter printWriter = new PrintWriter(new FileWriter(gitHubStepSummary, true));
-                printWriter.println("## Test results");
-                printWriter.println("| Class Success | Class Failures | Success | Failures | Disabled |" );
-                printWriter.println("| ------------- | -------------- | ------- | -------- | -------- |" );
-                printWriter.println("| " + classSuccess + " | " + classError + " | " + methodSuccess + " | " + methodFailed + " | " + methodDisabled + " |" );
 
-                if (!failedClasses.isEmpty()) {
-                    printWriter.println("### Test classes with errors");
-                    failedClasses.forEach(c -> printWriter.println(" * " + c.getName()));
-                }
+                if (failedClasses.isEmpty() && failedMethods.isEmpty() && slowClasses.isEmpty() && slowMethods.isEmpty()) {
+                    printWriter.println("## :white_check_mark: All tests passed");
+                    printWriter.println("Executed " + methodSuccess + " tests");
+                } else {
+                    if (!failedClasses.isEmpty() || !failedMethods.isEmpty()) {
+                        printWriter.println("## :no_entry: Failed tests");
+                        printWriter.println("| Test class | Test method |");
+                        printWriter.println("| ---------- | ----------- |");
 
-                if (!failedMethods.isEmpty()) {
-                    printWriter.println("### Tests with errors");
-                    failedMethods.forEach(m -> printWriter.println(" * " + testName(m)));
-                }
+                        failedClasses.forEach(c ->
+                            printWriter.println("| " + c.getName() + " | |")
+                        );
 
-                if (!slowClasses.isEmpty()) {
-                    printWriter.println("### Slow test classes");
-                    printWriter.println("| Class | Execution time |" );
-                    printWriter.println("| ----- | -------------- |" );
-                    slowClasses.forEach((key, value) -> printWriter.println("| " + key.getName() + " | " + value + " |"));
-                }
+                        failedMethods.forEach(m ->
+                            printWriter.println("| " + m.getDeclaringClass().getName() + " | " + m.getName() + " |")
+                        );
+                    }
 
-                if (!slowMethods.isEmpty()) {
-                    printWriter.println("### Slow test classes");
-                    printWriter.println("| Class | Execution time |" );
-                    printWriter.println("| ----- | -------------- |" );
-                    slowMethods.forEach((key, value) -> printWriter.println("| " + testName(key) + " | " + value + " |"));
+                    if (!slowClasses.isEmpty() || !slowMethods.isEmpty()) {
+                        printWriter.println("## :warning: Slow tests detected");
+                        printWriter.println("| Test class | Test method | Execution time |");
+                        printWriter.println("| ---------- | ----------- | -------------- |");
+
+                        slowClasses.forEach((c, t) ->
+                            printWriter.println("| " + c.getName() + " | | " + t + " |")
+                        );
+
+                        slowMethods.forEach((m, t) ->
+                            printWriter.println("| " + m.getDeclaringClass().getName() + " | " + m.getName() + " | " + t + " |")
+                        );
+                    }
                 }
 
                 printWriter.close();
