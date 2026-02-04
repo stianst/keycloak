@@ -1161,9 +1161,6 @@ jobs:
       - name: Run tests
         run: ./mvnw package -f tests/pom.xml -Dtest=FailingTest,PassingTest,ErrorTest
 
-      - name: Reports
-        if: failure()
-        run: javac misc/log/SureFireReports.java && java -cp misc/log SureFireReports
 #
 #  admin-v2-tests:
 #    name: Admin v2
