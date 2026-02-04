@@ -66,6 +66,18 @@ public class GitHubActions {
 
     public void onClassError(ExtensionContext context) {
         if (gitHubStepSummary != null) {
+            String file = findJavaClass(context.getRequiredTestClass());
+
+            Throwable throwable = context.getExecutionException().get();
+
+            StackTraceElement stackTraceElement = throwable.getStackTrace()[throwable.getStackTrace().length - 1];
+            String message = throwable.getMessage();
+            int line = stackTraceElement.getLineNumber();
+
+            String title = "Test error";
+
+            printErrorAnnotation(file, line, title, message);
+
             failedClasses.add(context.getRequiredTestClass());
             classError++;
         }
