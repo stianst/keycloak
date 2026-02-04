@@ -4,6 +4,7 @@ import java.util.logging.Filter;
 import java.util.logging.Handler;
 
 import org.keycloak.testframework.config.Config;
+import org.keycloak.testframework.github.GitHubActions;
 
 import io.quarkus.runtime.logging.LoggingSetupRecorder;
 import io.smallrye.config.SmallRyeConfigProviderResolver;
@@ -11,8 +12,6 @@ import org.eclipse.microprofile.config.spi.ConfigProviderResolver;
 import org.jboss.logging.Logger;
 import org.jboss.logmanager.LogManager;
 import org.junit.jupiter.api.extension.ExtensionContext;
-
-import org.keycloak.testframework.github.GitHubActions;
 
 public class LogHandler implements AutoCloseable {
 

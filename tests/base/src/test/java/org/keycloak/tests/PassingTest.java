@@ -1,10 +1,9 @@
 package org.keycloak.tests;
 
-import org.junit.jupiter.api.Disabled;
-
 import org.keycloak.testframework.annotations.KeycloakIntegrationTest;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 @KeycloakIntegrationTest

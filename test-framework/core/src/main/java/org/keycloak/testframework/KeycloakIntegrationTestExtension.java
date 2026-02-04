@@ -3,8 +3,6 @@ package org.keycloak.testframework;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
-import org.junit.jupiter.api.AutoClose;
-
 import org.keycloak.testframework.injection.Registry;
 
 import org.junit.jupiter.api.extension.AfterAllCallback;
