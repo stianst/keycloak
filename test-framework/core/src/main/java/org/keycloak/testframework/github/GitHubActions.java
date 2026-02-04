@@ -1,7 +1,5 @@
 package org.keycloak.testframework.github;
 
-import org.junit.jupiter.api.extension.ExtensionContext;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -12,6 +10,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import org.junit.jupiter.api.extension.ExtensionContext;
 
 public class GitHubActions {
 
