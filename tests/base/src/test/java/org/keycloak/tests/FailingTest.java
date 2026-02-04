@@ -14,6 +14,24 @@ public class FailingTest {
     }
 
     @Test
+    public void slowTest() {
+        try {
+            Thread.sleep(1100);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void slowTest2() {
+        try {
+            Thread.sleep(1100);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
     public void failingTestTwo() {
         Assertions.assertEquals(3, 4);
     }
