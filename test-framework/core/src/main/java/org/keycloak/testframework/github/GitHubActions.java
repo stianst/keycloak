@@ -5,170 +5,111 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+
+import org.keycloak.testframework.config.Config;
 
 import org.junit.jupiter.api.extension.ExtensionContext;
 
 public class GitHubActions {
 
+    private final boolean enabled;
+    private final boolean annotations;
     private final File gitHubStepSummary;
     private final String gitRoot = findGitRoot();
 
-    private static final long SLOW_CLASS_TIMEOUT = TimeUnit.SECONDS.toMillis(2);
-    private static final long SLOW_METHOD_TIMEOUT = TimeUnit.SECONDS.toMillis(1);
+    private final long slowTestTimeout;
 
-    private long classStartedAt;
-    private long methodStartedAt;
+    private long testStartedAt;
 
-    private int classSuccess;
-    private int classError;
-    private int methodSuccess;
-    private int methodFailed;
-    private int methodAborted;
-    private int methodDisabled;
+    private int successTestCount;
 
-    private List<Class<?>> failedClasses = new LinkedList<>();
-    private List<Method> failedMethods = new LinkedList<>();
-    private Map<Class<?>, Long> slowClasses = new HashMap<>();
-    private Map<Method, Long> slowMethods = new HashMap<>();
-
-    public static void main(String[] args) {
-        GitHubActions gitHubActions = new GitHubActions();
-    }
+    private List<Failure> failures = new LinkedList<>();
+    private List<Slow> slowTests = new LinkedList<>();
 
     public GitHubActions() {
         String githubStepSummary = System.getenv("GITHUB_STEP_SUMMARY");
         this.gitHubStepSummary = githubStepSummary != null ? new File(githubStepSummary) : null;
-    }
+        this.enabled = Config.get("kc.test.github.enabled", true, Boolean.class) && gitHubStepSummary != null;
+        this.slowTestTimeout = TimeUnit.SECONDS.toMillis(Config.get("kc.test.github.slow", 1L, Long.class));
+        this.annotations = Config.get("kc.test.github.annotations", false, Boolean.class);
 
-    public void onClassStart(ExtensionContext context) {
-        classStartedAt = System.currentTimeMillis();
-    }
+        System.out.println("SUMMARY: " + githubStepSummary);
+        System.out.println("Enabled: " + enabled);
+        System.out.println("Timeout: " + slowTestTimeout);
+        System.out.println("Annotations: " + annotations);
 
-    public void onClassSuccess(ExtensionContext context) {
-        if (gitHubStepSummary != null) {
-            long classExecutionTime = System.currentTimeMillis() - classStartedAt;
-            if (classExecutionTime > SLOW_CLASS_TIMEOUT) {
-                String file = findJavaClass(context.getRequiredTestClass());
-                String title = "Slow test class detected";
-                String message = "Took " + classExecutionTime + "ms to execute";
-                printWarnAnnotation(file, title, message);
-                slowClasses.put(context.getRequiredTestClass(), classExecutionTime);
-            }
-
-            classSuccess++;
-        }
     }
 
     public void onClassError(ExtensionContext context) {
-        if (gitHubStepSummary != null) {
-            String file = findJavaClass(context.getRequiredTestClass());
-
-            Throwable throwable = context.getExecutionException().get();
-
-            StackTraceElement stackTraceElement = throwable.getStackTrace()[throwable.getStackTrace().length - 1];
-            String message = throwable.getMessage();
-            int line = stackTraceElement.getLineNumber();
-
-            String title = "Test error";
-
-            printErrorAnnotation(file, line, title, message);
-
-            failedClasses.add(context.getRequiredTestClass());
-            classError++;
+        if (enabled) {
+            onError(context, false);
         }
     }
 
-    public void onMethodStart(ExtensionContext context) {
-        methodStartedAt = System.currentTimeMillis();
+    public void onMethodStart() {
+        if (enabled && slowTestTimeout >= -1) {
+            testStartedAt = System.currentTimeMillis();
+        }
     }
 
     public void onMethodSuccess(ExtensionContext context) {
-        long methodExecutionTime = System.currentTimeMillis() - methodStartedAt;
-        if (methodExecutionTime > SLOW_METHOD_TIMEOUT) {
-            String file = findJavaClass(context.getRequiredTestClass());
-            String title = "Slow test method detected: '" + context.getRequiredTestMethod().getName() + "'";
-            String message = "Took " + methodExecutionTime + "ms to execute";
-            printWarnAnnotation(file, title, message);
-            slowMethods.put(context.getRequiredTestMethod(), methodExecutionTime);
-        }
+        if (enabled) {
+            if (slowTestTimeout >= -1) {
+                long executionTime = System.currentTimeMillis() - testStartedAt;
+                if (executionTime > slowTestTimeout) {
+                    slowTests.add(new Slow(context.getRequiredTestClass().getName(), context.getRequiredTestMethod().getName(), executionTime));
+                }
+            }
 
-        if (gitHubStepSummary != null) {
-            methodSuccess++;
+            successTestCount++;
         }
     }
 
     public void onMethodFailed(ExtensionContext context) {
-        if (gitHubStepSummary != null) {
-            String file = findJavaClass(context.getRequiredTestClass());
-
-            Throwable throwable = context.getExecutionException().get();
-
-            StackTraceElement stackTraceElement = throwable.getStackTrace()[throwable.getStackTrace().length - 1];
-            String message = throwable.getMessage();
-            int line = stackTraceElement.getLineNumber();
-
-            String title = "Test '" + context.getRequiredTestMethod().getName() + "' failed";
-
-            printErrorAnnotation(file, line, title, message);
-            failedMethods.add(context.getRequiredTestMethod());
-            methodFailed++;
-        }
-    }
-
-    public void onMethodAborted(ExtensionContext context) {
-        if (gitHubStepSummary != null) {
-            methodAborted++;
-        }
-    }
-
-    public void onMethodDisabled(ExtensionContext context) {
-        if (gitHubStepSummary != null) {
-            methodDisabled++;
+        if (enabled) {
+            onError(context, true);
         }
     }
 
     public void printSummary() {
-        if (gitHubStepSummary != null) {
+        if (enabled) {
             try {
                 PrintWriter printWriter = new PrintWriter(new FileWriter(gitHubStepSummary, true));
 
-                if (failedClasses.isEmpty() && failedMethods.isEmpty() && slowClasses.isEmpty() && slowMethods.isEmpty()) {
+                if (failures.isEmpty() && slowTests.isEmpty()) {
                     printWriter.println("## :white_check_mark: All tests passed");
-                    printWriter.println("Executed " + methodSuccess + " tests");
+                    printWriter.println("Executed " + successTestCount + " tests");
                 } else {
-                    if (!failedClasses.isEmpty() || !failedMethods.isEmpty()) {
-                        printWriter.println("## :no_entry: Failed tests");
-                        printWriter.println("| Test class | Test method |");
-                        printWriter.println("| ---------- | ----------- |");
+                    if (!failures.isEmpty()) {
+                        printWriter.println("## :x: Failed tests");
+                        printWriter.println("| Test class | Test method | Failure |");
+                        printWriter.println("| ---------- | ----------- | ------- |");
 
-                        failedClasses.forEach(c ->
-                            printWriter.println("| " + c.getName() + " | |")
-                        );
-
-                        failedMethods.forEach(m ->
-                            printWriter.println("| " + m.getDeclaringClass().getName() + " | " + m.getName() + " |")
+                        failures.stream().sorted(Comparator.comparing(Failure::className)).forEach(f ->
+                                printWriter.println("| " + f.className() + " | " + f.methodName + " |" + f.message() + " |")
                         );
                     }
 
-                    if (!slowClasses.isEmpty() || !slowMethods.isEmpty()) {
-                        printWriter.println("## :warning: Slow tests detected");
+                    if (!slowTests.isEmpty()) {
+                        printWriter.println("## :hourglass: Slow tests detected");
                         printWriter.println("| Test class | Test method | Execution time |");
                         printWriter.println("| ---------- | ----------- | -------------- |");
 
-                        slowClasses.forEach((c, t) ->
-                            printWriter.println("| " + c.getName() + " | | " + t + " |")
-                        );
-
-                        slowMethods.forEach((m, t) ->
-                            printWriter.println("| " + m.getDeclaringClass().getName() + " | " + m.getName() + " | " + t + " |")
+                        slowTests.stream().sorted(Comparator.comparing(Slow::executionTime).reversed()).forEach(s ->
+                                printWriter.println("| " + s.className() + " | " + s.methodName() + " | " + s.executionTime() + " |")
                         );
                     }
                 }
+
+                printWriter.println("## Env");
+                printWriter.println("| Key | Value |");
+                printWriter.println("| --- | ----- |");
+                System.getenv().forEach((k, v) -> printWriter.println("| " + k + " | " + v + " |"));
 
                 printWriter.close();
             } catch (IOException e) {
@@ -177,23 +118,36 @@ public class GitHubActions {
         }
     }
 
-    private void printWarnAnnotation(String file, String title, String message) {
-        System.out.print("::warning ");
-        System.out.print("file=" + file);
-        System.out.print(",title=" + title);
-        System.out.println("::" + message);
+    private void onError(ExtensionContext context, boolean method) {
+        Optional<Throwable> executionException = context.getExecutionException();
+        if (executionException.isPresent()) {
+            Class<?> testClass = context.getRequiredTestClass();
+            String file = findJavaClass(testClass);
+
+            Method testMethod = method ? context.getRequiredTestMethod() : null;
+
+            Throwable throwable = executionException.get();
+
+            String message = throwable.getMessage();
+
+            StackTraceElement stackTraceElement = throwable.getStackTrace()[throwable.getStackTrace().length - 1];
+            int line = stackTraceElement.getLineNumber();
+
+            String title = "Test '" + context.getRequiredTestMethod().getName() + "' failed";
+
+            printErrorAnnotation(file, line, title, message);
+            failures.add(new Failure(testClass.getName(), testMethod != null ? testMethod.getName() : "", message));
+        }
     }
 
     private void printErrorAnnotation(String file, int line, String title, String message) {
-        System.out.print("::error ");
-        System.out.print("file=" + file);
-        System.out.print(",line=" + line);
-        System.out.print(",title=" + title);
-        System.out.println("::" + message);
-    }
-
-    private String testName(Method method) {
-        return method.getDeclaringClass().getName() + "#" + method.getName();
+        if (annotations) {
+            System.out.print("::error ");
+            System.out.print("file=" + file);
+            System.out.print(",line=" + line);
+            System.out.print(",title=" + title);
+            System.out.println("::" + message);
+        }
     }
 
     private String findJavaClass(Class<?> testClass) {
@@ -211,5 +165,9 @@ public class GitHubActions {
         }
         throw new RuntimeException("Failed to find .git directory");
     }
+
+    private record Slow(String className, String methodName, long executionTime) {}
+
+    private record Failure(String className, String methodName, String message) {}
 
 }
