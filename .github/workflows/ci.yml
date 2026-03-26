@@ -940,7 +940,7 @@ jobs:
         uses: ./.github/actions/integration-test-setup
 
       - name: Run model tests
-        run: ./mvnw -B -Dsurefire.timeout=900 test -pl testsuite/model "-P{{ matrix.profile }}" ${{ env.SUREFIRE_RETRY }}
+        run: ./mvnw -B -Dsurefire.timeout=900 install -pl testsuite/model "-P{{ matrix.profile }}" ${{ env.SUREFIRE_RETRY }}
 
       - uses: ./.github/actions/upload-flaky-tests
         name: Upload flaky tests
