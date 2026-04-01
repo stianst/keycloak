@@ -33,7 +33,7 @@ public class ScriptProviderDescriptor {
 
     public static final String SAML_MAPPERS = "saml-mappers";
 
-    private Map<String, List<ScriptProviderMetadata>> providers = new HashMap<>();
+    private final Map<String, List<ScriptProviderMetadata>> providers = new HashMap<>();
 
     @JsonUnwrapped
     @JsonGetter
@@ -65,19 +65,20 @@ public class ScriptProviderDescriptor {
         addProvider(AUTHENTICATORS, name, fileName, null);
     }
     
-    private void addProvider(String type, String name, String fileName, String description) {
-        List<ScriptProviderMetadata> authenticators = providers.get(type);
+    private void addProvider(String providerType, String name, String fileName, String description) {
+        providers.computeIfAbsent(providerType, k -> new ArrayList<>()).add(new ScriptProviderMetadata(name, fileName, description));
+    }
 
-        if (authenticators == null) {
-            authenticators = new ArrayList<>();
-            providers.put(type, authenticators);
-        }
-
-        authenticators.add(new ScriptProviderMetadata(name, fileName, description));
+    private void addProvider(String providerType, String name, String fileName, String description, String type) {
+        providers.computeIfAbsent(providerType, k -> new ArrayList<>()).add(new ScriptProviderMetadata(name, fileName, description, type));
     }
 
     public void addPolicy(String name, String fileName) {
         addProvider(POLICIES, name, fileName, null);
+    }
+
+    public void addPolicy(String name, String fileName, String type) {
+        addProvider(POLICIES, name, fileName, null, type);
     }
 
     public void addMapper(String name, String fileName) {

@@ -4,4 +4,5 @@ export default interface PolicyProviderRepresentation {
   group?: string;
   description?: string;
   code?: string;
+  supportedCapabilities?: string[];
 }

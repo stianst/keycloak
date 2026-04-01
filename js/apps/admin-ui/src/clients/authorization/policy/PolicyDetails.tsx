@@ -1,3 +1,4 @@
+import type PolicyProviderRepresentation from "@keycloak/keycloak-admin-client/lib/defs/policyProviderRepresentation";
 import type PolicyRepresentation from "@keycloak/keycloak-admin-client/lib/defs/policyRepresentation";
 import { useAlerts, useFetch } from "@keycloak/keycloak-ui-shared";
 import {
@@ -48,7 +49,8 @@ type Policy = Omit<PolicyRepresentation, "roles"> & {
 };
 
 const COMPONENTS: {
-  [index: string]: () => JSX.Element;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [index: string]: (props?: any) => JSX.Element;
 } = {
   aggregate: Aggregate,
   client: Client,
@@ -73,6 +75,10 @@ export default function PolicyDetails() {
   const { reset, handleSubmit } = form;
   const { addAlert, addError } = useAlerts();
   const [policy, setPolicy] = useState<PolicyRepresentation>();
+  const [supportedCapabilities, setSupportedCapabilities] = useState<string[]>(
+    [],
+  );
+  const [isScriptingProvider, setIsScriptingProvider] = useState(false);
   const isDisabled = policyType === "js";
   const isAdminPermissionsClient =
     useIsAdminPermissionsClient(permissionClientId);
@@ -80,27 +86,42 @@ export default function PolicyDetails() {
   useFetch(
     async () => {
       if (policyId) {
-        const result = await Promise.all([
+        const fetches: [
+          Promise<PolicyRepresentation | undefined>,
+          Promise<PolicyRepresentation[]>,
+          Promise<PolicyProviderRepresentation[] | undefined>,
+        ] = [
           adminClient.clients.findOnePolicyWithType({
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- permissionClientId is undefined when navigating from client authorization tab
             id: permissionClientId ?? id,
             type: policyType!,
             policyId,
-          }) as PolicyRepresentation | undefined,
+          }) as Promise<PolicyRepresentation | undefined>,
           adminClient.clients.getAssociatedPolicies({
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- permissionClientId is undefined when navigating from client authorization tab
             id: permissionClientId ?? id,
             permissionId: policyId,
           }),
-        ]);
+          !isValidComponentType(policyType!)
+            ? adminClient.clients.listPolicyProviders({
+                id: permissionClientId ?? id,
+              })
+            : Promise.resolve(undefined),
+        ];
+
+        const result = await Promise.all(fetches);
 
         if (!result[0]) {
           throw new Error(t("notFound"));
         }
 
+        const provider = result[2]?.find((p) => p.type === policyType);
+
         return {
           policy: result[0],
           policies: result[1].map((p) => p.id),
+          supportedCapabilities: provider?.supportedCapabilities,
+          isScriptingProvider: !!provider,
         };
       }
       if (!isValidComponentType(policyType!)) {
@@ -112,17 +133,21 @@ export default function PolicyDetails() {
         if (provider) {
           return {
             policy: {
-              code: provider.code,
+              config: { code: provider.code ?? "" },
               description: provider.description,
             } as PolicyRepresentation,
+            supportedCapabilities: provider.supportedCapabilities,
+            isScriptingProvider: true,
           };
         }
       }
       return {};
     },
-    ({ policy, policies }) => {
+    ({ policy, policies, supportedCapabilities, isScriptingProvider }) => {
       reset({ ...policy, policies });
       setPolicy(policy);
+      setSupportedCapabilities(supportedCapabilities ?? []);
+      setIsScriptingProvider(isScriptingProvider ?? false);
     },
     [permissionClientId, id, policyType, policyId],
   );
@@ -237,7 +262,10 @@ export default function PolicyDetails() {
         >
           <FormProvider {...form}>
             <NameDescription isDisabled={isDisabled} />
-            <ComponentType />
+            <ComponentType
+              supportedCapabilities={supportedCapabilities}
+              isScriptingProvider={isScriptingProvider}
+            />
             <LogicSelector isDisabled={isDisabled} />
           </FormProvider>
           <ActionGroup>

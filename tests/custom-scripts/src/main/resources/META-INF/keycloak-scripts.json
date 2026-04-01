@@ -8,6 +8,30 @@
       "name": "Default Policy",
       "fileName": "scripts/default-policy.js",
       "description": "A policy that grants access only for users within this realm"
+    },
+    {
+      "name": "Cedar Grant Policy",
+      "fileName": "scripts/cedar-grant-policy.cedar",
+      "description": "Grants access to fully profiled principals with a localhost email",
+      "type": "cedar"
+    },
+    {
+      "name": "Cedar Deny Policy",
+      "fileName": "scripts/cedar-deny-policy.cedar",
+      "description": "Denies access to restricted resources unless the principal is an admin",
+      "type": "cedar"
+    },
+    {
+      "name": "Cedar Custom Attr Policy",
+      "fileName": "scripts/cedar-custom-attr-policy.cedar",
+      "description": "Grants view access to principals in the engineering department",
+      "type": "cedar"
+    },
+    {
+      "name": "Cedar Invalid Attr Policy",
+      "fileName": "scripts/cedar-invalid-attr-policy.cedar",
+      "description": "Invalid policy referencing a non-existent attribute",
+      "type": "cedar"
     }
   ]
 }

@@ -326,6 +326,11 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>com.cedarpolicy</groupId>
+            <artifactId>cedar-java</artifactId>
+            <classifier>uber</classifier>
+        </dependency>
+        <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-kerberos-federation</artifactId>
             <exclusions>

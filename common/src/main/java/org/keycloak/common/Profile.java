@@ -61,6 +61,8 @@ public class Profile {
 
         AUTHZEN("OpenID AuthZen Authorization", Type.EXPERIMENTAL),
 
+        CEDAR_POLICIES("Cedar Authorization Policies with runtime deployment", Type.EXPERIMENTAL, Feature.AUTHORIZATION),
+
         ACCOUNT_API("Account Management REST API", Type.DEFAULT),
 
         ACCOUNT_V3("Account Console version 3", Type.DEFAULT, 3, Feature.ACCOUNT_API),

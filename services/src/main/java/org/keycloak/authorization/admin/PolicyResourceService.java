@@ -41,12 +41,14 @@ import org.keycloak.authorization.store.StoreFactory;
 import org.keycloak.events.admin.OperationType;
 import org.keycloak.events.admin.ResourceType;
 import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.ModelValidationException;
 import org.keycloak.models.utils.ModelToRepresentation;
 import org.keycloak.models.utils.RepresentationToModel;
 import org.keycloak.representations.idm.authorization.AbstractPolicyRepresentation;
 import org.keycloak.representations.idm.authorization.PolicyRepresentation;
 import org.keycloak.representations.idm.authorization.ResourceRepresentation;
 import org.keycloak.representations.idm.authorization.ScopeRepresentation;
+import org.keycloak.services.ErrorResponseException;
 import org.keycloak.services.resources.admin.AdminEventBuilder;
 import org.keycloak.services.resources.admin.fgap.AdminPermissionEvaluator;
 import org.keycloak.util.JsonSerialization;
@@ -94,8 +96,11 @@ public class PolicyResourceService {
 
         AdminPermissionsSchema.SCHEMA.throwExceptionIfResourceTypeOrScopesNotProvided(
                 authorization.getKeycloakSession(), resourceServer, representation);
-        RepresentationToModel.toModel(representation, authorization, policy);
-
+        try {
+            RepresentationToModel.toModel(representation, authorization, policy);
+        } catch (ModelValidationException e) {
+            throw new ErrorResponseException(e.getMessage(), e.getMessage(), Status.BAD_REQUEST);
+        }
 
         audit(representation, OperationType.UPDATE);
 

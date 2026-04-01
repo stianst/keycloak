@@ -25,10 +25,12 @@ public class ScriptProviderMetadata {
     private String name;
     private String fileName;
     private String description;
+    private String type;
 
     @JsonIgnore
     private String code;
 
+    @SuppressWarnings("unused")
     public ScriptProviderMetadata() {
 
     }
@@ -37,6 +39,13 @@ public class ScriptProviderMetadata {
         this.name = name;
         this.fileName = fileName;
         this.description = description;
+    }
+
+    public ScriptProviderMetadata(String name, String fileName, String description, String type) {
+        this.name = name;
+        this.fileName = fileName;
+        this.description = description;
+        this.type = type;
     }
 
     public String getId() {
@@ -77,5 +86,13 @@ public class ScriptProviderMetadata {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

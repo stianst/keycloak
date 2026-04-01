@@ -26,6 +26,7 @@ public class PolicyProviderRepresentation {
     private String group;
     private String description;
     private String code;
+    private java.util.List<String> supportedCapabilities;
 
     public String getType() {
         return this.type;
@@ -65,5 +66,13 @@ public class PolicyProviderRepresentation {
 
     public void setCode( String code) {
         this.code = code;
+    }
+
+    public java.util.List<String> getSupportedCapabilities() {
+        return this.supportedCapabilities;
+    }
+
+    public void setSupportedCapabilities(java.util.List<String> supportedCapabilities) {
+        this.supportedCapabilities = supportedCapabilities;
     }
 }

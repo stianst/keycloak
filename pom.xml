@@ -40,6 +40,8 @@
 
         <asciidoctor.plugin.version>1.5.8</asciidoctor.plugin.version>
 
+        <cedar-java.version>4.9.0</cedar-java.version>
+
         <quarkus.version>3.33.2.1</quarkus.version>
         <quarkus.build.version>3.33.2.1</quarkus.build.version>
         <jboss-logging-annotations.version>3.0.4.Final</jboss-logging-annotations.version> <!-- keep in sync with the version used by quarkus -->
@@ -1095,6 +1097,12 @@
                 <groupId>org.keycloak</groupId>
                 <artifactId>keycloak-authz-policy-common</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.cedarpolicy</groupId>
+                <artifactId>cedar-java</artifactId>
+                <version>${cedar-java.version}</version>
+                <classifier>uber</classifier>
             </dependency>
 
             <!-- Quarkus -->

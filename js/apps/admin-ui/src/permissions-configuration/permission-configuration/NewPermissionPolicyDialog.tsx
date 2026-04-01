@@ -62,10 +62,8 @@ const defaultValues: Policy = {
 };
 
 const COMPONENTS: {
-  [index: string]: ({
-    isPermissionClient,
-    permissionClientId,
-  }: ComponentsProps) => JSX.Element;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [index: string]: (props?: any) => JSX.Element;
 } = {
   aggregate: Aggregate,
   client: Client,

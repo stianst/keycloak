@@ -19,9 +19,11 @@ package org.keycloak.authorization.authzen;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import jakarta.ws.rs.BadRequestException;
@@ -50,6 +52,7 @@ import org.keycloak.common.constants.ServiceAccountConstants;
 import org.keycloak.models.ClientModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
+import org.keycloak.models.RoleModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.UserProvider;
 import org.keycloak.representations.AccessToken;
@@ -152,21 +155,18 @@ public class AuthZenResource {
         AuthorizationProvider authorization = session.getProvider(AuthorizationProvider.class);
         StoreFactory storeFactory = authorization.getStoreFactory();
 
-        ClientModel client;
-        if (request.subject().type() == AuthZen.SubjectType.CLIENT) {
-            if (!request.subject().id().equals(token.getIssuedFor())) {
-                return DECISION_FALSE;
-            }
-            client = realm.getClientByClientId(request.subject().id());
-        } else {
-            client = realm.getClientByClientId(token.getIssuedFor());
-        }
-
-        if (client == null || !client.isEnabled()) {
+        // TODO need a generic solution for Gateways: https://github.com/keycloak/keycloak/issues/49696
+        // The resource server is always identified by the bearer token's client (e.g. mcp-gateway).
+        // For USER subjects the subject identity is resolved separately.
+        // For CLIENT subjects the subject.id names the client being evaluated — it need not be the
+        // same as the bearer token's client, allowing a gateway service account to evaluate policies
+        // for other agent clients against its own resource server.
+        ClientModel resourceServerClient = realm.getClientByClientId(token.getIssuedFor());
+        if (resourceServerClient == null || !resourceServerClient.isEnabled()) {
             return DECISION_FALSE;
         }
 
-        ResourceServer resourceServer = storeFactory.getResourceServerStore().findByClient(client);
+        ResourceServer resourceServer = storeFactory.getResourceServerStore().findByClient(resourceServerClient);
         if (resourceServer == null) {
             return DECISION_FALSE;
         }
@@ -193,20 +193,29 @@ public class AuthZenResource {
             return DECISION_FALSE;
         }
 
-        Map<String, List<String>> claims = null;
+        // Seed claims with the resource's registered Keycloak attributes (e.g. sensitivity, team).
+        // This means callers do not need to supply resource.properties — they are always present
+        // in Cedar as resource.* attributes regardless of whether the request body includes them.
+        Map<String, List<String>> claims = new HashMap<>();
+        Map<String, List<String>> resourceAttrs = resource.getAttributes();
+        if (resourceAttrs != null) {
+            resourceAttrs.forEach((k, v) -> {
+                if (v != null && !v.isEmpty()) {
+                    claims.put(k, v);
+                }
+            });
+        }
+        // Request-supplied resource.properties override registered attributes, allowing the caller
+        // to augment or override values (e.g. for testing or dynamic attributes).
         if (request.resource().properties() != null) {
-            claims = new HashMap<>();
             convertContext(request.resource().properties(), claims);
         }
         if (request.context() != null) {
-            if (claims == null) {
-                claims = new HashMap<>();
-            }
             convertContext(request.context(), claims);
         }
 
         DefaultEvaluationContext context = new DefaultEvaluationContext(identity, claims, session);
-        ResourcePermission permission = new ResourcePermission(resource, List.of(scope), resourceServer);
+        ResourcePermission permission = new ResourcePermission(resource, List.of(scope), resourceServer, claims);
 
         Collection<Permission> granted = authorization.evaluators()
               .from(List.of(permission), context)
@@ -220,17 +229,99 @@ public class AuthZenResource {
         Identity identity = switch (subject.type()) {
             case USER -> {
                 UserModel user = resolveUserId(realm, subject.id());
-                yield user != null ? new UserModelIdentity(realm, user) : null;
+                yield user != null ? createUserIdentity(realm, user) : null;
             }
             case CLIENT -> {
                 ClientModel subjectClient = realm.getClientByClientId(subject.id());
-                yield subjectClient != null ? new ClientModelIdentity(session, subjectClient) : null;
+                yield subjectClient != null ? createClientIdentity(session, subjectClient) : null;
             }
         };
-        if (request.subject().properties() != null && !request.subject().properties().isEmpty()) {
-            identity = withSubjectProperties(identity, request.subject().properties());
+        if (identity != null && subject.properties() != null && !subject.properties().isEmpty()) {
+            identity = withSubjectProperties(identity, subject.properties());
         }
         return identity;
+    }
+
+    private static Identity createUserIdentity(RealmModel realm, UserModel user) {
+        Map<String, Collection<String>> attributes = new HashMap<>();
+
+        Map<String, List<String>> userAttrs = user.getAttributes();
+        if (userAttrs != null) {
+            attributes.putAll(userAttrs);
+        }
+
+        // UserModel.getAttributes() uses Java property names (firstName, lastName).
+        // Add OIDC standard claim names so policies can reference either form.
+        if (user.getFirstName() != null) {
+            attributes.put("given_name", List.of(user.getFirstName()));
+        }
+        if (user.getLastName() != null) {
+            attributes.put("family_name", List.of(user.getLastName()));
+        }
+        if (user.getUsername() != null) {
+            attributes.put("preferred_username", List.of(user.getUsername()));
+        }
+
+        Set<String> realmRoles = new HashSet<>();
+        user.getRealmRoleMappingsStream().forEach(role -> collectRoleNames(role, realmRoles));
+        if (!realmRoles.isEmpty()) {
+            attributes.put("kc.realm.roles", realmRoles);
+        }
+
+        Attributes enrichedAttributes = Attributes.from(attributes);
+        return new UserModelIdentity(realm, user) {
+            @Override
+            public Attributes getAttributes() {
+                return enrichedAttributes;
+            }
+        };
+    }
+
+    /**
+     * Creates an enriched identity for a client subject, mirroring what {@link #createUserIdentity}
+     * does for users. Collects the service account's realm role mappings into {@code kc.realm.roles}
+     * so Cedar policies can inspect them via {@code principal.kc_realm_roles}.
+     */
+    private Identity createClientIdentity(KeycloakSession session, ClientModel client) {
+        UserModel serviceAccount = session.users().getServiceAccount(client);
+
+        Map<String, Collection<String>> attributes = new HashMap<>();
+
+        if (serviceAccount != null) {
+            // Include any custom attributes set directly on the service-account user.
+            Map<String, List<String>> saAttrs = serviceAccount.getAttributes();
+            if (saAttrs != null) {
+                attributes.putAll(saAttrs);
+            }
+
+            // Expose service-account realm roles under the same key used for human users,
+            // so Cedar policies can use principal.kc_realm_roles uniformly.
+            Set<String> realmRoles = new HashSet<>();
+            serviceAccount.getRealmRoleMappingsStream().forEach(role -> collectRoleNames(role, realmRoles));
+            if (!realmRoles.isEmpty()) {
+                attributes.put("kc.realm.roles", realmRoles);
+            }
+        }
+
+        // Expose the OAuth client_id so policies can reference it if needed.
+        attributes.put("client_id", List.of(client.getClientId()));
+
+        Attributes enrichedAttributes = Attributes.from(attributes);
+        return new ClientModelIdentity(session, client) {
+            @Override
+            public Attributes getAttributes() {
+                return enrichedAttributes;
+            }
+        };
+    }
+
+    private static void collectRoleNames(RoleModel role, Set<String> names) {
+        names.add(role.getName());
+        if (role.isComposite()) {
+            role.getCompositesStream()
+                    .filter(child -> !child.isClientRole())
+                    .forEach(child -> collectRoleNames(child, names));
+        }
     }
 
     private UserModel resolveUserId(RealmModel realm, String subjectId) {

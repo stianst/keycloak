@@ -46,3 +46,4 @@ org.keycloak.authorization.policy.provider.group.GroupPolicyProviderFactory
 org.keycloak.authorization.policy.provider.permission.UMAPolicyProviderFactory
 org.keycloak.authorization.policy.provider.clientscope.ClientScopePolicyProviderFactory
 org.keycloak.authorization.policy.provider.regex.RegexPolicyProviderFactory
+org.keycloak.authorization.policy.provider.cedar.RuntimeCedarPolicyProviderFactory

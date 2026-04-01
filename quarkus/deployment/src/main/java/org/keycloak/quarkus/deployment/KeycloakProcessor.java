@@ -54,6 +54,7 @@ import org.keycloak.authentication.AuthenticatorSpi;
 import org.keycloak.authentication.authenticators.browser.DeployedScriptAuthenticatorFactory;
 import org.keycloak.authentication.authenticators.browser.WebAuthnMetadataService;
 import org.keycloak.authorization.policy.provider.PolicySpi;
+import org.keycloak.authorization.policy.provider.cedar.CedarPolicyProviderFactory;
 import org.keycloak.authorization.policy.provider.js.DeployedScriptPolicyFactory;
 import org.keycloak.common.Profile;
 import org.keycloak.common.crypto.FipsMode;
@@ -230,6 +231,9 @@ class KeycloakProcessor {
     }
 
     private static ProviderFactory registerScriptPolicy(ScriptProviderMetadata metadata) {
+        if (CedarPolicyProviderFactory.POLICY_TYPE.equals(metadata.getType())) {
+            return new CedarPolicyProviderFactory(metadata);
+        }
         return new DeployedScriptPolicyFactory(metadata);
     }
 

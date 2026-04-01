@@ -43,8 +43,10 @@ import org.keycloak.authorization.model.Policy;
 import org.keycloak.authorization.model.Resource;
 import org.keycloak.authorization.model.ResourceServer;
 import org.keycloak.authorization.model.Scope;
+import org.keycloak.authorization.policy.provider.PolicyProvider;
 import org.keycloak.authorization.policy.provider.PolicyProviderAdminService;
 import org.keycloak.authorization.policy.provider.PolicyProviderFactory;
+import org.keycloak.authorization.policy.provider.ScriptingPolicyProvider;
 import org.keycloak.authorization.store.PolicyStore;
 import org.keycloak.authorization.store.ResourceStore;
 import org.keycloak.authorization.store.ScopeStore;
@@ -337,6 +339,17 @@ public class PolicyService {
                             representation.setType(factory.getId());
                             representation.setDescription(factory.getDescription());
                             representation.setCode(factory.getCode());
+
+                            PolicyProvider provider = factory.create(authorization);
+                            if (provider instanceof ScriptingPolicyProvider scriptingProvider) {
+                                List<String> capabilities = java.util.Arrays.stream(ScriptingPolicyProvider.Capability.values())
+                                        .filter(scriptingProvider::supports)
+                                        .map(c -> c.name().toLowerCase())
+                                        .collect(Collectors.toList());
+                                if (!capabilities.isEmpty()) {
+                                    representation.setSupportedCapabilities(capabilities);
+                                }
+                            }
 
                             return representation;
                         })

@@ -24,7 +24,7 @@ import javax.script.SimpleScriptContext;
 import org.keycloak.authorization.AuthorizationProvider;
 import org.keycloak.authorization.model.Policy;
 import org.keycloak.authorization.policy.evaluation.Evaluation;
-import org.keycloak.authorization.policy.provider.PolicyProvider;
+import org.keycloak.authorization.policy.provider.ScriptingPolicyProvider;
 import org.keycloak.scripting.EvaluatableScriptAdapter;
 
 import org.jboss.logging.Logger;
@@ -32,7 +32,7 @@ import org.jboss.logging.Logger;
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Igor</a>
  */
-class JSPolicyProvider implements PolicyProvider {
+class JSPolicyProvider implements ScriptingPolicyProvider {
 
     private static final Logger logger = Logger.getLogger(JSPolicyProvider.class);
 
