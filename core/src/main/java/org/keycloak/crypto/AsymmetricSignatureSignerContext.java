@@ -51,6 +51,7 @@ public class AsymmetricSignatureSignerContext implements SignatureSignerContext 
             Signature signature = Signature.getInstance(JavaAlgorithm.getJavaAlgorithm(key.getAlgorithmOrDefault(), key.getCurve()));
             signature.initSign((PrivateKey) key.getPrivateKey());
             signature.update(data);
+            System.out.println(signature.getProvider().getName() + " -- " + signature.getAlgorithm());
             return signature.sign();
         } catch (Exception e) {
             throw new SignatureException("Signing failed", e);

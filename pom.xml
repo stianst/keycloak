@@ -317,8 +317,12 @@
     </modules>
 
     <dependencyManagement>
-
         <dependencies>
+            <dependency>
+                <groupId>net.glassless</groupId>
+                <artifactId>glassless-provider</artifactId>
+                <version>0.12.0</version>
+            </dependency>
             <dependency>
                 <groupId>org.infinispan</groupId>
                 <artifactId>infinispan-bom</artifactId>

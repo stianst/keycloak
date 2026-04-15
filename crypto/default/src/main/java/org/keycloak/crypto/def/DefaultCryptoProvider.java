@@ -33,6 +33,7 @@ import org.keycloak.common.util.BouncyIntegration;
 import org.keycloak.common.util.KeystoreUtil.KeystoreFormat;
 import org.keycloak.crypto.JavaAlgorithm;
 
+import net.glassless.provider.GlaSSLessProvider;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
@@ -43,6 +44,11 @@ import org.jboss.logging.Logger;
  * @author <a href="mailto:mposolda@redhat.com">Marek Posolda</a>
  */
 public class DefaultCryptoProvider implements CryptoProvider {
+
+    static {
+        Security.insertProviderAt(new GlaSSLessProvider(), 1);
+        System.out.println("GlaSSLess GlaSSLess GlaSSLess GlaSSLess");
+    }
 
     private static final Logger log = Logger.getLogger(DefaultCryptoProvider.class);
 

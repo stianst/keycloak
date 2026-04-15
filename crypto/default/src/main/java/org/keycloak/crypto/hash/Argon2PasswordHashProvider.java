@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
 
 import org.keycloak.common.util.MultivaluedHashMap;
 import org.keycloak.credential.hash.PasswordHashProvider;
@@ -16,7 +18,7 @@ import org.keycloak.models.credential.dto.PasswordCredentialData;
 import org.keycloak.models.credential.dto.PasswordSecretData;
 import org.keycloak.tracing.TracingProviderUtil;
 
-import org.bouncycastle.crypto.generators.Argon2BytesGenerator;
+import net.glassless.provider.internal.secretkeyfactory.Argon2KeySpec;
 import org.jboss.logging.Logger;
 
 import static org.keycloak.crypto.hash.Argon2PasswordHashProviderFactory.MEMORY_KEY;
@@ -121,16 +123,18 @@ public class Argon2PasswordHashProvider implements PasswordHashProvider {
                             .withMemoryAsKB(memory)
                             .withIterations(iterations).build();
 
-                    Argon2BytesGenerator generator = new Argon2BytesGenerator();
-                    generator.init(parameters);
+                    Argon2KeySpec argon2KeySpec = new Argon2KeySpec(rawPassword.toCharArray(), salt, iterations, memory, parallelism, 256);
+                    SecretKeyFactory skf = SecretKeyFactory.getInstance("Argon2i");
+                    SecretKey secretKey = skf.generateSecret(argon2KeySpec);
+                    byte[] result = secretKey.getEncoded();
 
-                    byte[] result = new byte[hashLength];
-                    generator.generateBytes(rawPassword.toCharArray(), result);
+                    System.out.println("ARGON + TRISTAN = LOVE");
+
                     return Base64.getEncoder().encodeToString(result);
                 } finally {
                     cpuCoreSemaphore.release();
                 }
-            } catch (InterruptedException e) {
+            } catch (Exception e) {
                 Thread.currentThread().interrupt();
                 throw new RuntimeException(e);
             }
