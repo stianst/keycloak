@@ -45,6 +45,7 @@ import org.keycloak.representations.oidc.TokenMetadataRepresentation;
 import org.keycloak.testsuite.AbstractTestRealmKeycloakTest;
 import org.keycloak.testsuite.Assert;
 import org.keycloak.testsuite.AssertEvents;
+import org.keycloak.testsuite.EventAssertion;
 import org.keycloak.testsuite.admin.AdminApiUtil;
 import org.keycloak.testsuite.oidc.AbstractOIDCScopeTest;
 import org.keycloak.testsuite.oidc.OIDCScopeTest;
@@ -214,7 +215,8 @@ public class TokenIntrospectionTest extends AbstractTestRealmKeycloakTest {
     public void testIntrospectRefreshToken() throws Exception {
         oauth.doLogin("test-user@localhost", "password");
         String code = oauth.parseLoginResponse().getCode();
-        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
+        EventRepresentation loginEvent = events.poll();
+        EventAssertion.expectLogin(loginEvent);
         String sessionId = loginEvent.getSessionId();
         AccessTokenResponse accessTokenResponse = oauth.doAccessTokenRequest(code);
         oauth.client("confidential-cli", "secret1");
@@ -310,7 +312,8 @@ public class TokenIntrospectionTest extends AbstractTestRealmKeycloakTest {
     public void testIntrospectAccessToken() throws Exception {
         oauth.doLogin("test-user@localhost", "password");
         String code = oauth.parseLoginResponse().getCode();
-        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
+        EventRepresentation loginEvent = events.poll();
+        EventAssertion.expectLogin(loginEvent);
         AccessTokenResponse accessTokenResponse = oauth.doAccessTokenRequest(code);
         oauth.client("confidential-cli", "secret1");
         TokenMetadataRepresentation rep = oauth.doIntrospectionAccessTokenRequest(accessTokenResponse.getAccessToken()).asTokenMetadata();
@@ -352,7 +355,8 @@ public class TokenIntrospectionTest extends AbstractTestRealmKeycloakTest {
     public void testIntrospectAccessTokenReturnedAsJwt() throws Exception {
         oauth.doLogin("test-user@localhost", "password");
         String code = oauth.parseLoginResponse().getCode();
-        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
+        EventRepresentation loginEvent = events.poll();
+        EventAssertion.expectLogin(loginEvent);
         AccessTokenResponse accessTokenResponse = oauth.doAccessTokenRequest(code);
 
         TokenMetadataRepresentation rep = oauth.introspectionRequest(accessTokenResponse.getAccessToken())
@@ -387,7 +391,8 @@ public class TokenIntrospectionTest extends AbstractTestRealmKeycloakTest {
 
             oauth.doLogin("test-user@localhost", "password");
             String code = oauth.parseLoginResponse().getCode();
-            EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
+            EventRepresentation loginEvent = events.poll();
+            EventAssertion.expectLogin(loginEvent);
             AccessTokenResponse accessTokenResponse = oauth.doAccessTokenRequest(code);
 
             assertEquals(jwaAlgorithm, new JWSInput(accessTokenResponse.getAccessToken()).getHeader().getAlgorithm().name());
@@ -495,7 +500,8 @@ public class TokenIntrospectionTest extends AbstractTestRealmKeycloakTest {
         String code = oauth.parseLoginResponse().getCode();
         AccessTokenResponse accessTokenResponse = oauth.doAccessTokenRequest(code);
 
-        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
+        EventRepresentation loginEvent = events.poll();
+        EventAssertion.expectLogin(loginEvent);
 
         UserRepresentation userRep = new UserRepresentation();
         try {

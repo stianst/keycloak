@@ -28,6 +28,7 @@ import org.keycloak.representations.idm.EventRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.testsuite.AbstractKeycloakTest;
 import org.keycloak.testsuite.AssertEvents;
+import org.keycloak.testsuite.EventAssertion;
 import org.keycloak.testsuite.admin.AdminApiUtil;
 import org.keycloak.testsuite.util.ClientManager;
 import org.keycloak.testsuite.util.oauth.AccessTokenResponse;
@@ -93,7 +94,8 @@ public class OIDCPublicClientTest extends AbstractKeycloakTest {
         // It should be possible to authenticate
         oauth.doLogin("test-user@localhost", "password");
 
-        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
+        EventRepresentation loginEvent = events.poll();
+        EventAssertion.expectLogin(loginEvent);
 
         String sessionId = loginEvent.getSessionId();
         String codeId = loginEvent.getDetails().get(Details.CODE_ID);

@@ -36,6 +36,7 @@ import org.keycloak.representations.idm.UserSessionRepresentation;
 import org.keycloak.services.resources.account.AccountCredentialResource;
 import org.keycloak.testsuite.AbstractChangeImportedUserPasswordsTest;
 import org.keycloak.testsuite.AssertEvents;
+import org.keycloak.testsuite.EventAssertion;
 import org.keycloak.testsuite.admin.AdminApiUtil;
 import org.keycloak.testsuite.broker.util.SimpleHttpDefault;
 import org.keycloak.testsuite.client.KeycloakTestingClient;
@@ -160,7 +161,8 @@ public class RecoveryAuthnCodesAuthenticatorTest extends AbstractChangeImportedU
         UserResource testUser = managedRealm.admin().users().get(findUser("test-user@localhost").getId());
         OAuthClient oauth2 = oauth.newConfig().driver(driver2);
         oauth2.doLogin("test-user@localhost", getPassword("test-user@localhost"));
-        EventRepresentation event1 = EventAssertion.expectLogin(events.poll());
+        EventRepresentation event1 = events.poll();
+        EventAssertion.expectLogin(event1);
         assertEquals(1, testUser.getUserSessions().size());
 
         // add action to recovery codes for the test user

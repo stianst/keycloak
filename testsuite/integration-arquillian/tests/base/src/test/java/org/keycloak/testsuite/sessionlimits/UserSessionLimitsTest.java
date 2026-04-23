@@ -34,6 +34,7 @@ import org.keycloak.representations.idm.EventRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.testsuite.AbstractTestRealmKeycloakTest;
 import org.keycloak.testsuite.AssertEvents;
+import org.keycloak.testsuite.EventAssertion;
 import org.keycloak.testsuite.admin.AdminApiUtil;
 import org.keycloak.testsuite.forms.BrowserFlowTest;
 import org.keycloak.testsuite.pages.AppPage;
@@ -172,7 +173,8 @@ public class UserSessionLimitsTest extends AbstractTestRealmKeycloakTest {
             // Login and verify login was successful
             oauth.openLoginForm();
             loginPage.login("test-user@localhost", "password");
-            EventRepresentation initialLoginEvent = EventAssertion.expectLogin(events.poll());
+            EventRepresentation initialLoginEvent = events.poll();
+            EventAssertion.expectLogin(initialLoginEvent);
             String userId = initialLoginEvent.getUserId();
             String initialLoginSessionID = initialLoginEvent.getSessionId();
 
@@ -228,7 +230,8 @@ public class UserSessionLimitsTest extends AbstractTestRealmKeycloakTest {
             setAuthenticatorConfigItem(DefaultAuthenticationFlows.BROWSER_FLOW, UserSessionLimitsAuthenticatorFactory.USER_CLIENT_LIMIT, "0");
             oauth.openLoginForm();
             loginPage.login("test-user@localhost", "password");
-            EventRepresentation initialLoginEvent = EventAssertion.expectLogin(events.poll());
+            EventRepresentation initialLoginEvent = events.poll();
+            EventAssertion.expectLogin(initialLoginEvent);
             String userId = initialLoginEvent.getUserId();
             String initialLoginSessionID = initialLoginEvent.getSessionId();
 
@@ -535,7 +538,8 @@ public class UserSessionLimitsTest extends AbstractTestRealmKeycloakTest {
             // Login and verify login was successful
             oauth.openLoginForm();
             loginPage.login("test-user@localhost", "password");
-            EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
+            EventRepresentation loginEvent = events.poll();
+            EventAssertion.expectLogin(loginEvent);
 
             // Delete the cookies, while maintaining the server side session active
             super.deleteCookies();
@@ -578,7 +582,8 @@ public class UserSessionLimitsTest extends AbstractTestRealmKeycloakTest {
             // Login and verify login was successful
             oauth.openLoginForm();
             loginPage.login("test-user@localhost", "password");
-            EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
+            EventRepresentation loginEvent = events.poll();
+            EventAssertion.expectLogin(loginEvent);
 
             // Delete the cookies, while maintaining the server side session active
             super.deleteCookies();
@@ -640,7 +645,8 @@ public class UserSessionLimitsTest extends AbstractTestRealmKeycloakTest {
         oauth.openLoginForm();
         loginPage.login("test-user@localhost", "password");
         assertEquals(AppPage.RequestType.AUTH_RESPONSE, appPage.getRequestType());
-        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
+        EventRepresentation loginEvent = events.poll();
+        EventAssertion.expectLogin(loginEvent);
         String sessionId1 = loginEvent.getSessionId();
 
         // SSO login in browser1. Should be still OK (Login won't be denied even if session limit is set to 1 because we are login in same browser for SSO login)

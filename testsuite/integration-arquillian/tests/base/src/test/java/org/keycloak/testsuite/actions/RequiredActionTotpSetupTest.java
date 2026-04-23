@@ -45,6 +45,7 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.keycloak.representations.idm.UserSessionRepresentation;
 import org.keycloak.testsuite.AbstractTestRealmKeycloakTest;
 import org.keycloak.testsuite.AssertEvents;
+import org.keycloak.testsuite.EventAssertion;
 import org.keycloak.testsuite.admin.AdminApiUtil;
 import org.keycloak.testsuite.pages.AppPage;
 import org.keycloak.testsuite.pages.AppPage.RequestType;
@@ -671,7 +672,8 @@ public class RequiredActionTotpSetupTest extends AbstractTestRealmKeycloakTest {
 
         assertEquals(RequestType.AUTH_RESPONSE, appPage.getRequestType());
 
-        loginEvent = EventAssertion.expectLogin(events.poll());
+        loginEvent = events.poll();
+        EventAssertion.expectLogin(loginEvent);
 
         tokenResponse = sendTokenRequestAndGetResponse(loginEvent);
         oauth.logoutForm().idTokenHint(tokenResponse.getIdToken()).withRedirect().open();
@@ -728,7 +730,8 @@ public class RequiredActionTotpSetupTest extends AbstractTestRealmKeycloakTest {
         UserResource testUser = managedRealm.admin().users().get(findUser("test-user@localhost").getId());
         OAuthClient oauth2 = oauth.newConfig().driver(driver2);
         oauth2.doLogin("test-user@localhost", "password");
-        EventRepresentation event1 = EventAssertion.expectLogin(events.poll());
+        EventRepresentation event1 = events.poll();
+        EventAssertion.expectLogin(event1);
         assertEquals(1, testUser.getUserSessions().size());
 
         // add action to configure totp

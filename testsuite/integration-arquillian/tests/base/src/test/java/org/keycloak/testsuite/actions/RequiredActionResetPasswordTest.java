@@ -35,6 +35,7 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.keycloak.representations.idm.UserSessionRepresentation;
 import org.keycloak.testsuite.AbstractTestRealmKeycloakTest;
 import org.keycloak.testsuite.AssertEvents;
+import org.keycloak.testsuite.EventAssertion;
 import org.keycloak.testsuite.admin.AdminApiUtil;
 import org.keycloak.testsuite.pages.AppPage;
 import org.keycloak.testsuite.pages.AppPage.RequestType;
@@ -116,7 +117,8 @@ public class RequiredActionResetPasswordTest extends AbstractTestRealmKeycloakTe
 
         Assertions.assertEquals(RequestType.AUTH_RESPONSE, appPage.getRequestType());
 
-        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
+        EventRepresentation loginEvent = events.poll();
+        EventAssertion.expectLogin(loginEvent);
 
         AccessTokenResponse tokenResponse = sendTokenRequestAndGetResponse(loginEvent);
         oauth.logoutForm().idTokenHint(tokenResponse.getIdToken()).withRedirect().open();
@@ -144,7 +146,8 @@ public class RequiredActionResetPasswordTest extends AbstractTestRealmKeycloakTe
         OAuthClient oauth2 = oauth.newConfig().driver(driver2);
         UserResource testUser = managedRealm.admin().users().get(findUser("test-user@localhost").getId());
         oauth2.doLogin("test-user@localhost", "password");
-        EventRepresentation regularSession = EventAssertion.expectLogin(events.poll());
+        EventRepresentation regularSession = events.poll();
+        EventAssertion.expectLogin(regularSession);
         assertEquals(1, testUser.getUserSessions().size());
 
         // navigate to a neutral URL to then clear the cookies on that domain
@@ -154,7 +157,8 @@ public class RequiredActionResetPasswordTest extends AbstractTestRealmKeycloakTe
         // create an offline session
         oauth2.scope(OAuth2Constants.OFFLINE_ACCESS);
         AuthorizationEndpointResponse os = oauth2.doLogin("test-user@localhost", "password");
-        EventRepresentation offlineSession = EventAssertion.expectLogin(events.poll());
+        EventRepresentation offlineSession = events.poll();
+        EventAssertion.expectLogin(offlineSession);
         AccessTokenResponse at = oauth2.doAccessTokenRequest(os.getCode());
         String clientUuid = managedRealm.admin().clients().findByClientId(oauth2.getClientId()).get(0).getId();
         assertEquals(1, testUser.getOfflineSessions(clientUuid).size());
@@ -183,7 +187,8 @@ public class RequiredActionResetPasswordTest extends AbstractTestRealmKeycloakTe
         events.expectRequiredAction(EventType.UPDATE_PASSWORD).detail(Details.CREDENTIAL_TYPE, PasswordCredentialModel.TYPE).assertEvent(true);
         events.expectRequiredAction(EventType.UPDATE_CREDENTIAL).detail(Details.CREDENTIAL_TYPE, PasswordCredentialModel.TYPE).assertEvent();
 
-        EventRepresentation event2 = EventAssertion.expectLogin(events.poll());
+        EventRepresentation event2 = events.poll();
+        EventAssertion.expectLogin(event2);
         List<UserSessionRepresentation> regularSessions = testUser.getUserSessions();
         List<UserSessionRepresentation> offlineSessions = testUser.getOfflineSessions(clientUuid);
         if (logoutOtherSessions) {

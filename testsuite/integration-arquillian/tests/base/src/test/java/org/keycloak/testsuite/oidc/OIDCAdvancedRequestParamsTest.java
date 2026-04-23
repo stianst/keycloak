@@ -74,6 +74,7 @@ import org.keycloak.services.util.CertificateInfoHelper;
 import org.keycloak.testsuite.AbstractAdminTest;
 import org.keycloak.testsuite.AbstractTestRealmKeycloakTest;
 import org.keycloak.testsuite.AssertEvents;
+import org.keycloak.testsuite.EventAssertion;
 import org.keycloak.testsuite.admin.AdminApiUtil;
 import org.keycloak.testsuite.broker.util.SimpleHttpDefault;
 import org.keycloak.testsuite.client.resources.TestApplicationResourceUrls;
@@ -205,7 +206,8 @@ public class OIDCAdvancedRequestParamsTest extends AbstractTestRealmKeycloakTest
     public void testMaxAge1() {
         // Open login form and login successfully
         oauth.doLogin("test-user@localhost", "password");
-        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
+        EventRepresentation loginEvent = events.poll();
+        EventAssertion.expectLogin(loginEvent);
 
         IDToken idToken = sendTokenRequestAndGetIDToken(loginEvent);
 
@@ -222,7 +224,8 @@ public class OIDCAdvancedRequestParamsTest extends AbstractTestRealmKeycloakTest
         loginPage.assertCurrent();
         assertThat(false, is(loginPage.isUsernameInputPresent()));
         loginPage.login("password");
-        loginEvent = EventAssertion.expectLogin(events.poll());
+        loginEvent = events.poll();
+        EventAssertion.expectLogin(loginEvent);
 
         idToken = sendTokenRequestAndGetIDToken(loginEvent);
 
@@ -235,7 +238,8 @@ public class OIDCAdvancedRequestParamsTest extends AbstractTestRealmKeycloakTest
     public void testMaxAge10000() {
         // Open login form and login successfully
         oauth.doLogin("test-user@localhost", "password");
-        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
+        EventRepresentation loginEvent = events.poll();
+        EventAssertion.expectLogin(loginEvent);
 
         IDToken idToken = sendTokenRequestAndGetIDToken(loginEvent);
 
@@ -251,7 +255,8 @@ public class OIDCAdvancedRequestParamsTest extends AbstractTestRealmKeycloakTest
         oauth.loginForm().maxAge(10000).open();
 
         // Assert that I will be automatically logged through cookie
-        loginEvent = EventAssertion.expectLogin(events.poll());
+        loginEvent = events.poll();
+        EventAssertion.expectLogin(loginEvent);
 
         idToken = sendTokenRequestAndGetIDToken(loginEvent);
 
@@ -1265,7 +1270,8 @@ public class OIDCAdvancedRequestParamsTest extends AbstractTestRealmKeycloakTest
             String request = new JWSBuilder().jsonContent(oidcRequest).none();
 
             oauth.loginForm().request(request).doLogin("test-user@localhost", "password");
-            EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
+            EventRepresentation loginEvent = events.poll();
+            EventAssertion.expectLogin(loginEvent);
 
             AccessTokenResponse accessTokenResponse = sendTokenRequestAndGetResponse(loginEvent);
             IDToken idToken = oauth.verifyIDToken(accessTokenResponse.getIdToken());
@@ -1312,7 +1318,8 @@ public class OIDCAdvancedRequestParamsTest extends AbstractTestRealmKeycloakTest
             request = new JWSBuilder().jsonContent(oidcRequest).none();
 
             oauth.loginForm().request(request).doLogin("test-user@localhost", "password");
-            loginEvent = EventAssertion.expectLogin(events.poll());
+            loginEvent = events.poll();
+            EventAssertion.expectLogin(loginEvent);
 
             accessTokenResponse = sendTokenRequestAndGetResponse(loginEvent);
             idToken = oauth.verifyIDToken(accessTokenResponse.getIdToken());

@@ -37,6 +37,7 @@ import org.keycloak.representations.idm.UserSessionRepresentation;
 import org.keycloak.representations.userprofile.config.UPAttribute;
 import org.keycloak.representations.userprofile.config.UPAttributePermissions;
 import org.keycloak.representations.userprofile.config.UPConfig;
+import org.keycloak.testsuite.EventAssertion;
 import org.keycloak.testsuite.pages.AppPage;
 import org.keycloak.testsuite.util.oauth.OAuthClient;
 
@@ -75,7 +76,8 @@ public class RequiredActionUpdateEmailTest extends AbstractRequiredActionUpdateE
         UserResource testUser = managedRealm.admin().users().get(findUser("test-user@localhost").getId());
         OAuthClient oauth2 = oauth.newConfig().driver(driver2);;
         oauth2.doLogin("test-user@localhost", "password");
-        EventRepresentation event1 = EventAssertion.expectLogin(events.poll());
+        EventRepresentation event1 = events.poll();
+        EventAssertion.expectLogin(event1);
         assertEquals(1, testUser.getUserSessions().size());
 
         // add the action and change it
@@ -92,7 +94,8 @@ public class RequiredActionUpdateEmailTest extends AbstractRequiredActionUpdateE
                 .detail(Details.UPDATED_EMAIL, "new@localhost").assertEvent();
         assertEquals(AppPage.RequestType.AUTH_RESPONSE, appPage.getRequestType());
 
-        EventRepresentation event2 = EventAssertion.expectLogin(events.poll());
+        EventRepresentation event2 = events.poll();
+        EventAssertion.expectLogin(event2);
         List<UserSessionRepresentation> sessions = testUser.getUserSessions();
         if (logoutOtherSessions) {
             assertEquals(1, sessions.size());

@@ -29,6 +29,7 @@ import org.keycloak.representations.idm.EventRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.keycloak.testsuite.AbstractChangeImportedUserPasswordsTest;
 import org.keycloak.testsuite.AssertEvents;
+import org.keycloak.testsuite.EventAssertion;
 import org.keycloak.testsuite.drone.Different;
 import org.keycloak.testsuite.pages.AppPage;
 import org.keycloak.testsuite.pages.AppPage.RequestType;
@@ -80,7 +81,8 @@ public class SSOTest extends AbstractChangeImportedUserPasswordsTest {
         assertEquals(RequestType.AUTH_RESPONSE, appPage.getRequestType());
         Assertions.assertNotNull(oauth.parseLoginResponse().getCode());
 
-        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
+        EventRepresentation loginEvent = events.poll();
+        EventAssertion.expectLogin(loginEvent);
         String sessionId = loginEvent.getSessionId();
 
         IDToken idToken = sendTokenRequestAndGetIDToken(loginEvent);
@@ -126,14 +128,16 @@ public class SSOTest extends AbstractChangeImportedUserPasswordsTest {
         Assertions.assertEquals(RequestType.AUTH_RESPONSE, appPage.getRequestType());
         Assertions.assertNotNull(oauth.parseLoginResponse().getCode());
 
-        EventRepresentation login1 = EventAssertion.expectLogin(events.poll());
+        EventRepresentation login1 = events.poll();
+        EventAssertion.expectLogin(login1);
 
         //OAuthClient oauth2 = new OAuthClient(driver2);
         OAuthClient oauth2 = oauth.newConfig().driver(driver2);
 
         oauth2.doLogin("test-user@localhost", getPassword("test-user@localhost"));
 
-        EventRepresentation login2 = EventAssertion.expectLogin(events.poll());
+        EventRepresentation login2 = events.poll();
+        EventAssertion.expectLogin(login2);
 
         Assertions.assertEquals(RequestType.AUTH_RESPONSE, RequestType.valueOf(driver2.getTitle()));
         Assertions.assertNotNull(oauth2.parseLoginResponse().getCode());
@@ -175,7 +179,8 @@ public class SSOTest extends AbstractChangeImportedUserPasswordsTest {
         assertEquals(RequestType.AUTH_RESPONSE, appPage.getRequestType());
         Assertions.assertNotNull(oauth.parseLoginResponse().getCode());
 
-        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
+        EventRepresentation loginEvent = events.poll();
+        EventAssertion.expectLogin(loginEvent);
         String sessionId = loginEvent.getSessionId();
 
         // Add update-profile required action to user now

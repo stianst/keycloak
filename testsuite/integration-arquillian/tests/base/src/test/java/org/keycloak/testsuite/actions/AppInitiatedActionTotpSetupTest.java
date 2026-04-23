@@ -36,6 +36,7 @@ import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.RequiredActionProviderRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.keycloak.testsuite.AssertEvents;
+import org.keycloak.testsuite.EventAssertion;
 import org.keycloak.testsuite.admin.AdminApiUtil;
 import org.keycloak.testsuite.pages.LoginConfigTotpPage;
 import org.keycloak.testsuite.pages.LoginTotpPage;
@@ -584,7 +585,8 @@ public class AppInitiatedActionTotpSetupTest extends AbstractAppInitiatedActionT
 
         assertKcActionStatus(null);
 
-        loginEvent = EventAssertion.expectLogin(events.poll());
+        loginEvent = events.poll();
+        EventAssertion.expectLogin(loginEvent);
 
         tokenResponse = sendTokenRequestAndGetResponse(loginEvent);
         oauth.logoutForm().idTokenHint(tokenResponse.getIdToken()).withRedirect().open();

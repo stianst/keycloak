@@ -36,6 +36,7 @@ import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.RequiredActionProviderRepresentation;
 import org.keycloak.representations.idm.UserSessionRepresentation;
 import org.keycloak.testsuite.actions.AbstractAppInitiatedActionTest;
+import org.keycloak.testsuite.EventAssertion;
 import org.keycloak.testsuite.admin.AdminApiUtil;
 import org.keycloak.testsuite.arquillian.annotation.IgnoreBrowserDriver;
 import org.keycloak.testsuite.pages.AppPage;
@@ -192,7 +193,8 @@ public class AppInitiatedActionWebAuthnTest extends AbstractAppInitiatedActionTe
                 .update()) {
             OAuthClient oauth2 = oauth.newConfig().driver(driver2);
             oauth2.doLogin(DEFAULT_USERNAME, getPassword(DEFAULT_USERNAME));
-            event1 = EventAssertion.expectLogin(events.poll());
+            event1 = events.poll();
+            EventAssertion.expectLogin(event1);
             assertEquals(1, testUser.getUserSessions().size());
         }
 

@@ -29,6 +29,7 @@ import org.keycloak.representations.idm.EventRepresentation;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.testsuite.AbstractTestRealmKeycloakTest;
 import org.keycloak.testsuite.AssertEvents;
+import org.keycloak.testsuite.EventAssertion;
 import org.keycloak.testsuite.admin.AdminApiUtil;
 import org.keycloak.testsuite.pages.AppPage;
 import org.keycloak.testsuite.pages.ErrorPage;
@@ -88,7 +89,8 @@ public class OIDCBackwardsCompatibilityTest extends AbstractTestRealmKeycloakTes
     public void testExcludeSessionStateParameter() {
         // Open login form and login successfully. Assert session_state is present
         AuthorizationEndpointResponse authzResponse = oauth.doLogin("test-user@localhost", "password");
-        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
+        EventRepresentation loginEvent = events.poll();
+        EventAssertion.expectLogin(loginEvent);
         Assertions.assertEquals(AppPage.RequestType.AUTH_RESPONSE, appPage.getRequestType());
         Assertions.assertNotNull(authzResponse.getSessionState());
 

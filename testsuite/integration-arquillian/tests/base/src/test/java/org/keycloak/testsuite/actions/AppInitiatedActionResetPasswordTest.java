@@ -40,6 +40,7 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.keycloak.representations.idm.UserSessionRepresentation;
 import org.keycloak.services.managers.AuthenticationSessionManager;
 import org.keycloak.services.resources.LoginActionsService;
+import org.keycloak.testsuite.EventAssertion;
 import org.keycloak.testsuite.admin.AdminApiUtil;
 import org.keycloak.testsuite.pages.LoginConfigTotpPage;
 import org.keycloak.testsuite.pages.LoginPasswordUpdatePage;
@@ -176,7 +177,8 @@ public class AppInitiatedActionResetPasswordTest extends AbstractAppInitiatedAct
 
             assertKcActionStatus(SUCCESS);
 
-            EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
+            EventRepresentation loginEvent = events.poll();
+            EventAssertion.expectLogin(loginEvent);
 
             AccessTokenResponse tokenResponse = sendTokenRequestAndGetResponse(loginEvent);
             oauth.logoutForm().idTokenHint(tokenResponse.getIdToken()).withRedirect().open();
@@ -421,7 +423,8 @@ public class AppInitiatedActionResetPasswordTest extends AbstractAppInitiatedAct
         final String firstSessionId = sessions.get(0).getId();
 
         oauth2.doLogin("test-user@localhost", "password");
-        EventRepresentation event2 = EventAssertion.expectLogin(events.poll());
+        EventRepresentation event2 = events.poll();
+        EventAssertion.expectLogin(event2);
         assertEquals(2, testUser.getUserSessions().size());
 
         doAIA();
