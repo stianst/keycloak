@@ -158,7 +158,7 @@ public class RequiredActionPriorityTest extends AbstractTestRealmKeycloakTest {
         // Logged in
         appPage.assertCurrent();
         assertEquals(RequestType.AUTH_RESPONSE, appPage.getRequestType());
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
     }
 
     @Test
@@ -208,7 +208,7 @@ public class RequiredActionPriorityTest extends AbstractTestRealmKeycloakTest {
         // Logged in
         appPage.assertCurrent();
         assertEquals(RequestType.AUTH_RESPONSE, appPage.getRequestType());
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
     }
 
     @Test
@@ -259,7 +259,7 @@ public class RequiredActionPriorityTest extends AbstractTestRealmKeycloakTest {
         // Logged in
         appPage.assertCurrent();
         assertEquals(RequestType.AUTH_RESPONSE, appPage.getRequestType());
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
     }
 
 
@@ -324,7 +324,7 @@ public class RequiredActionPriorityTest extends AbstractTestRealmKeycloakTest {
         // Logged in
         appPage.assertCurrent();
         assertEquals(RequestType.AUTH_RESPONSE, appPage.getRequestType());
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
     }
 
     @Test
@@ -377,7 +377,7 @@ public class RequiredActionPriorityTest extends AbstractTestRealmKeycloakTest {
         // Logged in
         appPage.assertCurrent();
         assertEquals(RequestType.AUTH_RESPONSE, appPage.getRequestType());
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
     }
 
     @Test
@@ -418,7 +418,7 @@ public class RequiredActionPriorityTest extends AbstractTestRealmKeycloakTest {
         // Logged in
         appPage.assertCurrent();
         assertThat(appPage.getRequestType(), is(RequestType.AUTH_RESPONSE));
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
 
     }
 

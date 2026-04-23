@@ -162,7 +162,7 @@ public class NonceBackwardsCompatibleMapperTest extends AbstractTestRealmKeycloa
             oauth.scope(OAuth2Constants.OFFLINE_ACCESS);
         }
         oauth.loginForm().nonce(nonce).doLogin("test-user@localhost", "password");
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
 
         String code = oauth.parseLoginResponse().getCode();
         AccessTokenResponse response = oauth.doAccessTokenRequest(code);

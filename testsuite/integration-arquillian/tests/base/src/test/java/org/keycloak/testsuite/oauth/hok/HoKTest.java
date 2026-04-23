@@ -188,7 +188,7 @@ public class HoKTest extends AbstractTestRealmKeycloakTest {
     @Test
     public void accessTokenRequestWithClientCertificate() throws Exception {
         oauth.doLogin("test-user@localhost", "password");
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
         String sessionId = loginEvent.getSessionId();
         String codeId = loginEvent.getDetails().get(Details.CODE_ID);
         String code = oauth.parseLoginResponse().getCode();
@@ -334,7 +334,7 @@ public class HoKTest extends AbstractTestRealmKeycloakTest {
     public void refreshTokenRequestByHoKRefreshTokenWithClientCertificate() throws Exception {
         oauth.doLogin("test-user@localhost", "password");
 
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
         String sessionId = loginEvent.getSessionId();
         String codeId = loginEvent.getDetails().get(Details.CODE_ID);
         String code = oauth.parseLoginResponse().getCode();
@@ -383,7 +383,7 @@ public class HoKTest extends AbstractTestRealmKeycloakTest {
     public void refreshTokenRequestByRefreshTokenWithoutClientCertificate() throws Exception {
         oauth.doLogin("test-user@localhost", "password");
 
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
         String sessionId = loginEvent.getSessionId();
         String code = oauth.parseLoginResponse().getCode();
 
@@ -472,7 +472,7 @@ public class HoKTest extends AbstractTestRealmKeycloakTest {
         // get an access token
         oauth.doLogin("test-user@localhost", "password");
 
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
         String sessionId = loginEvent.getSessionId();
         String codeId = loginEvent.getDetails().get(Details.CODE_ID);
         String code = oauth.parseLoginResponse().getCode();
@@ -513,7 +513,7 @@ public class HoKTest extends AbstractTestRealmKeycloakTest {
         // get an access token
         oauth.doLogin("test-user@localhost", "password");
 
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
         String sessionId = loginEvent.getSessionId();
         String codeId = loginEvent.getDetails().get(Details.CODE_ID);
         String code = oauth.parseLoginResponse().getCode();
@@ -616,7 +616,7 @@ public class HoKTest extends AbstractTestRealmKeycloakTest {
 
         oauth.loginForm().nonce(nonce).doLogin("test-user@localhost", "password");
 
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
         AuthorizationEndpointResponse authzResponse = oauth.parseLoginResponse();
         Assertions.assertNotNull(authzResponse.getSessionState());
         List<IDToken> idTokens = testAuthzResponseAndRetrieveIDTokens(authzResponse, loginEvent);
@@ -651,7 +651,7 @@ public class HoKTest extends AbstractTestRealmKeycloakTest {
         // mimic Client
         oauth.doLogin("test-user@localhost", "password");
         String code = oauth.parseLoginResponse().getCode();
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
         AccessTokenResponse accessTokenResponse = null;
         try (CloseableHttpClient client = MutualTLSUtils.newCloseableHttpClientWithDefaultKeyStoreAndTrustStore()) {
             oauth.httpClient().set(client);

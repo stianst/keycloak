@@ -54,7 +54,7 @@ public class OAuthDanceClientSessionExtensionTest extends AbstractKeycloakTest {
     public void doOauthDanceWithClientSessionStateAndHost() throws Exception {
         oauth.doLogin("test-user@localhost", "password");
 
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
 
         String sessionId = loginEvent.getSessionId();
         String codeId = loginEvent.getDetails().get(Details.CODE_ID);

@@ -410,7 +410,7 @@ public class AppInitiatedActionTotpSetupTest extends AbstractAppInitiatedActionT
 
         loginTotpPage.login(totp.generateTOTP(totpSecret));
 
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
     }
 
     @Test
@@ -529,7 +529,7 @@ public class AppInitiatedActionTotpSetupTest extends AbstractAppInitiatedActionT
 
         assertKcActionStatus(null);
 
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
 
         // Revert
         realmRep = adminClient.realm("test").toRepresentation();
@@ -584,7 +584,7 @@ public class AppInitiatedActionTotpSetupTest extends AbstractAppInitiatedActionT
 
         assertKcActionStatus(null);
 
-        loginEvent = events.expectLogin().assertEvent();
+        loginEvent = EventAssertion.expectLogin(events.poll());
 
         tokenResponse = sendTokenRequestAndGetResponse(loginEvent);
         oauth.logoutForm().idTokenHint(tokenResponse.getIdToken()).withRedirect().open();
@@ -610,7 +610,7 @@ public class AppInitiatedActionTotpSetupTest extends AbstractAppInitiatedActionT
 
         assertKcActionStatus(null);
 
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
 
         // Revert
         realmRep = adminClient.realm("test").toRepresentation();

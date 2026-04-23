@@ -94,7 +94,7 @@ public class AppInitiatedActionUpdateProfileTest extends AbstractAppInitiatedAct
                 .detail(Details.PREVIOUS_LAST_NAME, "Brady").detail(Details.UPDATED_LAST_NAME, "New last")
                 .detail(Details.PREVIOUS_EMAIL, "test-user@localhost").detail(Details.UPDATED_EMAIL, "new@email.com")
                 .assertEvent();
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
 
         assertKcActionStatus(SUCCESS);
 
@@ -120,12 +120,12 @@ public class AppInitiatedActionUpdateProfileTest extends AbstractAppInitiatedAct
 
         updateProfilePage.prepareUpdate().username("test-user@localhost").firstName("New first").lastName("New last").email("new@email.com").submit();
 
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
         events.expectRequiredAction(EventType.UPDATE_PROFILE).detail(Details.PREVIOUS_FIRST_NAME, "Tom").detail(Details.UPDATED_FIRST_NAME, "New first")
                 .detail(Details.PREVIOUS_LAST_NAME, "Brady").detail(Details.UPDATED_LAST_NAME, "New last")
                 .detail(Details.PREVIOUS_EMAIL, "test-user@localhost").detail(Details.UPDATED_EMAIL, "new@email.com")
                 .assertEvent();
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
 
         assertKcActionStatus(SUCCESS);
 

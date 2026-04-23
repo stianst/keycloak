@@ -199,7 +199,7 @@ public class AccessTokenTest extends AbstractKeycloakTest {
     public void accessTokenRequest() throws Exception {
         oauth.doLogin("test-user@localhost", "password");
 
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
 
         String sessionId = loginEvent.getSessionId();
         String codeId = loginEvent.getDetails().get(Details.CODE_ID);
@@ -324,7 +324,7 @@ public class AccessTokenTest extends AbstractKeycloakTest {
 
         oauth.fillLoginForm("test-user@localhost", "password");
 
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
 
         AccessTokenResponse response = oauth.doAccessTokenRequest(loginPageCode);
 
@@ -336,7 +336,7 @@ public class AccessTokenTest extends AbstractKeycloakTest {
     public void accessTokenInvalidClientCredentials() throws Exception {
         oauth.doLogin("test-user@localhost", "password");
 
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
         String codeId = loginEvent.getDetails().get(Details.CODE_ID);
 
         String code = oauth.parseLoginResponse().getCode();
@@ -352,7 +352,7 @@ public class AccessTokenTest extends AbstractKeycloakTest {
         oauth.client("test-app");
         oauth.doLogin("test-user@localhost", "password");
 
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
         String codeId = loginEvent.getDetails().get(Details.CODE_ID);
 
         String code = oauth.parseLoginResponse().getCode();
@@ -367,7 +367,7 @@ public class AccessTokenTest extends AbstractKeycloakTest {
     public void accessTokenInvalidRedirectUri() throws Exception {
         oauth.doLogin("test-user@localhost", "password");
 
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
         String codeId = loginEvent.getDetails().get(Details.CODE_ID);
 
         String code = oauth.parseLoginResponse().getCode();
@@ -397,7 +397,7 @@ public class AccessTokenTest extends AbstractKeycloakTest {
     public void accessTokenUserSessionExpired() {
         oauth.doLogin("test-user@localhost", "password");
 
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
 
         String codeId = loginEvent.getDetails().get(Details.CODE_ID);
         String sessionId = loginEvent.getSessionId();
@@ -430,7 +430,7 @@ public class AccessTokenTest extends AbstractKeycloakTest {
         RealmManager.realm(adminClient.realm("test")).accessCodeLifeSpan(1);
         oauth.doLogin("test-user@localhost", "password");
 
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
 
         String codeId = loginEvent.getDetails().get(Details.CODE_ID);
         loginEvent.getSessionId();
@@ -463,7 +463,7 @@ public class AccessTokenTest extends AbstractKeycloakTest {
     @Test
     public void bearerAccessTokenAsDPoPOnUserInfoEndpoint() throws IOException {
         oauth.doLogin("test-user@localhost", "password");
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
         loginEvent.getSessionId();
         AccessTokenResponse response = oauth.doAccessTokenRequest(oauth.parseLoginResponse().getCode());
         Assertions.assertEquals(200, response.getStatusCode());
@@ -481,7 +481,7 @@ public class AccessTokenTest extends AbstractKeycloakTest {
     public void accessTokenCodeUsed() throws IOException {
         oauth.doLogin("test-user@localhost", "password");
 
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
 
         String codeId = loginEvent.getDetails().get(Details.CODE_ID);
         loginEvent.getSessionId();
@@ -544,7 +544,7 @@ public class AccessTokenTest extends AbstractKeycloakTest {
 
         oauth.doLogin("test-user@localhost", "password");
 
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
 
         loginEvent.getDetails().get(Details.CODE_ID);
 
@@ -1123,7 +1123,7 @@ public class AccessTokenTest extends AbstractKeycloakTest {
     public void accessTokenResponseHeader() throws Exception {
         oauth.doLogin("test-user@localhost", "password");
 
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
 
         String sessionId = loginEvent.getSessionId();
         String codeId = loginEvent.getDetails().get(Details.CODE_ID);
@@ -1451,7 +1451,7 @@ public class AccessTokenTest extends AbstractKeycloakTest {
     private void tokenRequest(String expectedRefreshAlg, String expectedAccessAlg, String expectedIdTokenAlg, String idTokenCurve) throws Exception {
         oauth.doLogin("test-user@localhost", "password");
 
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
 
         String sessionId = loginEvent.getSessionId();
         String codeId = loginEvent.getDetails().get(Details.CODE_ID);

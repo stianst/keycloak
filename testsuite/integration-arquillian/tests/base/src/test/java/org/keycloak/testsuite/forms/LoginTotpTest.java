@@ -151,7 +151,7 @@ public class LoginTotpTest extends AbstractChangeImportedUserPasswordsTest {
 
         Assertions.assertEquals(RequestType.AUTH_RESPONSE, appPage.getRequestType());
 
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
     }
 
     // KEYCLOAK-3835
@@ -171,7 +171,7 @@ public class LoginTotpTest extends AbstractChangeImportedUserPasswordsTest {
 
         Assertions.assertEquals(RequestType.AUTH_RESPONSE, appPage.getRequestType());
 
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
     }
 
     @Test

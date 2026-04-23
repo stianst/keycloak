@@ -101,7 +101,7 @@ public class OAuth2OnlyTest extends AbstractTestRealmKeycloakTest {
 
         driver.navigate().to(loginFormUrl);
         oauth.fillLoginForm("test-user@localhost", "password");
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
 
         String code = oauth.parseLoginResponse().getCode();
         AccessTokenResponse response = oauth.doAccessTokenRequest(code);
@@ -152,7 +152,7 @@ public class OAuth2OnlyTest extends AbstractTestRealmKeycloakTest {
         driver.navigate().to(loginFormUrl);
         loginPage.assertCurrent();
         oauth.fillLoginForm("test-user@localhost", "password");
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
 
         // Client 'more-uris-client' has 2 redirect uris. OAuth2 login without redirect_uri won't be allowed
         oauth.client("more-uris-client");
@@ -185,7 +185,7 @@ public class OAuth2OnlyTest extends AbstractTestRealmKeycloakTest {
         driver.navigate().to(loginFormUrl);
         loginPage.assertCurrent();
         oauth.fillLoginForm("test-user@localhost", "password");
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
 
         AuthorizationEndpointResponse response = oauth.parseLoginResponse();
         Assertions.assertNull(response.getError());

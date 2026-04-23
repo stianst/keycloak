@@ -134,7 +134,7 @@ public class RequiredActionUpdateProfileTest extends AbstractChangeImportedUserP
                 .assertEvent();
         Assertions.assertEquals(RequestType.AUTH_RESPONSE, appPage.getRequestType());
 
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
 
         // assert user is really updated in persistent store
         user = ActionUtil.findUserWithAdminClient(adminClient, "test-user@localhost");
@@ -437,7 +437,7 @@ public class RequiredActionUpdateProfileTest extends AbstractChangeImportedUserP
 
             Assertions.assertEquals(RequestType.AUTH_RESPONSE, appPage.getRequestType());
 
-            events.expectLogin().assertEvent();
+            EventAssertion.expectLogin(events.poll());
 
             // assert user is really updated in persistent store
             userRep = ActionUtil.findUserWithAdminClient(adminClient, "test-user@localhost");

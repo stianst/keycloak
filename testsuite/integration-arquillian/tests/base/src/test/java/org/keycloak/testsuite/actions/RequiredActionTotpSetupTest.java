@@ -442,7 +442,7 @@ public class RequiredActionTotpSetupTest extends AbstractTestRealmKeycloakTest {
             assertEquals("Invalid authenticator code.", loginTotpPage.getInputError());
         } else {
             assertEquals(RequestType.AUTH_RESPONSE, appPage.getRequestType());
-            events.expectLogin().assertEvent();
+            EventAssertion.expectLogin(events.poll());
         }
     }
 
@@ -614,7 +614,7 @@ public class RequiredActionTotpSetupTest extends AbstractTestRealmKeycloakTest {
 
         assertEquals(RequestType.AUTH_RESPONSE, appPage.getRequestType());
 
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
 
         // Revert
         realmRep = adminClient.realm("test").toRepresentation();
@@ -671,7 +671,7 @@ public class RequiredActionTotpSetupTest extends AbstractTestRealmKeycloakTest {
 
         assertEquals(RequestType.AUTH_RESPONSE, appPage.getRequestType());
 
-        loginEvent = events.expectLogin().assertEvent();
+        loginEvent = EventAssertion.expectLogin(events.poll());
 
         tokenResponse = sendTokenRequestAndGetResponse(loginEvent);
         oauth.logoutForm().idTokenHint(tokenResponse.getIdToken()).withRedirect().open();
@@ -696,7 +696,7 @@ public class RequiredActionTotpSetupTest extends AbstractTestRealmKeycloakTest {
 
         assertEquals(RequestType.AUTH_RESPONSE, appPage.getRequestType());
 
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
 
         // Revert
         realmRep = adminClient.realm("test").toRepresentation();
@@ -728,7 +728,7 @@ public class RequiredActionTotpSetupTest extends AbstractTestRealmKeycloakTest {
         UserResource testUser = managedRealm.admin().users().get(findUser("test-user@localhost").getId());
         OAuthClient oauth2 = oauth.newConfig().driver(driver2);
         oauth2.doLogin("test-user@localhost", "password");
-        EventRepresentation event1 = events.expectLogin().assertEvent();
+        EventRepresentation event1 = EventAssertion.expectLogin(events.poll());
         assertEquals(1, testUser.getUserSessions().size());
 
         // add action to configure totp

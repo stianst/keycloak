@@ -160,7 +160,7 @@ public class RecoveryAuthnCodesAuthenticatorTest extends AbstractChangeImportedU
         UserResource testUser = managedRealm.admin().users().get(findUser("test-user@localhost").getId());
         OAuthClient oauth2 = oauth.newConfig().driver(driver2);
         oauth2.doLogin("test-user@localhost", getPassword("test-user@localhost"));
-        EventRepresentation event1 = events.expectLogin().assertEvent();
+        EventRepresentation event1 = EventAssertion.expectLogin(events.poll());
         assertEquals(1, testUser.getUserSessions().size());
 
         // add action to recovery codes for the test user

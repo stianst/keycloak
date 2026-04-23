@@ -214,7 +214,7 @@ public class TokenIntrospectionTest extends AbstractTestRealmKeycloakTest {
     public void testIntrospectRefreshToken() throws Exception {
         oauth.doLogin("test-user@localhost", "password");
         String code = oauth.parseLoginResponse().getCode();
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
         String sessionId = loginEvent.getSessionId();
         AccessTokenResponse accessTokenResponse = oauth.doAccessTokenRequest(code);
         oauth.client("confidential-cli", "secret1");
@@ -251,7 +251,7 @@ public class TokenIntrospectionTest extends AbstractTestRealmKeycloakTest {
 
         driver.navigate().refresh();
         oauth.fillLoginForm("test-user@localhost", "password");
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
 
         Assertions.assertFalse(loginPage.isCurrent());
 
@@ -310,7 +310,7 @@ public class TokenIntrospectionTest extends AbstractTestRealmKeycloakTest {
     public void testIntrospectAccessToken() throws Exception {
         oauth.doLogin("test-user@localhost", "password");
         String code = oauth.parseLoginResponse().getCode();
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
         AccessTokenResponse accessTokenResponse = oauth.doAccessTokenRequest(code);
         oauth.client("confidential-cli", "secret1");
         TokenMetadataRepresentation rep = oauth.doIntrospectionAccessTokenRequest(accessTokenResponse.getAccessToken()).asTokenMetadata();
@@ -352,7 +352,7 @@ public class TokenIntrospectionTest extends AbstractTestRealmKeycloakTest {
     public void testIntrospectAccessTokenReturnedAsJwt() throws Exception {
         oauth.doLogin("test-user@localhost", "password");
         String code = oauth.parseLoginResponse().getCode();
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
         AccessTokenResponse accessTokenResponse = oauth.doAccessTokenRequest(code);
 
         TokenMetadataRepresentation rep = oauth.introspectionRequest(accessTokenResponse.getAccessToken())
@@ -387,7 +387,7 @@ public class TokenIntrospectionTest extends AbstractTestRealmKeycloakTest {
 
             oauth.doLogin("test-user@localhost", "password");
             String code = oauth.parseLoginResponse().getCode();
-            EventRepresentation loginEvent = events.expectLogin().assertEvent();
+            EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
             AccessTokenResponse accessTokenResponse = oauth.doAccessTokenRequest(code);
 
             assertEquals(jwaAlgorithm, new JWSInput(accessTokenResponse.getAccessToken()).getHeader().getAlgorithm().name());
@@ -495,7 +495,7 @@ public class TokenIntrospectionTest extends AbstractTestRealmKeycloakTest {
         String code = oauth.parseLoginResponse().getCode();
         AccessTokenResponse accessTokenResponse = oauth.doAccessTokenRequest(code);
 
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
 
         UserRepresentation userRep = new UserRepresentation();
         try {
@@ -539,7 +539,7 @@ public class TokenIntrospectionTest extends AbstractTestRealmKeycloakTest {
     public void testIntrospectWithSamlClient() {
         oauth.doLogin("test-user@localhost", "password");
         String code = oauth.parseLoginResponse().getCode();
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
         AccessTokenResponse accessTokenResponse = oauth.doAccessTokenRequest(code);
         oauth.client("saml-client", "secret2");
         IntrospectionResponse introspectionResponse = oauth.doIntrospectionAccessTokenRequest(accessTokenResponse.getAccessToken());

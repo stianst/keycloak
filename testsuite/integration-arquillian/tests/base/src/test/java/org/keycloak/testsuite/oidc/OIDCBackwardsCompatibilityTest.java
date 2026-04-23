@@ -88,7 +88,7 @@ public class OIDCBackwardsCompatibilityTest extends AbstractTestRealmKeycloakTes
     public void testExcludeSessionStateParameter() {
         // Open login form and login successfully. Assert session_state is present
         AuthorizationEndpointResponse authzResponse = oauth.doLogin("test-user@localhost", "password");
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
         Assertions.assertEquals(AppPage.RequestType.AUTH_RESPONSE, appPage.getRequestType());
         Assertions.assertNotNull(authzResponse.getSessionState());
 
@@ -116,7 +116,7 @@ public class OIDCBackwardsCompatibilityTest extends AbstractTestRealmKeycloakTes
     public void testExcludeIssuerParameter() {
         // Open login form and login successfully. Assert iss parameter is present
         AuthorizationEndpointResponse authzResponse = oauth.doLogin("test-user@localhost", "password");
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
         Assertions.assertEquals(AppPage.RequestType.AUTH_RESPONSE, appPage.getRequestType());
         Assertions.assertEquals(oauth.AUTH_SERVER_ROOT + "/realms/test", authzResponse.getIssuer());
 

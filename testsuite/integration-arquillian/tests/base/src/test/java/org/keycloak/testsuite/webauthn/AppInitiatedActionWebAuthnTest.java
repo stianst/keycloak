@@ -192,7 +192,7 @@ public class AppInitiatedActionWebAuthnTest extends AbstractAppInitiatedActionTe
                 .update()) {
             OAuthClient oauth2 = oauth.newConfig().driver(driver2);
             oauth2.doLogin(DEFAULT_USERNAME, getPassword(DEFAULT_USERNAME));
-            event1 = events.expectLogin().assertEvent();
+            event1 = EventAssertion.expectLogin(events.poll());
             assertEquals(1, testUser.getUserSessions().size());
         }
 

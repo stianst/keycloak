@@ -31,6 +31,7 @@ import org.keycloak.protocol.oidc.OIDCLoginProtocol;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.testsuite.AbstractTestRealmKeycloakTest;
 import org.keycloak.testsuite.AssertEvents;
+import org.keycloak.testsuite.EventAssertion;
 import org.keycloak.testsuite.admin.ApiUtil;
 import org.keycloak.testsuite.util.AdminClientUtil;
 import org.keycloak.testsuite.util.ClientBuilder;
@@ -104,7 +105,7 @@ public class ClientRedirectTest extends AbstractTestRealmKeycloakTest {
         try {
             log.debug("log in");
             oauth.doLogin("test-user@localhost", "password");
-            events.expectLogin().assertEvent();
+            EventAssertion.expectLogin(events.poll());
 
             String code = oauth.parseLoginResponse().getCode();
             String idTokenHint = oauth.doAccessTokenRequest(code).getIdToken();

@@ -105,7 +105,7 @@ public class TermsAndConditionsTest extends AbstractChangeImportedUserPasswordsT
         AuthorizationEndpointResponse response = oauth.parseLoginResponse();
         Assertions.assertNotNull(response.getCode());
 
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
 
         // assert user attribute is properly set
         UserRepresentation user = ActionUtil.findUserWithAdminClient(adminClient, "test-user@localhost");
@@ -213,7 +213,7 @@ public class TermsAndConditionsTest extends AbstractChangeImportedUserPasswordsT
 
         assertTrue(appPage.isCurrent());
 
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
 
     }
 

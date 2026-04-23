@@ -98,7 +98,7 @@ public class OAuthProofKeyForCodeExchangeTest extends AbstractKeycloakTest {
     	// test case : success : A-1-1
         oauth.doLogin("test-user@localhost", "password");
 
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
         
         String sessionId = loginEvent.getSessionId();
         String codeId = loginEvent.getDetails().get(Details.CODE_ID);
@@ -116,7 +116,7 @@ public class OAuthProofKeyForCodeExchangeTest extends AbstractKeycloakTest {
 
         oauth.loginForm().codeChallenge(codeChallenge, OAuth2Constants.PKCE_METHOD_S256).doLogin("test-user@localhost", "password");
 
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
 
         String sessionId = loginEvent.getSessionId();
         String codeId = loginEvent.getDetails().get(Details.CODE_ID);
@@ -134,7 +134,7 @@ public class OAuthProofKeyForCodeExchangeTest extends AbstractKeycloakTest {
 
         oauth.loginForm().codeChallenge(codeChallenge, OAuth2Constants.PKCE_METHOD_S256).doLogin("test-user@localhost", "password");
 
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
 
         String sessionId = loginEvent.getSessionId();
         String codeId = loginEvent.getDetails().get(Details.CODE_ID);
@@ -156,7 +156,7 @@ public class OAuthProofKeyForCodeExchangeTest extends AbstractKeycloakTest {
     	// test case : success : A-1-3
         oauth.loginForm().codeChallenge(".234567890-234567890~234567890_234567890123", OAuth2Constants.PKCE_METHOD_PLAIN).doLogin("test-user@localhost", "password");
 
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
 
         String sessionId = loginEvent.getSessionId();
         String codeId = loginEvent.getDetails().get(Details.CODE_ID);
@@ -171,7 +171,7 @@ public class OAuthProofKeyForCodeExchangeTest extends AbstractKeycloakTest {
     	// test case : failure : A-1-6
         oauth.loginForm().codeChallenge("1234567890123456789012345678901234567890123", OAuth2Constants.PKCE_METHOD_PLAIN).doLogin("test-user@localhost", "password");
 
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
 
         String sessionId = loginEvent.getSessionId();
         String codeId = loginEvent.getDetails().get(Details.CODE_ID);
@@ -193,7 +193,7 @@ public class OAuthProofKeyForCodeExchangeTest extends AbstractKeycloakTest {
     	// test case : success : A-1-4
         oauth.loginForm().codeChallenge("1234567890123456789012345678901234567890123", null).doLogin("test-user@localhost", "password");
 
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
 
         String sessionId = loginEvent.getSessionId();
         String codeId = loginEvent.getDetails().get(Details.CODE_ID);
@@ -253,7 +253,7 @@ public class OAuthProofKeyForCodeExchangeTest extends AbstractKeycloakTest {
 
         oauth.loginForm().codeChallenge(codeChallenge, OAuth2Constants.PKCE_METHOD_S256).doLogin("test-user@localhost", "password");
 
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
 
         String sessionId = loginEvent.getSessionId();
         String codeId = loginEvent.getDetails().get(Details.CODE_ID);
@@ -277,7 +277,7 @@ public class OAuthProofKeyForCodeExchangeTest extends AbstractKeycloakTest {
 
         oauth.loginForm().codeChallenge(codeChallenge, OAuth2Constants.PKCE_METHOD_S256).doLogin("test-user@localhost", "password");
 
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
 
         String sessionId = loginEvent.getSessionId();
         String codeId = loginEvent.getDetails().get(Details.CODE_ID);
@@ -298,7 +298,7 @@ public class OAuthProofKeyForCodeExchangeTest extends AbstractKeycloakTest {
     	// test case : failure : A-1-12
         oauth.loginForm().codeChallenge("1234567890123456789012345678901234567890123", OAuth2Constants.PKCE_METHOD_S256).doLogin("test-user@localhost", "password");
 
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
 
         String sessionId = loginEvent.getSessionId();
         String codeId = loginEvent.getDetails().get(Details.CODE_ID);
@@ -336,7 +336,7 @@ public class OAuthProofKeyForCodeExchangeTest extends AbstractKeycloakTest {
 
         oauth.loginForm().codeChallenge(codeChallenge, OAuth2Constants.PKCE_METHOD_S256).doLogin("test-user@localhost", "password");
 
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
 
         String sessionId = loginEvent.getSessionId();
         String codeId = loginEvent.getDetails().get(Details.CODE_ID);
@@ -359,7 +359,7 @@ public class OAuthProofKeyForCodeExchangeTest extends AbstractKeycloakTest {
         // send oauth request without code_challenge because intercepted
         oauth.doLogin("test-user@localhost", "password");
 
-        EventRepresentation loginEvent = events.expectLogin().assertEvent();
+        EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
         String sessionId = loginEvent.getSessionId();
         String codeId = loginEvent.getDetails().get(Details.CODE_ID);
 
@@ -498,7 +498,7 @@ public class OAuthProofKeyForCodeExchangeTest extends AbstractKeycloakTest {
 
             oauth.loginForm().codeChallenge(codeChallenge, OAuth2Constants.PKCE_METHOD_S256).doLogin("test-user@localhost", "password");
 
-            EventRepresentation loginEvent = events.expectLogin().assertEvent();
+            EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
 
             String sessionId = loginEvent.getSessionId();
             String codeId = loginEvent.getDetails().get(Details.CODE_ID);
@@ -524,7 +524,7 @@ public class OAuthProofKeyForCodeExchangeTest extends AbstractKeycloakTest {
 
             oauth.loginForm().codeChallenge(codeChallenge, OAuth2Constants.PKCE_METHOD_PLAIN).doLogin("test-user@localhost", "password");
 
-            EventRepresentation loginEvent = events.expectLogin().assertEvent();
+            EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
 
             String sessionId = loginEvent.getSessionId();
             String codeId = loginEvent.getDetails().get(Details.CODE_ID);
@@ -629,7 +629,7 @@ public class OAuthProofKeyForCodeExchangeTest extends AbstractKeycloakTest {
 
             oauth.loginForm().codeChallenge(codeChallenge, OAuth2Constants.PKCE_METHOD_S256).doLogin("test-user@localhost", "password");
 
-            EventRepresentation loginEvent = events.expectLogin().assertEvent();
+            EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
 
             String sessionId = loginEvent.getSessionId();
             String codeId = loginEvent.getDetails().get(Details.CODE_ID);

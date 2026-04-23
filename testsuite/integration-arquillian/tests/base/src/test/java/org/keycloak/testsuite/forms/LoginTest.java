@@ -1087,7 +1087,7 @@ public class LoginTest extends AbstractChangeImportedUserPasswordsTest {
             oauth.openLoginForm();
             loginPage.login("test-user@localhost", getPassword("test-user@localhost"));
             Assertions.assertEquals(RequestType.AUTH_RESPONSE, appPage.getRequestType());
-            events.expectLogin().assertEvent();
+            EventAssertion.expectLogin(events.poll());
         } finally {
             testingClient.enableFeature(Profile.Feature.WEB_AUTHN);
         }
@@ -1098,7 +1098,7 @@ public class LoginTest extends AbstractChangeImportedUserPasswordsTest {
         oauth.openLoginForm();
         loginPage.login("test-user@localhost", getPassword("test-user@localhost"));
         Assertions.assertEquals(RequestType.AUTH_RESPONSE, appPage.getRequestType());
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
 
         UsersResource users = adminClient.realm("test").users();
         UserRepresentation user = users.search("test-user@localhost").get(0);

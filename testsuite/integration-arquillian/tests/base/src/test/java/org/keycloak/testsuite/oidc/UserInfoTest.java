@@ -618,7 +618,7 @@ public class UserInfoTest extends AbstractKeycloakTest {
 
         driver.navigate().refresh();
         oauth.fillLoginForm("test-user@localhost", "password");
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
 
         Assertions.assertFalse(loginPage.isCurrent());
 

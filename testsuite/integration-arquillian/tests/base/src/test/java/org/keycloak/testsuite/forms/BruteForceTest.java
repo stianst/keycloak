@@ -1221,7 +1221,7 @@ public class BruteForceTest extends AbstractChangeImportedUserPasswordsTest {
 
         Assertions.assertEquals(RequestType.AUTH_RESPONSE, appPage.getRequestType());
 
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
 
         String code = oauth.parseLoginResponse().getCode();
         String idTokenHint = oauth.doAccessTokenRequest(code ).getIdToken();
@@ -1249,7 +1249,7 @@ public class BruteForceTest extends AbstractChangeImportedUserPasswordsTest {
 
         Assertions.assertEquals(RequestType.AUTH_RESPONSE, appPage.getRequestType());
 
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
         String code = oauth.parseLoginResponse().getCode();
         String idTokenHint = oauth.doAccessTokenRequest(code).getIdToken();
         appPage.logout(idTokenHint);

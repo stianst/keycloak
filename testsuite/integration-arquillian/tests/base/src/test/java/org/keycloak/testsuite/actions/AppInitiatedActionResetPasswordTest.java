@@ -133,7 +133,7 @@ public class AppInitiatedActionResetPasswordTest extends AbstractAppInitiatedAct
             oauth.openLoginForm();
             loginPage.login("test-user@localhost", "password");
 
-            events.expectLogin().assertEvent();
+            EventAssertion.expectLogin(events.poll());
 
             doAIA();
 
@@ -176,7 +176,7 @@ public class AppInitiatedActionResetPasswordTest extends AbstractAppInitiatedAct
 
             assertKcActionStatus(SUCCESS);
 
-            EventRepresentation loginEvent = events.expectLogin().assertEvent();
+            EventRepresentation loginEvent = EventAssertion.expectLogin(events.poll());
 
             AccessTokenResponse tokenResponse = sendTokenRequestAndGetResponse(loginEvent);
             oauth.logoutForm().idTokenHint(tokenResponse.getIdToken()).withRedirect().open();
@@ -186,7 +186,7 @@ public class AppInitiatedActionResetPasswordTest extends AbstractAppInitiatedAct
             oauth.openLoginForm();
             loginPage.login("test-user@localhost", "new-password");
 
-            events.expectLogin().assertEvent();
+            EventAssertion.expectLogin(events.poll());
         }
     }
 
@@ -195,7 +195,7 @@ public class AppInitiatedActionResetPasswordTest extends AbstractAppInitiatedAct
         oauth.openLoginForm();
         loginPage.login("test-user@localhost", "password");
 
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
 
         setTimeOffset(350);
 
@@ -232,7 +232,7 @@ public class AppInitiatedActionResetPasswordTest extends AbstractAppInitiatedAct
         oauth.openLoginForm();
         loginPage.login("test-user@localhost", "password");
 
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
 
         setTimeOffset(550);
 
@@ -271,7 +271,7 @@ public class AppInitiatedActionResetPasswordTest extends AbstractAppInitiatedAct
         oauth.openLoginForm();
         loginPage.login("test-user@localhost", "password");
 
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
 
         setTimeOffset(350);
 
@@ -308,7 +308,7 @@ public class AppInitiatedActionResetPasswordTest extends AbstractAppInitiatedAct
             oauth.openLoginForm();
             loginPage.login("test-user@localhost", "password");
 
-            events.expectLogin().assertEvent();
+            EventAssertion.expectLogin(events.poll());
 
             // we need to add some slack to avoid timing issues
             setTimeOffset(1);
@@ -352,7 +352,7 @@ public class AppInitiatedActionResetPasswordTest extends AbstractAppInitiatedAct
                 .detail(Details.CUSTOM_REQUIRED_ACTION, UserModel.RequiredAction.UPDATE_PASSWORD.name())
                 .error(Errors.REJECTED_BY_USER)
                 .assertEvent();
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
     }
 
     @Test
@@ -388,7 +388,7 @@ public class AppInitiatedActionResetPasswordTest extends AbstractAppInitiatedAct
         userRep.getRequiredActions().add(UserModel.RequiredAction.UPDATE_PASSWORD.name());
         userResource.update(userRep);
 
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
 
         doAIA();
 
@@ -413,7 +413,7 @@ public class AppInitiatedActionResetPasswordTest extends AbstractAppInitiatedAct
 
         oauth.openLoginForm();
         loginPage.login("test-user@localhost", "password");
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
 
         UserResource testUser = managedRealm.admin().users().get(findUser("test-user@localhost").getId());
         List<UserSessionRepresentation> sessions = testUser.getUserSessions();
@@ -421,7 +421,7 @@ public class AppInitiatedActionResetPasswordTest extends AbstractAppInitiatedAct
         final String firstSessionId = sessions.get(0).getId();
 
         oauth2.doLogin("test-user@localhost", "password");
-        EventRepresentation event2 = events.expectLogin().assertEvent();
+        EventRepresentation event2 = EventAssertion.expectLogin(events.poll());
         assertEquals(2, testUser.getUserSessions().size());
 
         doAIA();
@@ -447,10 +447,10 @@ public class AppInitiatedActionResetPasswordTest extends AbstractAppInitiatedAct
 
         oauth.openLoginForm();
         loginPage.login("test-user@localhost", "password");
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
 
         oauth2.doLogin("test-user@localhost", "password");
-        events.expectLogin().assertEvent();
+        EventAssertion.expectLogin(events.poll());
         assertEquals(2, testUser.getUserSessions().size());
 
         doAIA();
