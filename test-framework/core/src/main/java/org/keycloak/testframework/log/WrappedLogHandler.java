@@ -33,10 +33,12 @@ public class WrappedLogHandler extends Handler {
                 managedKeycloakLogger.log(record.getLevel(), message, record.getParameters());
             }
         } else {
-            LogQueue logQueue = LogQueue.getInstance();
-            logQueue.add(record);
-            if (logQueue.shouldPublish()) {
-                wrappedHandler.publish(record);
+            if (wrappedHandler.isLoggable(record)) {
+                LogQueue logQueue = LogQueue.getInstance();
+                logQueue.add(record);
+                if (logQueue.shouldPublish()) {
+                    wrappedHandler.publish(record);
+                }
             }
         }
     }
