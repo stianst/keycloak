@@ -34,11 +34,11 @@ public class WrappedLogHandler extends Handler {
             }
         } else {
             if (wrappedHandler.isLoggable(record)) {
-                LogQueue logQueue = LogQueue.getInstance();
-                logQueue.add(record);
-                if (logQueue.shouldPublish()) {
+//                LogQueue logQueue = LogQueue.getInstance();
+//                logQueue.add(record);
+//                if (logQueue.shouldPublish()) {
                     wrappedHandler.publish(record);
-                }
+//                }
             }
         }
     }

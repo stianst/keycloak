@@ -48,12 +48,12 @@ public class LogHandler implements AutoCloseable {
 
     public void beforeEachStarting(ExtensionContext context) {
         logTestMethodStatus(context, Status.INIT, Logger.Level.DEBUG);
-        logQueue.testInit();
+//        logQueue.testInit();
     }
 
     public void beforeEachCompleted(ExtensionContext context) {
         logTestMethodStatus(context, Status.RUNNING, Logger.Level.DEBUG);
-        logQueue.testStarting();
+//        logQueue.testStarting();
         gitHubActionReport.onMethodStart();
     }
 
@@ -76,23 +76,23 @@ public class LogHandler implements AutoCloseable {
 
     public void testSuccessful(ExtensionContext context) {
         gitHubActionReport.onMethodSuccess(context);
-        logQueue.testSuccess();
+//        logQueue.testSuccess();
         logTestMethodStatus(context, Status.SUCCESS, Logger.Level.DEBUG);
     }
 
     public void testFailed(ExtensionContext context) {
         gitHubActionReport.onMethodFailed(context);
-        logQueue.testFailure();
+//        logQueue.testFailure();
         logTestMethodStatus(context, Status.FAILED, Logger.Level.ERROR);
     }
 
     public void testAborted(ExtensionContext context) {
-        logQueue.testFailure();
+//        logQueue.testFailure();
         logTestMethodStatus(context, Status.ABORTED, Logger.Level.ERROR);
     }
 
     public void testDisabled(ExtensionContext context) {
-        logQueue.testSuccess();
+//        logQueue.testSuccess();
         logTestMethodStatus(context, Status.DISABLED, Logger.Level.DEBUG);
     }
 
