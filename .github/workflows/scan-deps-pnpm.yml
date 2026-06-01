@@ -16,6 +16,8 @@ jobs:
       - uses: pnpm/action-setup@v4
       - name: Run pnpm audit
         run: cd js && pnpm audit -P --json > pnpm-audit-report.json || true
+        with:
+          version: latest
       - name: Convert to SARIF
         run: cd js && npx npm-audit-report --input pnpm-audit-report.json --output audit.sarif
       - name: Upload results to GitHub Code Scanning
