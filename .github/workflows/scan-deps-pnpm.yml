@@ -1,0 +1,25 @@
+name: scan-deps-pnpm.yml
+on:
+  workflow_dispatch:
+
+jobs:
+  scan-pnpm-deps:
+    name: Scan PNPM dependencies
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+      - uses: pnpm/action-setup@v4
+      - name: Run pnpm audit
+        run: cd js && pnpm audit -P --json > pnpm-audit-report.json || true
+      - name: Convert to SARIF
+        run: cd js && npx npm-audit-report --input pnpm-audit-report.json --output audit.sarif
+      - name: Upload results to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'js/audit.sarif'
+          category: pnpm
