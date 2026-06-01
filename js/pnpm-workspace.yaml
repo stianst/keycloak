@@ -35,6 +35,9 @@ overrides:
   serialize-javascript: ^7.0.3
   diff@^4: ^4.0.4
   diff@^7: ^8.0.3
+  lodash@>=4.0.0 <=4.17.23: ^4.17.24
 allowBuilds:
   '@swc/core': true
   esbuild: true
+minimumReleaseAgeExclude:
+  - lodash@4.17.24
