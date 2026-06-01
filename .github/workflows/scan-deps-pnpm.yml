@@ -12,34 +12,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-      - uses: pnpm/action-setup@v4
+      - uses: aquasecurity/trivy-action@v0.36.0
         with:
-          version: latest
-      - name: Run pnpm audit
-        run: cd js && pnpm audit -P --json > pnpm-audit-report.json || true
-      - name: Convert to SARIF
-        run: |
-          cat js/pnpm-audit-report.json | jq -r '
-          {
-            "$schema": "https://schemastore.org",
-            "version": "2.1.0",
-            "runs": [
-              {
-                "tool": { "driver": { "name": "pnpm audit" } },
-                "results": [
-                  (.advisories | to_entries[] | .value | {
-                    "ruleId": .id,
-                    "message": { "text": "Vulnerability found in \(.module_name): \(.title)" },
-                    "level": (if .severity == "critical" or .severity == "high" then "error" else "warning" end),
-                    "locations": [{"physicalLocation": {"artifactLocation": {"uri": "package.json"}}}]
-                  })
-                ]
-              }
-            ]
-          }' > js/audit.sarif
-      - name: Upload results to GitHub Code Scanning
-        uses: github/codeql-action/upload-sarif@v3
+          scan-type: 'fs'
+          scan-ref: 'js/pnpm-lock.yaml'
+          format: 'sarif'
+          output: 'trivy-pnpm.sarif'
+          scanners: 'vuln'
+      - uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: 'js/audit.sarif'
-          category: pnpm
+          sarif_file: 'trivy-pnpm.sarif'
+          category: 'trivy-pnpm'
+        
