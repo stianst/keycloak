@@ -19,7 +19,25 @@ jobs:
       - name: Run pnpm audit
         run: cd js && pnpm audit -P --json > pnpm-audit-report.json || true
       - name: Convert to SARIF
-        run: cd js && npx npm-audit-report --input pnpm-audit-report.json --output audit.sarif
+        run: |
+          cat js/pnpm-audit-report.json | jq -r '
+          {
+            "$schema": "https://schemastore.org",
+            "version": "2.1.0",
+            "runs": [
+              {
+                "tool": { "driver": { "name": "pnpm audit" } },
+                "results": [
+                  (.advisories | to_entries[] | .value | {
+                    "ruleId": .id,
+                    "message": { "text": "Vulnerability found in \(.module_name): \(.title)" },
+                    "level": (if .severity == "critical" or .severity == "high" then "error" else "warning" end),
+                    "locations": [{"physicalLocation": {"artifactLocation": {"uri": "package.json"}}}]
+                  })
+                ]
+              }
+            ]
+          }' > js/audit.sarif
       - name: Upload results to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v3
         with:
