@@ -17,6 +17,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ matrix.branch }}
+      - run: echo "CURRENT_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
       - uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: 'fs'
@@ -29,3 +30,4 @@ jobs:
           sarif_file: 'trivy-pnpm.sarif'
           category: 'trivy-pnpm'
           ref: ${{ matrix.branch }}
+          sha: ${{ env.CURRENT_SHA }}          
