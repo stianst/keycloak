@@ -29,5 +29,5 @@ jobs:
         with:
           sarif_file: 'trivy-pnpm.sarif'
           category: 'trivy-pnpm'
-          ref: ${{ matrix.branch }}
+          ref: refs/heads/${{ matrix.branch }}
           sha: ${{ env.CURRENT_SHA }}          
