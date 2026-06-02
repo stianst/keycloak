@@ -30,6 +30,8 @@ jobs:
           distribution: 'temurin'
           java-version: '25'
           cache: 'maven'
+      - name: Resolve Maven dependencies
+        run: mvn dependency:resolve -F quarkus/deployment/pom.xml
       - name: Trivy - Scan pnpm packages
         uses: aquasecurity/trivy-action@v0.36.0
         with:
