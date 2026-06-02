@@ -11,13 +11,13 @@ jobs:
       security-events: write
     strategy:
       matrix:
-        branch: [ "main", "release/26.4", "archive/release/26.5", "release/26.6" ]
+        ref: [ "refs/heads/main", "refs/heads/release/26.4", "refs/heads/release/26.6", "refs/tags/26.6.2" ]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ matrix.branch }}
+          ref: ${{ matrix.ref }}
       - name: Get head commit
         run: echo "CURRENT_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
       - name: Trivy Setup
@@ -50,21 +50,12 @@ jobs:
           output: 'trivy-java.sarif'
           scanners: 'vuln'          
           skip-setup-trivy: true
-      - name: Trivy - Scan Java packages - table
-        uses: aquasecurity/trivy-action@v0.36.0
-        with:
-          scan-type: 'fs'
-          scan-ref: 'quarkus/deployment/pom.xml'
-          output: 'trivy-java.table'
-          scanners: 'vuln'          
-          skip-setup-trivy: true
-          format: 'table'
       - name: Upload pnpm report
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: 'trivy-pnpm.sarif'
           category: 'trivy-pnpm'
-          ref: refs/heads/${{ matrix.branch }}
+          ref: ${{ matrix.ref }}
           sha: ${{ env.CURRENT_SHA }}
           scanners: vuln
       - name: Upload Java report
@@ -72,13 +63,10 @@ jobs:
         with:
           sarif_file: 'trivy-java.sarif'
           category: 'trivy-java'
-          ref: refs/heads/${{ matrix.branch }}
+          ref: ${{ matrix.ref }}
           sha: ${{ env.CURRENT_SHA }}
           scanners: vuln
       - name: Display pnpm report
         run: cat trivy-pnpm.sarif
       - name: Display Java report
         run: cat trivy-java.sarif
-      - name: Display Java table report
-        run: cat trivy-java.table
-          
