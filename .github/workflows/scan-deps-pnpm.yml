@@ -21,7 +21,7 @@ jobs:
       - name: Get head commit
         run: echo "CURRENT_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
       - name: Trivy Setup
-        uses: aquasecurity/setup-trivy@v0.2.0
+        uses: aquasecurity/setup-trivy@v0.2.6
         with:
           cache: true
           version: v0.71.0
