@@ -28,10 +28,25 @@ jobs:
           format: 'sarif'
           output: 'trivy-pnpm.sarif'
           scanners: 'vuln'
+      - name: Trivy - Scan Java packages
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: 'fs'
+          scan-ref: 'quarkus/deployment/pom.xml'
+          format: 'sarif'
+          output: 'trivy-java.sarif'
+          scanners: 'vuln'          
       - name: Upload pnpm report
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: 'trivy-pnpm.sarif'
           category: 'trivy-pnpm'
           ref: refs/heads/${{ matrix.branch }}
-          sha: ${{ env.CURRENT_SHA }}          
+          sha: ${{ env.CURRENT_SHA }}
+      - name: Upload Java report
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-java.sarif'
+          category: 'trivy-java'
+          ref: refs/heads/${{ matrix.branch }}
+          sha: ${{ env.CURRENT_SHA }}
