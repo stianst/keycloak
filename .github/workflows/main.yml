@@ -1,0 +1,48 @@
+name: List refs
+on:
+  workflow_dispatch:
+
+jobs:
+  define-refs:
+    runs-on: ubuntu-latest
+    outputs:
+      refs: ${{ steps.refs.outputs.refs }}
+    steps:
+      - id: refs
+        run: |
+          BRANCHES=($(gh api --cache 1h --paginate /repos/keycloak/keycloak/branches -q '.[] | .name | select(startswith("release"))' | sort -V -r))
+          LATEST_REL_BRANCH=$(echo ${BRANCHES[0]} | sed 's|release/||') 
+          TAGS=($(gh api --cache 1h /repos/keycloak/keycloak/tags --paginate -q ".[] | .name | select(startswith(\"$LATEST_REL_BRANCH\"))" | sort -V -r))
+          LATEST_TAG=$(echo ${TAGS[0]}) 
+          
+          REFS='['
+          FIRST=true
+          for BRANCH in "${BRANCHES[@]}"; do
+              if $FIRST; then
+                  FIRST=false
+              else
+                  REFS+=", "
+              fi
+              REFS+="\"refs/heads/$BRANCH\""
+          done
+
+          REFS+=", \"refs/tags/$LATEST_TAG\""
+          
+          REFS+=']'
+
+          echo "refs=$REFS" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  scan-dependencies:
+    name: Scan dependencies
+    runs-on: ubuntu-latest
+    needs: define-refs
+    permissions:
+      contents: read
+      security-events: write
+    strategy:
+      matrix:
+        ref: ${{ fromJSON(needs.define-refs.outputs.refs) }}
+    steps:
+      - run: echo ${{ matrix.ref }}
