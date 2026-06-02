@@ -31,7 +31,7 @@ jobs:
           java-version: '25'
           cache: 'maven'
       - name: Resolve Maven dependencies
-        run: ./mvnw dependency:resolve -DskipTestsuite -q
+        run: ./mvnw dependency:tree -DskipTestsuite -DexcludeGroupIds=org.keycloak
       - name: Trivy - Scan pnpm packages
         uses: aquasecurity/trivy-action@v0.36.0
         with:
