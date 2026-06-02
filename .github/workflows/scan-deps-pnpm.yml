@@ -3,16 +3,47 @@ on:
   workflow_dispatch:
 
 jobs:
+  define-refs:
+    runs-on: ubuntu-latest
+    outputs:
+      refs: ${{ steps.refs.outputs.refs }}
+    steps:
+      - id: refs
+        run: |
+          BRANCHES=($(gh api --cache 1h --paginate /repos/${{ github.repository }}/branches -q '.[] | .name | select(startswith("release"))' | sort -V -r))
+          LATEST_REL_BRANCH=$(echo ${BRANCHES[0]} | sed 's|release/||') 
+          TAGS=($(gh api --cache 1h /repos/${{ github.repository }}/tags --paginate -q ".[] | .name | select(startswith(\"$LATEST_REL_BRANCH\"))" | sort -V -r))
+          LATEST_TAG=$(echo ${TAGS[0]}) 
+          
+          REFS='['
+          FIRST=true
+          for BRANCH in "${BRANCHES[@]}"; do
+              if $FIRST; then
+                  FIRST=false
+              else
+                  REFS+=", "
+              fi
+              REFS+="\"refs/heads/$BRANCH\""
+          done
+
+          REFS+=", \"refs/tags/$LATEST_TAG\""
+          
+          REFS+=']'
+
+          echo "refs=$REFS" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   scan-dependencies:
     name: Scan dependencies
     runs-on: ubuntu-latest
+    needs: define-refs
     permissions:
       contents: read
       security-events: write
     strategy:
       matrix:
-        ref: [ "refs/heads/main", "refs/heads/release/26.4", "refs/heads/release/26.6", "refs/tags/26.6.2" ]
-
+        ref: ${{ fromJSON(needs.define-refs.outputs.refs) }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
