@@ -55,7 +55,7 @@ jobs:
         with:
           scan-type: 'fs'
           scan-ref: 'quarkus/deployment/pom.xml'
-          output: 'trivy-java.sarif'
+          output: 'trivy-java.table'
           scanners: 'vuln'          
           skip-setup-trivy: true
           format: 'table'
@@ -79,4 +79,6 @@ jobs:
         run: cat trivy-pnpm.sarif
       - name: Display Java report
         run: cat trivy-java.sarif
+      - name: Display Java table report
+        run: cat trivy-java.table
           
