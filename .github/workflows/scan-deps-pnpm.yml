@@ -11,7 +11,7 @@ jobs:
       security-events: write
     strategy:
       matrix:
-        branch: [ "main", "release/26.4", "release/26.6" ]
+        branch: [ "main", "release/26.4", "release/26.5", "release/26.6" ]
 
     steps:
       - name: Checkout repository
