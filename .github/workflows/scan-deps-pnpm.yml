@@ -11,7 +11,7 @@ jobs:
       security-events: write
     strategy:
       matrix:
-        branch: [ "main", "release/26.4", "release/26.5", "release/26.6" ]
+        branch: [ "main", "release/26.4", "archive/release/26.5", "release/26.6" ]
 
     steps:
       - name: Checkout repository
@@ -43,6 +43,7 @@ jobs:
           category: 'trivy-pnpm'
           ref: refs/heads/${{ matrix.branch }}
           sha: ${{ env.CURRENT_SHA }}
+          scanners: vuln
       - name: Upload Java report
         uses: github/codeql-action/upload-sarif@v3
         with:
@@ -50,6 +51,7 @@ jobs:
           category: 'trivy-java'
           ref: refs/heads/${{ matrix.branch }}
           sha: ${{ env.CURRENT_SHA }}
+          scanners: vuln
       - name: Display pnpm report
         run: cat trivy-pnpm.sarif
       - name: Display Java report
