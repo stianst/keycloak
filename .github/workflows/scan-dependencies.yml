@@ -49,7 +49,7 @@ jobs:
         ref: ${{ fromJSON(needs.define-refs.outputs.refs) }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ matrix.ref }}
       - name: Get head commit
