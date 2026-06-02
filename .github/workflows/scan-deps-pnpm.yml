@@ -1,10 +1,10 @@
-name: scan-deps-pnpm.yml
+name: Scan dependencies
 on:
   workflow_dispatch:
 
 jobs:
-  scan-pnpm-deps:
-    name: Scan PNPM dependencies
+  scan-dependencies:
+    name: Scan dependencies
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -14,18 +14,22 @@ jobs:
         branch: [ "main", "release/26.4", "release/26.6" ]
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           ref: ${{ matrix.branch }}
-      - run: echo "CURRENT_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
-      - uses: aquasecurity/trivy-action@v0.36.0
+      - name: Get head commit
+        run: echo "CURRENT_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
+      - name: Trivy - Scan pnpm packages
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: 'fs'
           scan-ref: 'js/pnpm-lock.yaml'
           format: 'sarif'
           output: 'trivy-pnpm.sarif'
           scanners: 'vuln'
-      - uses: github/codeql-action/upload-sarif@v3
+      - name: Upload pnpm report
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: 'trivy-pnpm.sarif'
           category: 'trivy-pnpm'
