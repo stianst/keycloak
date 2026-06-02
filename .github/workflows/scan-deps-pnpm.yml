@@ -50,3 +50,8 @@ jobs:
           category: 'trivy-java'
           ref: refs/heads/${{ matrix.branch }}
           sha: ${{ env.CURRENT_SHA }}
+      - name: Display pnpm report
+        run: cat trivy-pnpm.sarif
+      - name: Display Java report
+        run: cat trivy-java.sarif
+          
