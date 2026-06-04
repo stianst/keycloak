@@ -80,6 +80,9 @@ jobs:
       - name: Display report
         run: |
           ls
+          echo "============================="
+          cat trivy-report.json
+          echo "============================="
           cat trivy-report.json | jq -r '[.Results[].Vulnerabilities[] | {VulnerabilityID: .VulnerabilityID, PkgName: .PkgName, InstalledVersion: .InstalledVersion, FixedVersion: .FixedVersion, Severity: .Severity}] | unique_by(.VulnerabilityID)'
       - name: Convert to sarif
         run: |
