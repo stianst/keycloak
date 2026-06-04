@@ -19,13 +19,9 @@ jobs:
           LATEST_TAG=$(echo ${TAGS[0]}) 
           
           REFS='['
-          FIRST=true
+          REFS+="\"refs/heads/main\""
           for BRANCH in "${BRANCHES[@]}"; do
-              if $FIRST; then
-                  FIRST=false
-              else
-                  REFS+=", "
-              fi
+              REFS+=", "
               REFS+="\"refs/heads/$BRANCH\""
           done
 
