@@ -54,7 +54,7 @@ jobs:
           ref: ${{ matrix.ref }}
       - name: Get head commit
         run: echo "CURRENT_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
-      - name: Trivy Setup
+      - name: Trivy setup
         uses: aquasecurity/setup-trivy@v0.2.6
         with:
           cache: true
@@ -65,40 +65,27 @@ jobs:
           java-version: '25'
           cache: 'maven'
       - name: Resolve Maven dependencies
-        run: ./mvnw dependency:tree -DskipTestsuite -DexcludeGroupIds=org.keycloak
-      - name: Trivy - Scan pnpm packages
+        run: |
+          ./mvnw dependency:tree -DskipTestsuite -DexcludeGroupIds=org.keycloak
+      - name: Trivy scan
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: 'fs'
-          scan-ref: 'js/pnpm-lock.yaml'
-          format: 'sarif'
-          output: 'trivy-pnpm.sarif'
-          scanners: 'vuln'
-          skip-setup-trivy: true
-      - name: Trivy - Scan Java packages
-        uses: aquasecurity/trivy-action@v0.36.0
-        with:
-          scan-type: 'fs'
-          scan-ref: 'quarkus/deployment/pom.xml'
-          format: 'sarif'
-          output: 'trivy-java.sarif'
+          scan-ref: '.'
+          format: 'json'
+          output: 'trivy-report.json'
           scanners: 'vuln'          
           skip-setup-trivy: true
-      - name: Upload pnpm report
+      - name: Display report
+        run: |
+          cat trivy-report.json | jq -r '[.Results[].Vulnerabilities[] | {VulnerabilityID: .VulnerabilityID, PkgName: .PkgName, InstalledVersion: .InstalledVersion, FixedVersion: .FixedVersion, Severity: .Severity}] | unique_by(.VulnerabilityID)'
+      - name: Convert to sarif
+        run: |
+          trivy convert --format sarif -o trivy-report.sarif --scanners vuln trivy-report.json
+      - name: Upload report
         uses: github/codeql-action/upload-sarif@v4
         with:
-          sarif_file: 'trivy-pnpm.sarif'
-          category: 'trivy-pnpm'
+          sarif_file: 'trivy-report.sarif'
+          category: 'dependencies'
           ref: ${{ matrix.ref }}
           sha: ${{ env.CURRENT_SHA }}
-      - name: Upload Java report
-        uses: github/codeql-action/upload-sarif@v4
-        with:
-          sarif_file: 'trivy-java.sarif'
-          category: 'trivy-java'
-          ref: ${{ matrix.ref }}
-          sha: ${{ env.CURRENT_SHA }}
-      - name: Display pnpm report
-        run: cat trivy-pnpm.sarif
-      - name: Display Java report
-        run: cat trivy-java.sarif
