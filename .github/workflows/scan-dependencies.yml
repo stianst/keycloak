@@ -58,7 +58,7 @@ jobs:
         uses: aquasecurity/setup-trivy@v0.2.6
         with:
           cache: true
-          version: v0.71.0
+          version: v0.70.0 # There's an issue in v0.71.0 that makes it not work with Keycloak
       - uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
