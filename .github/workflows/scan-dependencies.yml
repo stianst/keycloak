@@ -76,8 +76,10 @@ jobs:
           output: 'trivy-report.json'
           scanners: 'vuln'          
           skip-setup-trivy: true
+          skip-version-check: true
       - name: Display report
         run: |
+          ls
           cat trivy-report.json | jq -r '[.Results[].Vulnerabilities[] | {VulnerabilityID: .VulnerabilityID, PkgName: .PkgName, InstalledVersion: .InstalledVersion, FixedVersion: .FixedVersion, Severity: .Severity}] | unique_by(.VulnerabilityID)'
       - name: Convert to sarif
         run: |
