@@ -75,8 +75,7 @@ jobs:
           skip-version-check: true
       - name: Display report
         run: |
-          cat trivy-report.json
-          cat trivy-report.json | jq -r '["ID","PKG","INSTALLED","FIXED","SEVERITY"], ([.Results[] | select(.Vulnerabilities != null) | .Vulnerabilities[]] | unique_by(.VulnerabilityID) | .[] | [ .VulnerabilityID, .PkgName, .InstalledVersion, .FixedVersion, .Severity ]) | @tsv' | column -ts $'\t' >> $GITHUB_STEP_SUMMARY
+          cat trivy-report.json | jq -r '"| ID | PKG | INSTALLED | FIXED | SEVERITY |", "| -- | -- | -- | -- | -- |", ([.Results[] | select(.Vulnerabilities != null) | .Vulnerabilities[]] | unique_by(.VulnerabilityID) | .[] | "| \(.VulnerabilityID) | \(.PkgName) | \(.InstalledVersion) | \(.FixedVersion) | \(.Severity) |")' >> $GITHUB_STEP_SUMMARY
       - name: Convert to sarif
         run: |
           trivy convert --format sarif -o trivy-report.sarif --scanners vuln trivy-report.json
