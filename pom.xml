@@ -314,6 +314,7 @@
         <module>themes</module>
         <module>misc/db-compatibility-verifier</module>
         <module>misc/theme-verifier</module>
+        <module>misc/vuln-to-issues</module>
         <module>model</module>
         <module>util</module>
         <module>rest</module>
