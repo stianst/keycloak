@@ -28,7 +28,6 @@ jobs:
         with:
           scan-type: 'fs'
           scan-ref: 'quarkus/deployment'
-          ignore-policy: .trivy/cncf-approved-licenses.rego
           scanners: 'license'
           skip-setup-trivy: true
           exit-code: 1
