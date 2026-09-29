@@ -162,9 +162,9 @@
                 </executions>
                 <dependencies>
                     <dependency>
-                        <groupId>org.jboss</groupId>
+                        <groupId>io.smallrye</groupId>
                         <artifactId>jandex</artifactId>
-                        <version>1.0.3.Final</version>
+                        <version>3.3.1</version>
                     </dependency>
                     <dependency>
                         <groupId>ant-contrib</groupId>
