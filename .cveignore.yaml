@@ -1,5 +1,5 @@
 # EOL - Ignoring all CVEs 26.4.x
-ignoreLevel: critical
+ignoreLevel: medium
 vulnerabilities:
   - cveId: CVE-2024-6485
     packageName: bootstrap
