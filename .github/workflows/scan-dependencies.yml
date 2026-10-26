@@ -54,11 +54,9 @@ jobs:
           ref: ${{ matrix.ref }}
 
       - name: Setup Java
-        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
-        with:
-          distribution: 'temurin'
-          java-version: '25'
-          cache: 'maven'
+        uses: ./.github/actions/java-setup
+      - name: Maven cache
+        uses: ./.github/actions/maven-cache
       - name: Setup Trivy
         uses: aquasecurity/setup-trivy@81e514348e19b6112ce2a7e3ecbafe19c1e1f567 # v0.3.1
         with:
@@ -120,10 +118,8 @@ jobs:
         with:
           path: /tmp/reports
           pattern: reports-*
-      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
-        with:
-          distribution: 'temurin'
-          java-version: '25'
+      - name: Setup Java
+        uses: ./.github/actions/java-setup
       - name: List artifacts
         run: tree /tmp/reports
       - name: Parse reports
