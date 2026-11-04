@@ -93,12 +93,7 @@ public class GitHubIssues {
                 .filter(l -> existingLabels.stream().noneMatch(e -> e.startsWith(l.replace("backport/", "release/") + ".")))
                 .collect(Collectors.toSet());
         if (!toAdd.isEmpty()) {
-            builder.label(backportLabels);
-        }
-
-        if (!issue.labels().containsAll(backportLabels)) {
-
-            builder.label(backportLabels);
+            builder.label(toAdd);
             update = true;
         }
 

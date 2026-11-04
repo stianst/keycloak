@@ -51,6 +51,14 @@ class GitHubRequest {
         return sendUpdate(uri, "PATCH", body, 200);
     }
 
+    JsonNode postLabels(URI uri, Object body) throws GitHubApiException {
+        return sendUpdate(uri, "POST", body, 200);
+    }
+
+    JsonNode delete(URI uri) throws GitHubApiException {
+        return sendUpdate(uri, "DELETE", null, 200);
+    }
+
     HttpResponse<byte[]> sendGet(URI uri) throws GitHubApiException {
         try {
             HttpRequest request = request(uri).GET().build();
@@ -66,11 +74,13 @@ class GitHubRequest {
 
     JsonNode sendUpdate(URI uri, String method, Object body, int expectedResponseCode) throws GitHubApiException {
         try {
-            byte[] bodyBytes = JsonUtil.write(body);
-            HttpRequest request = request(uri)
-                    .header("Content-Type", "application/json")
-                    .method(method, HttpRequest.BodyPublishers.ofByteArray(bodyBytes))
-                    .build();
+            HttpRequest.Builder builder = request(uri);
+            HttpRequest.BodyPublisher publisher = HttpRequest.BodyPublishers.noBody();
+            if (body != null) {
+                builder.header("Content-Type", "application/json");
+                publisher = HttpRequest.BodyPublishers.ofByteArray(JsonUtil.write(body));
+            }
+            HttpRequest request = builder.method(method, publisher).build();
 
             HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
             if (response.statusCode() != expectedResponseCode) {

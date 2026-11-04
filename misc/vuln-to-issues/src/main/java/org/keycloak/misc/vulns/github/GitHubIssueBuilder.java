@@ -1,6 +1,8 @@
 package org.keycloak.misc.vulns.github;
 
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -77,26 +79,45 @@ public class GitHubIssueBuilder {
     }
 
     public GitHubIssueBuilder clearLabels() {
-        if (this.labels != null) {
-            this.labels.clear();
+        if (this.labels == null) {
+            this.labels = new HashSet<>();
         }
+        this.labels.clear();
         return this;
     }
 
     public GitHubIssue send() throws GitHubApiException {
-        if ((existing == null && this.labels != null) || (existing != null && !existing.labels().equals(this.labels))) {
-            requestBody.put("labels", this.labels);
+        if (existing == null) {
+            if (this.labels != null) {
+                requestBody.put("labels", this.labels);
+            }
+            URI uri = GitHubUriBuilder.create("repos", repositoryFullName, "issues").build();
+            return GitHubApi.asIssue(request.post(uri, requestBody));
         }
 
-        if (existing == null) {
-            URI uri = GitHubUriBuilder.create("repos", repositoryFullName, "issues").build();
-            JsonNode json = request.post(uri, requestBody);
-            return GitHubApi.asIssue(json);
-        } else {
-            URI uri = GitHubUriBuilder.create("repos", repositoryFullName, "issues", Integer.toString(existing.number())).build();
-            JsonNode json = request.patch(uri, requestBody);
-            return GitHubApi.asIssue(json);
+        String number = Integer.toString(existing.number());
+        URI issueUri = GitHubUriBuilder.create("repos", repositoryFullName, "issues", number).build();
+        JsonNode json = requestBody.isEmpty() ? null : request.patch(issueUri, requestBody);
+
+        // Change labels incrementally so concurrent label changes are not overwritten
+        Set<String> toAdd = new HashSet<>(this.labels);
+        toAdd.removeAll(existing.labels());
+        Set<String> toRemove = new HashSet<>(existing.labels());
+        toRemove.removeAll(this.labels);
+
+        if (!toAdd.isEmpty()) {
+            URI labelsUri = GitHubUriBuilder.create("repos", repositoryFullName, "issues", number, "labels").build();
+            request.postLabels(labelsUri, Map.of("labels", toAdd));
         }
+        for (String label : toRemove) {
+            URI labelUri = GitHubUriBuilder.create("repos", repositoryFullName, "issues", number, "labels", URLEncoder.encode(label, StandardCharsets.UTF_8).replace("+", "%20")).build();
+            request.delete(labelUri);
+        }
+
+        if (json == null || !toAdd.isEmpty() || !toRemove.isEmpty()) {
+            json = request.get(issueUri);
+        }
+        return GitHubApi.asIssue(json);
     }
 
     private GitHubIssueBuilder put(String key, Object value) {
