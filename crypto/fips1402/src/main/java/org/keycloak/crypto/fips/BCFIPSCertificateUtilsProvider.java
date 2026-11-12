@@ -173,6 +173,11 @@ public class BCFIPSCertificateUtilsProvider implements CertificateUtilsProvider{
 
     @Override
     public X509Certificate generateV1SelfSignedCertificate(KeyPair caKeyPair, String subject, BigInteger serialNumber, Date validityEndDate) {
+        return generateV1SelfSignedCertificate(caKeyPair, caKeyPair.getPrivate().getAlgorithm(), subject, serialNumber, validityEndDate);
+    }
+
+        @Override
+    public X509Certificate generateV1SelfSignedCertificate(KeyPair caKeyPair, String algorithm, String subject, BigInteger serialNumber, Date validityEndDate) {
         try {
             X500Name subjectDN = new X500NameBuilder(BCStyle.INSTANCE).addRDN(BCStyle.CN, subject).build();
             Date validityStartDate = new Date(System.currentTimeMillis() - 100000);
@@ -180,7 +185,7 @@ public class BCFIPSCertificateUtilsProvider implements CertificateUtilsProvider{
 
             X509v1CertificateBuilder builder = new X509v1CertificateBuilder(subjectDN, serialNumber, validityStartDate,
                     validityEndDate, subjectDN, subPubKeyInfo);
-            X509CertificateHolder holder = builder.build(createSigner(caKeyPair.getPrivate()));
+            X509CertificateHolder holder = builder.build(createSigner(caKeyPair.getPrivate(), algorithm));
 
             return new JcaX509CertificateConverter().getCertificate(holder);
         } catch (Exception e) {
@@ -195,10 +200,10 @@ public class BCFIPSCertificateUtilsProvider implements CertificateUtilsProvider{
      *
      * @return the content signer
      */
-    private ContentSigner createSigner(PrivateKey privateKey) {
+    private ContentSigner createSigner(PrivateKey privateKey, String algorithm) {
         try {
             JcaContentSignerBuilder signerBuilder;
-            switch (privateKey.getAlgorithm()) {
+            switch (algorithm) {
                 case "RSA": {
                     signerBuilder = new JcaContentSignerBuilder("SHA256WithRSAEncryption")
                             .setProvider(BouncyIntegration.PROVIDER);
@@ -216,6 +221,11 @@ public class BCFIPSCertificateUtilsProvider implements CertificateUtilsProvider{
                     break;
                 }
                 default: {
+                    if (privateKey.getAlgorithm().startsWith("ML-DSA")) {
+                        signerBuilder = new JcaContentSignerBuilder(privateKey.getAlgorithm())
+                                .setProvider(BouncyIntegration.PROVIDER);
+                        break;
+                    }
                     throw new RuntimeException(String.format("Keytype %s is not supported.", privateKey.getAlgorithm()));
                 }
             }

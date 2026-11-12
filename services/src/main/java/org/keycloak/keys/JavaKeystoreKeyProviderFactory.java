@@ -192,6 +192,7 @@ public class JavaKeystoreKeyProviderFactory implements KeyProviderFactory {
         List<String> algorithms = Stream.of(
                         List.of(Algorithm.AES, Algorithm.EdDSA),
                         List.of(Algorithm.ES256, Algorithm.ES384, Algorithm.ES512),
+                        List.of(Algorithm.ML_DSA_44, Algorithm.ML_DSA_65, Algorithm.ML_DSA_87),
                         Attributes.HS_ALGORITHM_PROPERTY.getOptions(),
                         Attributes.RS_ALGORITHM_PROPERTY.getOptions(),
                         Attributes.RS_ENC_ALGORITHM_PROPERTY.getOptions(),

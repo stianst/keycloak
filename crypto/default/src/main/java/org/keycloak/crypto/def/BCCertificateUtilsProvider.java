@@ -26,6 +26,8 @@ import java.security.PrivateKey;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.security.spec.AlgorithmParameterSpec;
+import java.security.spec.NamedParameterSpec;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
@@ -171,6 +173,11 @@ public class BCCertificateUtilsProvider implements CertificateUtilsProvider {
 
     @Override
     public X509Certificate generateV1SelfSignedCertificate(KeyPair caKeyPair, String subject, BigInteger serialNumber, Date validityEndDate) {
+        return generateV1SelfSignedCertificate(caKeyPair, caKeyPair.getPrivate().getAlgorithm(), subject, serialNumber, validityEndDate);
+    }
+
+    @Override
+    public X509Certificate generateV1SelfSignedCertificate(KeyPair caKeyPair, String algorithm, String subject, BigInteger serialNumber, Date validityEndDate) {
         try {
             X500Name subjectDN = new X500NameBuilder(BCStyle.INSTANCE).addRDN(BCStyle.CN, subject).build();
             Date validityStartDate = new Date(System.currentTimeMillis() - 100000);
@@ -178,7 +185,7 @@ public class BCCertificateUtilsProvider implements CertificateUtilsProvider {
 
             X509v1CertificateBuilder builder = new X509v1CertificateBuilder(subjectDN, serialNumber, validityStartDate,
                     validityEndDate, subjectDN, subPubKeyInfo);
-            X509CertificateHolder holder = builder.build(createSigner(caKeyPair.getPrivate()));
+            X509CertificateHolder holder = builder.build(createSigner(caKeyPair.getPrivate(), algorithm));
 
             return new JcaX509CertificateConverter().getCertificate(holder);
         } catch (Exception e) {
@@ -192,7 +199,7 @@ public class BCCertificateUtilsProvider implements CertificateUtilsProvider {
      * @param privateKey the private key
      * @return the content signer
      */
-    private ContentSigner createSigner(PrivateKey privateKey) {
+    private ContentSigner createSigner(PrivateKey privateKey, String algorithm) {
         try {
             JcaContentSignerBuilder signerBuilder;
             switch (privateKey.getAlgorithm()) {
@@ -210,6 +217,13 @@ public class BCCertificateUtilsProvider implements CertificateUtilsProvider {
                 case JavaAlgorithm.Ed25519:
                 case JavaAlgorithm.Ed448: {
                     signerBuilder = new JcaContentSignerBuilder(privateKey.getAlgorithm())
+                            .setProvider(BouncyIntegration.PROVIDER);
+                    break;
+                }
+                case "ML-DSA-44":
+                case "ML-DSA-65":
+                case "ML-DSA-87": {
+                    signerBuilder = new JcaContentSignerBuilder(algorithm)
                             .setProvider(BouncyIntegration.PROVIDER);
                     break;
                 }

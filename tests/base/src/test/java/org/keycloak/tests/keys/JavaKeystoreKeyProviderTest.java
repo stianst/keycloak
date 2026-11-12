@@ -36,6 +36,7 @@ import java.util.Date;
 
 import jakarta.ws.rs.core.Response;
 
+import org.keycloak.common.Profile;
 import org.keycloak.common.util.CertificateUtils;
 import org.keycloak.common.util.KeystoreUtil;
 import org.keycloak.common.util.MultivaluedHashMap;
@@ -216,6 +217,21 @@ public class JavaKeystoreKeyProviderTest {
         createSuccess(KeystoreUtil.KeystoreFormat.BCFKS, AlgorithmType.EDDSA, Algorithm.EdDSA, true);
     }
 
+    @Test
+    public void createPkcs12MlDsa44() throws Exception {
+        createSuccess(KeystoreUtil.KeystoreFormat.PKCS12, AlgorithmType.MLDSA, Algorithm.ML_DSA_44, false);
+    }
+
+    @Test
+    public void createPkcs12MlDsa65() throws Exception {
+        createSuccess(KeystoreUtil.KeystoreFormat.PKCS12, AlgorithmType.MLDSA, Algorithm.ML_DSA_65, true);
+    }
+
+    @Test
+    public void createPkcs12MlDsa87() throws Exception {
+        createSuccess(KeystoreUtil.KeystoreFormat.PKCS12, AlgorithmType.MLDSA, Algorithm.ML_DSA_87, false);
+    }
+
     private void createSuccess(KeystoreUtil.KeystoreFormat keystoreType, AlgorithmType algorithmType, String keyAlgorithm, boolean vault) throws Exception {
         cryptoHelper.keystore().assumeKeystoreTypeSupported(keystoreType);
         generateKeystore(keystoreType, algorithmType, keyAlgorithm);
@@ -260,6 +276,10 @@ public class JavaKeystoreKeyProviderTest {
             }
             case EDDSA -> {
                 assertEquals(KeyType.OKP, key.getType());
+                assertEquals(keyAlgorithm, key.getAlgorithm());
+            }
+            case MLDSA -> {
+                assertEquals(KeyType.AKP, key.getType());
                 assertEquals(keyAlgorithm, key.getAlgorithm());
             }
         }
@@ -446,6 +466,10 @@ public class JavaKeystoreKeyProviderTest {
                 this.generatedKeystore = cryptoHelper.keystore().generateKeystore(folder, keystoreType, "keyalias", "password", "password",
                         KeyUtils.generateEdDSAKey(Algorithm.Ed25519));
             }
+            case MLDSA -> {
+                this.generatedKeystore = cryptoHelper.keystore().generateKeystore(folder, keystoreType, "keyalias", "password", "password",
+                        KeyUtils.generateMlDsaKey(keyAlgorithm), keyAlgorithm);
+            }
         }
     }
 
@@ -478,7 +502,7 @@ public class JavaKeystoreKeyProviderTest {
                 if (url == null) {
                     throw new RuntimeException("Unable to find the vault folder in the classpath for the default_keystore__password file!");
                 }
-                return config.option("vault", "file").option("vault-dir", Path.of(url.toURI()).toString());
+                return config.option("vault", "file").option("vault-dir", Path.of(url.toURI()).toString()).features(Profile.Feature.OAUTH_ML_DSA);
             } catch (URISyntaxException e) {
                 throw new RuntimeException(e);
             }

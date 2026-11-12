@@ -32,7 +32,7 @@ import java.util.List;
  */
 public interface CertificateUtilsProvider {
 
-    public static final String CRL_DISTRIBUTION_POINTS_OID = "2.5.29.31";
+    String CRL_DISTRIBUTION_POINTS_OID = "2.5.29.31";
 
     /**
      * Generates version 3 {@link java.security.cert.X509Certificate}.
@@ -46,7 +46,7 @@ public interface CertificateUtilsProvider {
      * 
      * @throws Exception the exception
      */
-    public X509Certificate generateV3Certificate(KeyPair keyPair, PrivateKey caPrivateKey, X509Certificate caCert,
+    X509Certificate generateV3Certificate(KeyPair keyPair, PrivateKey caPrivateKey, X509Certificate caCert,
             String subject) throws Exception;
 
     /**
@@ -59,20 +59,22 @@ public interface CertificateUtilsProvider {
      * 
      * @throws Exception the exception
      */
-    public X509Certificate generateV1SelfSignedCertificate(KeyPair caKeyPair, String subject); 
+    X509Certificate generateV1SelfSignedCertificate(KeyPair caKeyPair, String subject);
 
-    public X509Certificate generateV1SelfSignedCertificate(KeyPair caKeyPair, String subject, BigInteger serialNumber);
+    X509Certificate generateV1SelfSignedCertificate(KeyPair caKeyPair, String subject, BigInteger serialNumber);
 
-    public X509Certificate generateV1SelfSignedCertificate(KeyPair caKeyPair, String subject, BigInteger serialNumber, Date validityEndDate);
+    X509Certificate generateV1SelfSignedCertificate(KeyPair caKeyPair, String subject, BigInteger serialNumber, Date validityEndDate);
 
-    public List<String> getCertificatePolicyList(X509Certificate cert) throws GeneralSecurityException;
+    List<String> getCertificatePolicyList(X509Certificate cert) throws GeneralSecurityException;
 
-    public List<String> getCRLDistributionPoints(X509Certificate cert) throws IOException;
+    List<String> getCRLDistributionPoints(X509Certificate cert) throws IOException;
 
-    public X509Certificate createServicesTestCertificate(String dn,
+    X509Certificate createServicesTestCertificate(String dn,
                                              Date startDate,
                                              Date expiryDate,
                                              KeyPair keyPair,
                                              String... certificatePolicyOid);
+
+    X509Certificate generateV1SelfSignedCertificate(KeyPair caKeyPair, String algorithm, String subject, BigInteger serialNumber, Date validityEndDate);
         
 }

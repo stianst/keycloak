@@ -70,6 +70,11 @@ public class CryptoKeyStore {
         return generateKeystore(folder, keystoreType, subject, keystorePassword, keyPassword, keyPair.getPrivate(), certificate);
     }
 
+    public KeystoreInfo generateKeystore(File folder, KeystoreUtil.KeystoreFormat keystoreType, String subject, String keystorePassword, String keyPassword, KeyPair keyPair, String keyAlgorithm) throws Exception {
+        X509Certificate certificate = CertificateUtils.generateV1SelfSignedCertificate(keyPair, subject, keyAlgorithm);
+        return generateKeystore(folder, keystoreType, subject, keystorePassword, keyPassword, keyPair.getPrivate(), certificate);
+    }
+
     public KeystoreInfo generateKeystore(File folder, KeystoreUtil.KeystoreFormat keystoreType,
             String subject, String keystorePassword, String keyPassword, PrivateKey privKey, Certificate certificate) throws Exception {
         KeyStore keyStore = CryptoIntegration.getProvider().getKeyStore(keystoreType);

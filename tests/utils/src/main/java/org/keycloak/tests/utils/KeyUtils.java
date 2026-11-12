@@ -67,6 +67,11 @@ public class KeyUtils {
         return kpg.generateKeyPair();
     }
 
+    public static KeyPair generateMlDsaKey(String algorithm) throws NoSuchAlgorithmException {
+        KeyPairGenerator kpg = KeyPairGenerator.getInstance(algorithm);
+        return kpg.generateKeyPair();
+    }
+
     public static SecretKey generateSecretKey(String algorithm, int keySize) throws NoSuchAlgorithmException, NoSuchProviderException {
         KeyGenerator keyGen = KeyGenerator.getInstance(JavaAlgorithm.getJavaAlgorithm(algorithm), BouncyIntegration.PROVIDER);
         keyGen.init(keySize);

@@ -29,6 +29,7 @@ import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
@@ -114,6 +115,8 @@ public class JavaKeystoreKeyProvider implements KeyProvider {
                     loadECKey(keyStore, keyAlias, KeyUse.ENC);
                 case Algorithm.EdDSA ->
                     loadEdDSAKey(keyStore, keyAlias, KeyUse.SIG);
+                case Algorithm.ML_DSA_44, Algorithm.ML_DSA_65, Algorithm.ML_DSA_87 ->
+                    loadMlDsaKey(keyStore, keyAlias, KeyUse.SIG);
                 case Algorithm.AES ->
                     loadOctKey(keyStore, keyAlias, JavaAlgorithm.getJavaAlgorithm(algorithm), KeyUse.ENC);
                 case Algorithm.HS256, Algorithm.HS384, Algorithm.HS512 ->
@@ -203,6 +206,15 @@ public class JavaKeystoreKeyProvider implements KeyProvider {
         PublicKey publicKey = x509Cert.getPublicKey();
         KeyPair keyPair = new KeyPair(publicKey, privateKey);
         return createKeyWrapper(keyPair, x509Cert, loadCertificateChain(privateKeyEntry), KeyType.OKP, keyUse, privateKey.getParams().getName());
+    }
+
+    private KeyWrapper loadMlDsaKey(KeyStore keyStore, String keyAlias, KeyUse keyUse) throws GeneralSecurityException {
+        KeyStore.PrivateKeyEntry privateKeyEntry = checkKeyEntry(keyStore, keyAlias, KeyStore.PrivateKeyEntry.class, keyUse);
+        PrivateKey privateKey = checkKey(privateKeyEntry.getPrivateKey(), keyAlias, PrivateKey.class, algorithm);
+        X509Certificate x509Cert = checkCertificate(privateKeyEntry.getCertificate());
+        PublicKey publicKey = x509Cert.getPublicKey();
+        KeyPair keyPair = new KeyPair(publicKey, privateKey);
+        return createKeyWrapper(keyPair, x509Cert, loadCertificateChain(privateKeyEntry), KeyType.AKP, keyUse, null);
     }
 
     private KeyWrapper loadECKey(KeyStore keyStore, String keyAlias, KeyUse keyUse) throws GeneralSecurityException {
